@@ -2,12 +2,14 @@ import Logo from "../assets/citu_logo.png";
 import Settings from "../assets/Settings.png";
 import Button from "./Button";
 
-export default function TopNavigation() {
+export default function TopNavigation({ onChangeDisplay, selectedTab }) {
+  const highlightNavClass =
+    "border-b-4 font-bold border-red-500 text-red-500 rounded-none";
   return (
     <nav className="w-screen py-6 px-8">
       <ul className="flex w-full justify-between">
         <li className="w-1/3">
-          <button>
+          <button onClick={() => onChangeDisplay("dashboard")}>
             <img
               src={Logo}
               alt="profile-logo"
@@ -16,17 +18,31 @@ export default function TopNavigation() {
           </button>
         </li>
         <li className="w-1/3 flex items-center justify-center">
-          <ul className="flex items-center justify-center gap-4 ">
-            <li className="hover:cursor-pointer">
-              <Button>Dashboard</Button>
+          <ul className="flex items-center justify-center gap-4">
+            <li>
+              <Button
+                onClick={() => onChangeDisplay("dashboard")}
+                cssAdOns={
+                  selectedTab === "dashboard" ? highlightNavClass : undefined
+                }
+              >
+                Dashboard
+              </Button>
             </li>
-            <li className="hover:cursor-pointer">
-              <Button>Manage</Button>
+            <li>
+              <Button
+                onClick={() => onChangeDisplay("manage")}
+                cssAdOns={
+                  selectedTab === "manage" ? highlightNavClass : undefined
+                }
+              >
+                Manage
+              </Button>
             </li>
           </ul>
         </li>
         <li className="w-1/3 flex items-center justify-end">
-          <button>
+          <button onClick={() => onChangeDisplay("settings")}>
             <img
               src={Settings}
               alt="settings-icon"
