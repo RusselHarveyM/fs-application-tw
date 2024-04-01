@@ -26,7 +26,7 @@ function App() {
   else if (contentDisplay === "settings") content = <SettingsContent />;
 
   return (
-    <main className="flex h-screen flex-col">
+    <main className="flex flex-col m-auto">
       <TopNavigation
         onChangeDisplay={handleContentDisplay}
         selectedTab={contentDisplay}

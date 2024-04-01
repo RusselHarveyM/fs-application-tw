@@ -6,7 +6,7 @@ export default function TopNavigation({ onChangeDisplay, selectedTab }) {
   const highlightNavClass =
     "border-b-4 font-bold border-red-500 text-red-500 rounded-none";
   return (
-    <nav className="w-screen py-6 px-8">
+    <nav className="py-6 px-8 w-full">
       <ul className="flex w-full justify-between">
         <li className="w-1/3">
           <button onClick={() => onChangeDisplay("dashboard")}>
