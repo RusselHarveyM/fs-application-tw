@@ -14,6 +14,66 @@ export const payments: Payment[] = [
     firstname: "Hanz",
     username: "example@gmail.com",
   },
+  {
+    id: "728ed52f",
+    lastname: "Doe",
+    firstname: "JOhn",
+    username: "m@example.com",
+  },
+  {
+    id: "489e1d42",
+    lastname: "Moe",
+    firstname: "Hanz",
+    username: "example@gmail.com",
+  },
+  {
+    id: "728ed52f",
+    lastname: "Doe",
+    firstname: "JOhn",
+    username: "m@example.com",
+  },
+  {
+    id: "489e1d42",
+    lastname: "Moe",
+    firstname: "Hanz",
+    username: "example@gmail.com",
+  },
+  {
+    id: "728ed52f",
+    lastname: "Doe",
+    firstname: "JOhn",
+    username: "m@example.com",
+  },
+  {
+    id: "489e1d42",
+    lastname: "Moe",
+    firstname: "Hanz",
+    username: "example@gmail.com",
+  },
+  {
+    id: "728ed52f",
+    lastname: "Doe",
+    firstname: "JOhn",
+    username: "m@example.com",
+  },
+  {
+    id: "489e1d42",
+    lastname: "Moe",
+    firstname: "Hanz",
+    username: "example@gmail.com",
+  },
+  {
+    id: "728ed52f",
+    lastname: "Doe",
+    firstname: "JOhn",
+    username: "m@example.com",
+  },
+  {
+    id: "489e1d42",
+    lastname: "Moe",
+    firstname: "Hanz",
+    username: "example@gmail.com",
+  },
   // ...
 ];
 

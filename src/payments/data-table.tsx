@@ -3,6 +3,13 @@
 import * as React from "react";
 
 import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DoubleArrowLeftIcon,
+  DoubleArrowRightIcon,
+} from "@radix-ui/react-icons";
+
+import {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
@@ -30,6 +37,7 @@ interface DataTableProps<TData, TValue> {
 }
 
 import { Button } from "@/components/ui/button";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -47,9 +55,12 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+  const [currentPage, setCurrentPage] = React.useState(1);
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data,
@@ -61,10 +72,12 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
+      rowSelection,
     },
   });
 
@@ -72,10 +85,12 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter username..."
+          value={
+            (table.getColumn("username")?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("username")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -159,19 +174,55 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
           variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
+          className="hidden h-8 w-8 p-0 lg:flex"
+          onClick={() => {
+            setCurrentPage(() => 1);
+            table.setPageIndex(0);
+          }}
           disabled={!table.getCanPreviousPage()}
         >
-          Previous
+          <span className="sr-only">Go to first page</span>
+          <DoubleArrowLeftIcon className="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
+          className="h-8 w-8 p-0"
+          onClick={() => {
+            setCurrentPage((prev) => prev - 1);
+            table.previousPage();
+          }}
+          disabled={!table.getCanPreviousPage()}
+        >
+          <span className="sr-only">Go to previous page</span>
+          <ChevronLeftIcon className="h-4 w-4" />
+        </Button>
+        <p>
+          {currentPage} of {table.getPageCount()}
+        </p>
+        <Button
+          variant="outline"
+          className="h-8 w-8 p-0"
+          onClick={() => {
+            setCurrentPage((prev) => prev + 1);
+            table.nextPage();
+          }}
           disabled={!table.getCanNextPage()}
         >
-          Next
+          <span className="sr-only">Go to next page</span>
+          <ChevronRightIcon className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          className="hidden h-8 w-8 p-0 lg:flex"
+          onClick={() => {
+            const page = table.getPageCount() - 1;
+            setCurrentPage(() => page + 1);
+            table.setPageIndex(page);
+          }}
+          disabled={!table.getCanNextPage()}
+        >
+          <span className="sr-only">Go to last page</span>
+          <DoubleArrowRightIcon className="h-4 w-4" />
         </Button>
       </div>
     </div>
