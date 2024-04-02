@@ -34,35 +34,33 @@ export default function DashboardContent() {
       </div>
       <div className="flex items-center justify-center h-1/6 mt-8 mb-16 ">
         <menu className="flex bg-stone-100 rounded-full py-2 px-4">
-          <li className="flex justify-center flex-col items-center">
-            <Button
-              onClick={() => handleTabSelect("buildings")}
-              cssAdOns={content === "buildings" ? "font-bold" : undefined}
-            >
-              <ImageTab
-                img={Building}
-                label="building"
-                isSelected={content === "buildings"}
-                isDisabled={false}
-              />
-              <h3 className="text-neutral-600">Buildings</h3>
-            </Button>
-          </li>
-          <li className="flex justify-center flex-col items-center">
-            <Button
-              onClick={() => handleTabSelect("rooms")}
-              cssAdOns={content === "rooms" ? "font-bold" : undefined}
-              disabled
-            >
-              <ImageTab
-                img={Room}
-                label="room"
-                isSelected={content === "rooms"}
-                isDisabled={true}
-              />
-              <h3 className="text-neutral-600">Rooms</h3>
-            </Button>
-          </li>
+          <Button
+            liCss="flex justify-center flex-col items-center"
+            onClick={() => handleTabSelect("buildings")}
+            cssAdOns={content === "buildings" ? "font-bold" : undefined}
+          >
+            <ImageTab
+              img={Building}
+              label="building"
+              isSelected={content === "buildings"}
+              isDisabled={false}
+            />
+            <h3 className="text-neutral-600">Buildings</h3>
+          </Button>
+          <Button
+            liCss="flex justify-center flex-col items-center"
+            onClick={() => handleTabSelect("rooms")}
+            cssAdOns={content === "rooms" ? "font-bold" : undefined}
+            disabled
+          >
+            <ImageTab
+              img={Room}
+              label="room"
+              isSelected={content === "rooms"}
+              isDisabled={true}
+            />
+            <h3 className="text-neutral-600">Rooms</h3>
+          </Button>
           {/* <li>
             <Button onClick={() => handleTabSelect("spaces")}>
               <ImageTab

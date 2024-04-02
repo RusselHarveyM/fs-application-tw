@@ -19,26 +19,22 @@ export default function TopNavigation({ onChangeDisplay, selectedTab }) {
         </li>
         <li className="w-1/3 flex items-center justify-center">
           <ul className="flex items-center justify-center gap-4">
-            <li>
-              <Button
-                onClick={() => onChangeDisplay("dashboard")}
-                cssAdOns={
-                  selectedTab === "dashboard" ? highlightNavClass : undefined
-                }
-              >
-                Dashboard
-              </Button>
-            </li>
-            <li>
-              <Button
-                onClick={() => onChangeDisplay("manage")}
-                cssAdOns={
-                  selectedTab === "manage" ? highlightNavClass : undefined
-                }
-              >
-                Manage
-              </Button>
-            </li>
+            <Button
+              onClick={() => onChangeDisplay("dashboard")}
+              cssAdOns={
+                selectedTab === "dashboard" ? highlightNavClass : undefined
+              }
+            >
+              Dashboard
+            </Button>
+            <Button
+              onClick={() => onChangeDisplay("manage")}
+              cssAdOns={
+                selectedTab === "manage" ? highlightNavClass : undefined
+              }
+            >
+              Manage
+            </Button>
           </ul>
         </li>
         <li className="w-1/3 flex items-center justify-end">
