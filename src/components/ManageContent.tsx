@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Button from "./Button";
+import Page from "@/payments/page";
 
 export default function ManageContent() {
   const [tableContent, setTableContent] = useState("users");
@@ -42,6 +43,7 @@ export default function ManageContent() {
           </Button>
         </menu>
       </div>
+      <Page />
     </div>
   );
 }
