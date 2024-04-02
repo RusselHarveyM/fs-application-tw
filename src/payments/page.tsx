@@ -1,101 +1,26 @@
-import { Payment, columns } from "./columns";
-import { DataTable } from "./data-table";
+import { useEffect, useState } from 'react';
+import { getUsersData } from '@/data/Api';
+import { columns } from './columns/columns';
+import { DataTable } from './data-table';
 
-export const payments: Payment[] = [
-  {
-    id: "728ed52f",
-    lastname: "Doe",
-    firstname: "JOhn",
-    username: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    lastname: "Moe",
-    firstname: "Hanz",
-    username: "example@gmail.com",
-  },
-  {
-    id: "728ed52f",
-    lastname: "Doe",
-    firstname: "JOhn",
-    username: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    lastname: "Moe",
-    firstname: "Hanz",
-    username: "example@gmail.com",
-  },
-  {
-    id: "728ed52f",
-    lastname: "Doe",
-    firstname: "JOhn",
-    username: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    lastname: "Moe",
-    firstname: "Hanz",
-    username: "example@gmail.com",
-  },
-  {
-    id: "728ed52f",
-    lastname: "Doe",
-    firstname: "JOhn",
-    username: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    lastname: "Moe",
-    firstname: "Hanz",
-    username: "example@gmail.com",
-  },
-  {
-    id: "728ed52f",
-    lastname: "Doe",
-    firstname: "JOhn",
-    username: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    lastname: "Moe",
-    firstname: "Hanz",
-    username: "example@gmail.com",
-  },
-  {
-    id: "728ed52f",
-    lastname: "Doe",
-    firstname: "JOhn",
-    username: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    lastname: "Moe",
-    firstname: "Hanz",
-    username: "example@gmail.com",
-  },
-  // ...
-];
+export default function Page() {
+  const [userData, setUserData] = useState([]);
 
-// async function getData(): Promise<Payment[]> {
-//   // Fetch data from your API here.
-//   return [
-//     {
-//       id: "728ed52f",
-//       amount: 100,
-//       status: "pending",
-//       email: "m@example.com",
-//     },
-//     // ...
-//   ];
-// }
-
-export default function page() {
-  // const data = await getData();
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getUsersData();
+        setUserData(data);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    }
+    fetchData();
+  }, []);
 
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={payments} />
+      <DataTable columns={columns} data={userData} />
     </div>
   );
 }
