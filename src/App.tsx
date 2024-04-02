@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import TopNavigation from "./components/TopNavigation";
 import DashboardContent from "./components/DashboardContent";
 import ManageContent from "./components/ManageContent";
@@ -9,8 +9,8 @@ function App() {
   const [contentDisplay, setContentDisplay] = useState("dashboard");
   const [isPopup, setIsPopup] = useState(true);
 
-  function handleContentDisplay(display) {
-    setContentDisplay(display);
+  function handleContentDisplay(selected: SetStateAction<string>) {
+    setContentDisplay(selected);
   }
 
   useEffect(() => {

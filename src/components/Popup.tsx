@@ -5,6 +5,6 @@ export default function Popup({ children }) {
     <div className="w-1/3 bg-white absolute top-28 left-1/3 text-xs md:text-base py-2 px-12 text-center shadow rounded-full m-auto hover:shadow-md hover:cursor-pointer animate-slide-in-top">
       {children}
     </div>,
-    document.getElementById("modal-root")
+    document.getElementById("modal-root") as Element
   );
 }

@@ -1,12 +1,3 @@
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useState } from "react";
 import Button from "./Button";
 
@@ -51,27 +42,6 @@ export default function ManageContent() {
           </Button>
         </menu>
       </div>
-
-      <Table>
-        <TableCaption>A list of your recent invoices.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Id</TableHead>
-            <TableHead>Last Name</TableHead>
-            <TableHead>First Name</TableHead>
-            <TableHead>Username</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell className="font-medium">INV001</TableCell>
-            <TableCell>Doe</TableCell>
-            <TableCell>John</TableCell>
-            <TableCell>johndoe123</TableCell>
-            <TableCell className="text-right">Edit</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
     </div>
   );
 }
