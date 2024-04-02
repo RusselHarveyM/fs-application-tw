@@ -8,7 +8,7 @@ export default function Container({
   return (
     <div
       {...props}
-      className="flex hover:scale-105 hover:brightness-105 rounded-xl justify-start gap-4 items-center shadow-sm border-2 border-neutral-200 bg-neutral-100 py-2 px-4 w-80"
+      className="flex transition ease-in delay-50 hover:scale-105 hover:brightness-105 rounded-xl justify-start gap-4 items-center shadow-sm border-2 border-neutral-200 bg-neutral-100 py-2 px-4 w-80"
     >
       {img ? (
         <img
