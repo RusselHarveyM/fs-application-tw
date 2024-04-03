@@ -31,6 +31,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+}
+
 import { Button } from "@/components/ui/button";
 
 import {
@@ -42,11 +47,6 @@ import {
 
 import { Input } from "@/components/ui/input";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
-
 export function DataTable<TData, TValue>({
   columns,
   data,
@@ -56,8 +56,10 @@ export function DataTable<TData, TValue>({
     []
   );
   const [currentPage, setCurrentPage] = React.useState(1);
+
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
@@ -77,21 +79,18 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
     },
-
   });
-
-  const selectedRowCount = Object.values(rowSelection).filter(Boolean).length;
 
   return (
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Search"
+          placeholder="Filter username..."
           value={
-            (table.getColumn("username"||"lastname"||"firstname"||"role")?.getFilterValue() as string) ?? ""
+            (table.getColumn("username")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("username"||"lastname"||"firstname"||"role")?.setFilterValue(event.target.value)
+            table.getColumn("username")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -226,11 +225,6 @@ export function DataTable<TData, TValue>({
           <DoubleArrowRightIcon className="h-4 w-4" />
         </Button>
       </div>
-      {/* <div>
-        {selectedRowCount > 0 && (
-          <p>{selectedRowCount} item(s) selected</p> //count the selected items in the table by checkbox
-        )}
-      </div> */}
     </div>
   );
 }
