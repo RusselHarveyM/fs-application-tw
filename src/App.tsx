@@ -6,6 +6,7 @@ import SettingsContent from "./components/SettingsContent";
 import Popup from "./components/Popup";
 
 import axios from "axios";
+import { DataContext } from "./data/data-context";
 
 function App() {
   const [contentDisplay, setContentDisplay] = useState("dashboard");
@@ -64,32 +65,39 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  let content = (
-    <DashboardContent buildings={data.buildings} rooms={data.rooms} />
-  );
+  let content = <DashboardContent />;
 
   if (contentDisplay === "manage") content = <ManageContent />;
   else if (contentDisplay === "settings") content = <SettingsContent />;
 
+  const dataCtx = {
+    users: data.users,
+    buildings: data.buildings,
+    rooms: data.rooms,
+    spaces: data.spaces,
+  };
+
   return (
-    <main className="flex flex-col m-auto">
-      <TopNavigation
-        onChangeDisplay={handleContentDisplay}
-        selectedTab={contentDisplay}
-      />
-      {isPopup && (
-        <Popup>
-          <p>
-            Welcome back,{" "}
-            <span className="text-red-500 font-bold text-sm md:text-xl">
-              Cebu Institute of Technology
-            </span>{" "}
-            !
-          </p>
-        </Popup>
-      )}
-      {content}
-    </main>
+    <DataContext.Provider value={dataCtx}>
+      <main className="flex flex-col m-auto">
+        <TopNavigation
+          onChangeDisplay={handleContentDisplay}
+          selectedTab={contentDisplay}
+        />
+        {isPopup && (
+          <Popup>
+            <p>
+              Welcome back,{" "}
+              <span className="text-red-500 font-bold text-sm md:text-xl">
+                Cebu Institute of Technology
+              </span>{" "}
+              !
+            </p>
+          </Popup>
+        )}
+        {content}
+      </main>
+    </DataContext.Provider>
   );
 }
 

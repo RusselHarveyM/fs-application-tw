@@ -25,7 +25,7 @@ export default function TopNavigation({ onChangeDisplay, selectedTab }) {
                 selectedTab === "dashboard" ? highlightNavClass : undefined
               }
             >
-              Dashboard
+              Home
             </Button>
             <Button
               onClick={() => onChangeDisplay("manage")}
