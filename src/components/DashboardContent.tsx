@@ -4,16 +4,30 @@ import Container from "./Container";
 
 import Building from "../assets/building.png";
 import Room from "../assets/room.png";
-import Space from "../assets/space.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ImageTab from "./ImageTab";
-import data from "../data/test01.json";
+import { Circle } from "rc-progress";
+import dummy from "../data/test01.json";
 
-export default function DashboardContent() {
+export default function DashboardContent({ buildings, rooms }) {
   const [content, setContent] = useState("buildings");
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    setData(buildings);
+  }, [buildings]);
 
   function handleTabSelect(selected) {
-    setContent(selected);
+    if (selected === "buildings") setData(buildings);
+    setContent(() => selected);
+  }
+
+  function handleContainerSelect(id) {
+    if (content === "buildings") {
+      const filteredRooms = rooms.filter((room) => room.buildingId === id);
+      setData(filteredRooms);
+      setContent(() => "rooms");
+    }
   }
 
   return (
@@ -51,52 +65,97 @@ export default function DashboardContent() {
             liCss="flex justify-center flex-col items-center"
             onClick={() => handleTabSelect("rooms")}
             cssAdOns={content === "rooms" ? "font-bold" : undefined}
-            disabled
+            disabled={content === "rooms" ? false : true}
           >
             <ImageTab
               img={Room}
               label="room"
               isSelected={content === "rooms"}
-              isDisabled={true}
+              isDisabled={content === "rooms" ? false : true}
             />
             <h3 className="text-neutral-600">Rooms</h3>
           </Button>
-          {/* <li>
-            <Button onClick={() => handleTabSelect("spaces")}>
-              <ImageTab
-                img={Space}
-                label="space"
-                isSelected={content === "spaces"}
-              />
-            </Button>
-          </li> */}
         </menu>
       </div>
-      <div className="flex flex-wrap justify-center pt-16   m-auto  gap-4  w-[95rem] h-[40rem]  rounded-[2rem] hover:cursor-pointer">
-        {data.map((item, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              index % 2 === 0 ? "flex-row" : "flex-row-reverse"
-            } flex-wrap w-full justify-center gap-8`}
-          >
-            {Array.from({ length: index % 2 === 0 ? 3 : 4 }).map(
-              (_, columnIndex) => {
-                const dataIndex = index * 4 + columnIndex;
-                const dataItem = data[dataIndex];
-                return dataItem ? (
-                  <Container
-                    key={dataItem.id}
-                    img={dataItem.image}
-                    title={dataItem.title}
-                    code={dataItem.code}
-                    noOfChildren={dataItem.noOfChildren}
-                  />
-                ) : null;
-              }
-            )}
-          </div>
-        ))}
+      <div className="flex flex-wrap justify-center pt-16 m-auto gap-4 w-[95rem] h-[40rem] rounded-[2rem] hover:cursor-pointer">
+        {data?.length > 0 ? (
+          data.map((item, index) => (
+            <div
+              key={index}
+              className={`flex ${
+                index % 2 === 0 ? "flex-row" : "flex-row-reverse"
+              } flex-wrap w-full justify-center gap-8`}
+            >
+              {Array.from({ length: index % 2 === 0 ? 3 : 4 }).map(
+                (_, columnIndex) => {
+                  const dataIndex = index * 4 + columnIndex;
+                  const dataItem = data[dataIndex];
+                  if (!dataItem) return null;
+                  let id;
+                  let img;
+                  let title;
+                  let code;
+                  if (content === "buildings") {
+                    id = dataItem?.id;
+                    img = dataItem?.image;
+                    title = dataItem?.buildingName;
+                    code = dataItem?.buildingCode;
+                  } else {
+                    id = dataItem?.id;
+                    img = dataItem?.image;
+                    title = dataItem?.roomNumber;
+                  }
+                  return dataItem ? (
+                    <Container
+                      key={id}
+                      img={img}
+                      title={title}
+                      code={code ?? "none"}
+                      onClick={() => handleContainerSelect(id)}
+                      // noOfChildren={dataItem.noOfChildren}
+                    />
+                  ) : null;
+                }
+              )}
+            </div>
+          ))
+        ) : data?.length === 0 ? (
+          <p className="text-neutral-500">The building is empty</p>
+        ) : (
+          dummy &&
+          dummy.map((item, index) => (
+            <div
+              key={index}
+              className={`flex ${
+                index % 2 === 0 ? "flex-row" : "flex-row-reverse"
+              } flex-wrap w-full justify-center gap-8`}
+            >
+              {Array.from({ length: index % 2 === 0 ? 3 : 4 }).map(
+                (_, columnIndex) => {
+                  const dataIndex = index * 4 + columnIndex;
+                  const dataItem = dummy[dataIndex];
+                  let id;
+                  let img;
+                  let title;
+                  let code;
+                  id = dataItem?.id;
+                  img = dataItem?.image;
+                  title = dataItem?.title;
+                  code = dataItem?.code;
+                  return dataItem ? (
+                    <Container
+                      key={id}
+                      img={img}
+                      title={title}
+                      code={code}
+                      noOfChildren={dataItem.noOfChildren}
+                    />
+                  ) : null;
+                }
+              )}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
