@@ -1,8 +1,11 @@
 import Logo from "../assets/citu_logo.png";
+import { Link } from 'react-router-dom';
+
 import Settings from "../assets/Settings.png";
 import Button from "./Button";
 
 export default function TopNavigation({ onChangeDisplay, selectedTab }) {
+
   const highlightNavClass =
     "border-b-4 font-bold border-red-500 text-red-500 rounded-none";
   return (
@@ -19,22 +22,26 @@ export default function TopNavigation({ onChangeDisplay, selectedTab }) {
         </li>
         <li className="w-1/3 flex items-center justify-center">
           <ul className="flex items-center justify-center gap-4">
-            <Button
-              onClick={() => onChangeDisplay("dashboard")}
-              cssAdOns={
-                selectedTab === "dashboard" ? highlightNavClass : undefined
-              }
-            >
-              Dashboard
-            </Button>
-            <Button
-              onClick={() => onChangeDisplay("manage")}
-              cssAdOns={
-                selectedTab === "manage" ? highlightNavClass : undefined
-              }
-            >
-              Manage
-            </Button>
+            <Link to="/dashboard">
+              <Button
+                onClick={() => onChangeDisplay("dashboard")}
+                cssAdOns={
+                  selectedTab === "dashboard" ? highlightNavClass : undefined
+                }
+              >
+                Dashboard
+              </Button>
+            </Link>
+            <Link to="/manage">
+              <Button
+                onClick={() => onChangeDisplay("manage")}
+                cssAdOns={
+                  selectedTab === "manage" ? highlightNavClass : undefined
+                }
+              >
+                Manage
+              </Button>
+            </Link>
           </ul>
         </li>
         <li className="w-1/3 flex items-center justify-end">
