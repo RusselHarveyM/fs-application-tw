@@ -109,7 +109,7 @@ export default function DashboardContent({ buildings, rooms }) {
                       key={id}
                       img={img}
                       title={title}
-                      code={code ?? "none"}
+                      code={code ?? ""}
                       onClick={() => handleContainerSelect(id)}
                       // noOfChildren={dataItem.noOfChildren}
                     />
