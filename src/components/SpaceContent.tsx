@@ -3,12 +3,11 @@ import React from 'react';
 const SpaceContent = () => {
   return (
     <div className="flex h-screen">
-      <button>
-        Back
-      </button>
+      
       {/* Side Navigation Bar */}
       <div className="bg-gray-200 w-1/5">
         {/* Add your navigation items here */}
+        <button className="w-full py-4">Back</button>
         <ul className="py-4">
           <li className="px-4 py-2">Item 1</li>
           <li className="px-4 py-2">Item 2</li>

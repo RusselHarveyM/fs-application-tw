@@ -45,13 +45,15 @@ export default function TopNavigation({ onChangeDisplay, selectedTab }) {
           </ul>
         </li>
         <li className="w-1/3 flex items-center justify-end">
-          <button onClick={() => onChangeDisplay("settings")}>
-            <img
-              src={Settings}
-              alt="settings-icon"
-              className="hover:cursor-pointer hover:brightness-50"
-            />
-          </button>
+          <Link to="/settings">
+            <button onClick={() => onChangeDisplay("settings")}>
+              <img
+                src={Settings}
+                alt="settings-icon"
+                className="hover:cursor-pointer hover:brightness-50"
+              />
+            </button>
+          </Link>
         </li>
       </ul>
     </nav>
