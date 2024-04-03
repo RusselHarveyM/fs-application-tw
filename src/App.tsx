@@ -25,6 +25,18 @@ function App() {
 
   return (
     <BrowserRouter>
+      <TopNavigation onChangeDisplay={handleContentDisplay} selectedTab={contentDisplay} />
+      {isPopup && (
+        <Popup>
+          <p>
+            Welcome back,{" "}
+            <span className="text-red-500 font-bold text-sm md:text-xl">
+              Cebu Institute of Technology
+            </span>{" "}
+            !
+          </p>
+        </Popup>
+      )}
       <Routes>
         <Route path="/" element={<DashboardContent />} />
         <Route path="/dashboard" element={<DashboardContent />} />
@@ -33,7 +45,6 @@ function App() {
         <Route path="/space" element={<SpaceContent />} 
         >{!isPopup}</Route>
       </Routes>
-      {isPopup && <Popup />}
     </BrowserRouter>
     
   );
