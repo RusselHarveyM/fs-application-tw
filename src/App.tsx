@@ -7,8 +7,6 @@ import Popup from "./components/Popup";
 
 import axios from "axios";
 
-// "https://fivesai-backend-production.up.railway.app/api/buildings"
-
 function App() {
   const [contentDisplay, setContentDisplay] = useState("dashboard");
   const [isPopup, setIsPopup] = useState(true);
@@ -33,22 +31,22 @@ function App() {
       };
       newData.users = (
         await axios.get(
-          "https://fivesai-backend-production.up.railway.app/api/user"
+          "https://fs-backend-copy-production.up.railway.app/api/user"
         )
       ).data;
       newData.buildings = (
         await axios.get(
-          "https://fivesai-backend-production.up.railway.app/api/buildings"
+          "https://fs-backend-copy-production.up.railway.app/api/buildings"
         )
       ).data;
       newData.rooms = (
         await axios.get(
-          "https://fivesai-backend-production.up.railway.app/api/rooms"
+          "https://fs-backend-copy-production.up.railway.app/api/rooms"
         )
       ).data;
       newData.spaces = (
         await axios.get(
-          "https://fivesai-backend-production.up.railway.app/api/space"
+          "https://fs-backend-copy-production.up.railway.app/api/space"
         )
       ).data;
       console.log(newData);

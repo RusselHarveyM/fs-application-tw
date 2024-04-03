@@ -14,7 +14,7 @@ export default function Container({
         <img
           src={`data:image/jpeg;base64,${img}`}
           alt={`${title}-image`}
-          className="w-24 h-24 object-contain object-fill rounded-xl bg-white"
+          className="w-24 h-24 rounded-xl bg-white"
         />
       ) : (
         <div className="w-24 h-24 object-contain rounded-xl bg-neutral-200 animate-pulse"></div>
