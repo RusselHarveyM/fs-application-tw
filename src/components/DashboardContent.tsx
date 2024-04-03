@@ -133,23 +133,8 @@ export default function DashboardContent({ buildings, rooms }) {
                 (_, columnIndex) => {
                   const dataIndex = index * 4 + columnIndex;
                   const dataItem = dummy[dataIndex];
-                  let id;
-                  let img;
-                  let title;
-                  let code;
-                  id = dataItem?.id;
-                  img = dataItem?.image;
-                  title = dataItem?.title;
-                  code = dataItem?.code;
-                  return dataItem ? (
-                    <Container
-                      key={id}
-                      img={img}
-                      title={title}
-                      code={code}
-                      noOfChildren={dataItem.noOfChildren}
-                    />
-                  ) : null;
+                  let id = dataItem?.id;
+                  return dataItem ? <Container key={id} /> : null;
                 }
               )}
             </div>

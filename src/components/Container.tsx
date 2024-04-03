@@ -1,7 +1,7 @@
 export default function Container({
-  img,
-  title,
-  code,
+  img = "",
+  title = "",
+  code = "",
   noOfChildren = 0,
   ...props
 }) {
