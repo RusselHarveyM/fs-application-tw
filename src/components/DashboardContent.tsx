@@ -6,7 +6,6 @@ import Building from "../assets/building.png";
 import Room from "../assets/room.png";
 import { useEffect, useState } from "react";
 import ImageTab from "./ImageTab";
-import { Circle } from "rc-progress";
 import dummy from "../data/test01.json";
 
 export default function DashboardContent({ buildings, rooms }) {
