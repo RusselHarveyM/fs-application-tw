@@ -78,26 +78,24 @@ function App() {
   };
 
   return (
-    <DataContext.Provider value={dataCtx}>
-      <main className="flex flex-col m-auto">
-        <TopNavigation
-          onChangeDisplay={handleContentDisplay}
-          selectedTab={contentDisplay}
-        />
-        {isPopup && (
-          <Popup>
-            <p>
-              Welcome back,{" "}
-              <span className="text-red-500 font-bold text-sm md:text-xl">
-                Cebu Institute of Technology
-              </span>{" "}
-              !
-            </p>
-          </Popup>
-        )}
-        {content}
-      </main>
-    </DataContext.Provider>
+    <main className="flex flex-col m-auto">
+      <TopNavigation
+        onChangeDisplay={handleContentDisplay}
+        selectedTab={contentDisplay}
+      />
+      {isPopup && (
+        <Popup>
+          <p>
+            Welcome back,{" "}
+            <span className="text-red-500 font-bold text-sm md:text-xl">
+              Cebu Institute of Technology
+            </span>{" "}
+            !
+          </p>
+        </Popup>
+      )}
+      <DataContext.Provider value={dataCtx}>{content}</DataContext.Provider>
+    </main>
   );
 }
 
