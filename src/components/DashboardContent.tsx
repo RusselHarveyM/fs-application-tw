@@ -1,4 +1,5 @@
 import CircularProgress from "./CircularProgress";
+import { Link } from 'react-router-dom';
 import Button from "./Button";
 import Container from "./Container";
 
@@ -11,7 +12,10 @@ import data from "../data/test01.json";
 
 export default function DashboardContent() {
   const [content, setContent] = useState("buildings");
-
+  
+  const handleRefresh = () => {
+    window.location.reload();
+  };
   function handleTabSelect(selected) {
     setContent(selected);
   }
@@ -51,7 +55,7 @@ export default function DashboardContent() {
             liCss="flex justify-center flex-col items-center"
             onClick={() => handleTabSelect("rooms")}
             cssAdOns={content === "rooms" ? "font-bold" : undefined}
-            disabled
+            disabled={false}
           >
             <ImageTab
               img={Room}
@@ -61,15 +65,22 @@ export default function DashboardContent() {
             />
             <h3 className="text-neutral-600">Rooms</h3>
           </Button>
-          {/* <li>
-            <Button onClick={() => handleTabSelect("spaces")}>
+          <Link to="/space">
+            <Button
+              liCss="flex justify-center flex-col items-center"
+              onClick={() => handleTabSelect("spaces")}
+              cssAdOns={content === "spaces" ? "font-bold" : undefined}
+              disabled={false}
+            >
               <ImageTab
                 img={Space}
                 label="space"
                 isSelected={content === "spaces"}
+                isDisabled={true}
               />
+              <h3 className="text-neutral-600">Space</h3>
             </Button>
-          </li> */}
+          </Link>
         </menu>
       </div>
       <div className="flex flex-wrap justify-center pt-16   m-auto  gap-4  w-[95rem] h-[40rem]  rounded-[2rem] hover:cursor-pointer">

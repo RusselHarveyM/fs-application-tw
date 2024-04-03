@@ -1,7 +1,9 @@
 import { SetStateAction, useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import TopNavigation from "./components/TopNavigation";
 import DashboardContent from "./components/DashboardContent";
 import ManageContent from "./components/ManageContent";
+import SpaceContent from "./components/SpaceContent";
 import SettingsContent from "./components/SettingsContent";
 import Popup from "./components/Popup";
 
@@ -20,30 +22,20 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  let content = <DashboardContent />;
-
-  if (contentDisplay === "manage") content = <ManageContent />;
-  else if (contentDisplay === "settings") content = <SettingsContent />;
 
   return (
-    <main className="flex flex-col m-auto">
-      <TopNavigation
-        onChangeDisplay={handleContentDisplay}
-        selectedTab={contentDisplay}
-      />
-      {isPopup && (
-        <Popup>
-          <p>
-            Welcome back,{" "}
-            <span className="text-red-500 font-bold text-sm md:text-xl">
-              Cebu Institute of Technology
-            </span>{" "}
-            !
-          </p>
-        </Popup>
-      )}
-      {content}
-    </main>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<DashboardContent />} />
+        <Route path="/dashboard" element={<DashboardContent />} />
+        <Route path="/manage" element={<ManageContent />} />
+        <Route path="/settings" element={<SettingsContent />} /> 
+        <Route path="/space" element={<SpaceContent />} 
+        >{!isPopup}</Route>
+      </Routes>
+      {isPopup && <Popup />}
+    </BrowserRouter>
+    
   );
 }
 
