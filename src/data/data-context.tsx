@@ -10,15 +10,10 @@ export const DataContext = createContext({
   ratings: undefined,
   comments: undefined,
   redTags: undefined,
-  addUser: () => {},
-  addBuilding: () => {},
-  addRoom: () => {},
-  addSpace: () => {},
-  addSpaceImage: () => {},
-  addRating: () => {},
-  addComment: () => {},
-  addRedTag: () => {},
+  editEntry: () => {},
 });
+
+const endpoint = "https://fs-backend-copy-production.up.railway.app";
 
 export default function DataContextProvider({ children }) {
   const [data, setData] = useState({
@@ -36,31 +31,29 @@ export default function DataContextProvider({ children }) {
         rooms: [],
         spaces: [],
       };
-      newData.users = (
-        await axios.get(
-          "https://fs-backend-copy-production.up.railway.app/api/user"
-        )
-      ).data;
-      newData.buildings = (
-        await axios.get(
-          "https://fs-backend-copy-production.up.railway.app/api/buildings"
-        )
-      ).data;
-      newData.rooms = (
-        await axios.get(
-          "https://fs-backend-copy-production.up.railway.app/api/rooms"
-        )
-      ).data;
-      newData.spaces = (
-        await axios.get(
-          "https://fs-backend-copy-production.up.railway.app/api/space"
-        )
-      ).data;
+      newData.users = (await axios.get(`${endpoint}/api/user`)).data;
+      newData.buildings = (await axios.get(`${endpoint}/api/buildings`)).data;
+      newData.rooms = (await axios.get(`${endpoint}/api/rooms`)).data;
+      newData.spaces = (await axios.get(`${endpoint}/api/space`)).data;
       console.log(newData);
       setData(newData);
     } catch (error) {
       console.log(error);
     }
+  }
+
+  /*
+  ------------------------
+  function handleEditEntry
+  ------------------------
+    param: action = {
+        type: buildings/users/rooms/..
+        method: GET/POST/..
+        data: {} // if necessary
+    }  
+  */
+  function handleEditEntry(action) {
+    //..
   }
 
   useEffect(() => {
