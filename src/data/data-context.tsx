@@ -65,6 +65,7 @@ export default function DataContextProvider({ children }) {
     buildings: data.buildings,
     rooms: data.rooms,
     spaces: data.spaces,
+    editEntry: handleEditEntry,
   };
   return (
     <DataContext.Provider value={dataCtx}>{children}</DataContext.Provider>
