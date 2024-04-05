@@ -7,7 +7,7 @@ export default function ImageGallery({ images }) {
             key={image.id}
             src={`data:image/jpeg;base64,${image.image}`}
             alt=""
-            className="h-full w-full"
+            className="h-full w-full hover:scale-105 hover:cursor-pointer"
           />
         ))
       ) : (
