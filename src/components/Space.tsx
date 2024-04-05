@@ -38,6 +38,12 @@ export default function Space() {
         </div>
         <ImageGallery />
       </div>
+      <div className="flex flex-col bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
+        <h2>Scores</h2>
+        <div>
+          <div className="w-64 h-64 bg-green-400"></div>
+        </div>
+      </div>
     </div>
   );
 }

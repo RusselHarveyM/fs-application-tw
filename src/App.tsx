@@ -5,9 +5,14 @@ import ManageContent from "./pages/ManageContent";
 import SettingsContent from "./components/SettingsContent";
 import DataContextProvider from "./data/data-context";
 import Spaces from "./pages/Spaces";
+import { Login } from "./pages/Login";
 
 function App() {
   const router = createBrowserRouter([
+    {
+      path: "/login",
+      element: <Login />,
+    },
     {
       path: "/",
       element: <RootLayout />,

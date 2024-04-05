@@ -70,7 +70,7 @@ export default function Spaces() {
         onSelectTab={handleSelectTab}
         selectedTab={content.selectedTab}
       />
-      {display}
+      <div className="w-full overflow-y-auto h-screen">{display}</div>
     </div>
   );
 }
