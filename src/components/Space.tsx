@@ -98,6 +98,28 @@ export default function Space({ data }) {
     }
   }
 
+  function handleImageUpload(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      // The result contains the data URL of the image
+      const imgElement = document.getElementById("preview") as HTMLImageElement;
+      console.log(imgElement.src);
+      imgElement.src = reader.result as string;
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function handleImageSubmit(event) {
+    event.preventDefault();
+    uploadModal.current.close();
+    console.log(event);
+  }
+
   return (
     <>
       {space.isLoad && (
@@ -105,13 +127,19 @@ export default function Space({ data }) {
           <p className="text-neutral-600 animate-bounce">Please wait...</p>
         </div>
       )}
-      <Modal buttonVariant="blue" buttonCaption="upload" ref={uploadModal}>
-        <div className="flex flex-col w-64 h-64">
-          <h2 className="text-neutral-500 text-xl">Upload an Image</h2>
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Input id="picture" type="file" />
-          </div>
-        </div>
+      <Modal
+        buttonVariant="blue"
+        buttonCaption="Submit"
+        input={
+          <>
+            <Input id="picture" type="file" onChange={handleImageUpload} />
+            <img id="preview" className="h-24 w-full object-contain" />
+          </>
+        }
+        ref={uploadModal}
+        onSubmit={handleImageSubmit}
+      >
+        <h2 className="text-neutral-500 text-xl mb-4">Upload an Image</h2>
       </Modal>
       <div className="flex flex-col gap-4 p-6 w-[82rem] mx-auto">
         <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
