@@ -1,23 +1,35 @@
 import { ArrowLeft, Box, Home, Tag } from "lucide-react";
 import Button from "./Button";
+
+import { NavLink } from "react-router-dom";
+
 import { Badge } from "./ui/badge";
 
-export default function Sidebar({ onSelectTab, selectedTab }) {
+export default function Sidebar({
+  onSelectTab,
+  selectedTab,
+  roomData,
+  buildingData,
+}) {
   const highlightNavClass =
     "font-bold border-red-500 text-red-500 rounded-none";
 
   return (
     <aside className="flex flex-col py-4 px-2 gap-4 items-center w-[19rem] h-screen bg-white shadow-md">
-      <Button liCss="justify-start w-full " cssAdOns="flex gap-2">
-        <ArrowLeft /> backlink
-      </Button>
-      <div className="flex justify-around items-center w-[90%] h-24 mb-4 ">
+      <NavLink
+        to={`/${buildingData?.id}`}
+        className={"justify-start w-full flex gap-2 hover:text-red-500"}
+      >
+        <ArrowLeft />
+        {buildingData?.buildingName}
+      </NavLink>
+      <div className="flex gap-4 items-center w-[90%] h-24 mb-4 ">
         <img
-          src=""
-          alt=""
+          src={`data:image/jpeg;base64,${roomData.image}`}
+          alt="room-image"
           className="w-20 h-20 object-fill rounded-md bg-stone-100"
         />
-        <h2>Room Name</h2>
+        <h2 className="text-xl text-neutral-600">{roomData.roomNumber}</h2>
       </div>
       <menu className="flex w-[90%] gap-2 pt-8 border-t-2 border-neutral-100 flex-col justify-start">
         <Button

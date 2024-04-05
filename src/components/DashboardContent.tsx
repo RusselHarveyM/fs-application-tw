@@ -4,11 +4,10 @@ import Container from "./Container";
 
 import Building from "../assets/building.png";
 import Room from "../assets/room.png";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { useNavigate, useParams, NavLink } from "react-router-dom";
 import ImageTab from "./ImageTab";
 import dummy from "../data/test01.json";
-
-import { useContext } from "react";
 
 import { DataContext } from "@/data/data-context";
 
@@ -17,7 +16,9 @@ export default function DashboardContent() {
     selectedTab: "buildings",
     data: undefined,
   });
+  const navigate = useNavigate();
   const { buildings, rooms } = useContext(DataContext);
+  const params = useParams();
 
   useEffect(() => {
     setContent((prev) => {
@@ -27,6 +28,20 @@ export default function DashboardContent() {
       };
     });
   }, [buildings]);
+
+  useEffect(() => {
+    if (rooms && params.id) {
+      const filteredRooms = rooms.filter(
+        (room) => room.buildingId === params.id
+      );
+      setContent(() => {
+        return {
+          selectedTab: "rooms",
+          data: filteredRooms,
+        };
+      });
+    }
+  }, [params]);
 
   function handleTabSelect(selected) {
     if (selected !== content.selectedTab)
@@ -50,6 +65,8 @@ export default function DashboardContent() {
           data: filteredRooms,
         };
       });
+    } else if (content.selectedTab === "rooms") {
+      navigate(`/room/${id}`);
     }
   }
 
@@ -71,12 +88,12 @@ export default function DashboardContent() {
       </div>
       <div className="flex items-center justify-center h-1/6 mt-8 mb-16 ">
         <menu className="flex bg-stone-100 rounded-full py-2 px-4">
-          <Button
-            liCss="flex justify-center flex-col items-center"
+          <NavLink
+            to="/"
+            className={`flex justify-center flex-col items-center ${
+              content.selectedTab === "buildings" ? "font-bold" : ""
+            }`}
             onClick={() => handleTabSelect("buildings")}
-            cssAdOns={
-              content.selectedTab === "buildings" ? "font-bold" : undefined
-            }
           >
             <ImageTab
               img={Building}
@@ -85,7 +102,7 @@ export default function DashboardContent() {
               isDisabled={false}
             />
             <h3 className="text-neutral-600">Buildings</h3>
-          </Button>
+          </NavLink>
           <Button
             liCss="flex justify-center flex-col items-center"
             onClick={() => handleTabSelect("rooms")}
