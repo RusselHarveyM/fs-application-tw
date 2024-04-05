@@ -35,7 +35,6 @@ export default function Space({ data }) {
   const { spaceImages, ratings, useEntry } = useContext(DataContext);
   const [space, setSpace] = useState(SPACE_DEFINITION);
   const uploadModal = useRef();
-  const uploadImage = useRef();
 
   useEffect(() => {
     setSpace((prev) => {
@@ -117,6 +116,7 @@ export default function Space({ data }) {
 
   function handleImageSubmit(event) {
     event.preventDefault();
+    uploadModal.current.close();
     console.log(event);
   }
 
