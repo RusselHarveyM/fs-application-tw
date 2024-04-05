@@ -15,7 +15,13 @@ import { DataContext } from "@/data/data-context";
 
 export default function Space({ data }) {
   const { spaceImages, useEntry } = useContext(DataContext);
-  const [space, setSpace] = useState({});
+  const [space, setSpace] = useState({
+    id: undefined,
+    name: "",
+    pictures: [],
+    roomId: undefined,
+    selectedImage: "",
+  });
 
   useEffect(() => {
     setSpace((prev) => {
@@ -38,8 +44,18 @@ export default function Space({ data }) {
     useEntry(action);
   }
 
+  function handleImageSelect(image) {
+    setSpace((prev) => {
+      return {
+        ...prev,
+        selectedImage: image,
+      };
+    });
+  }
+
   function handleSpaceSelect(selectedSpace) {
     const currentSpace = data.find((space) => space.name === selectedSpace);
+    console.log(currentSpace);
     getSpaceImages(currentSpace.id);
     setSpace(currentSpace);
   }
@@ -71,9 +87,9 @@ export default function Space({ data }) {
       </div>
       <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
         <div className="flex flex-col justify-between w-2/3">
-          {space.pictures ? (
+          {space.selectedImage ? (
             <img
-              src={`data:image/jpeg;base64,${space.pictures[0].image}`}
+              src={`data:image/jpeg;base64,${space.selectedImage}`}
               alt="space-image"
               className=" h-[26rem] bg-neutral-100 rounded-xl list-image-none"
             />
@@ -90,7 +106,10 @@ export default function Space({ data }) {
             <Button variant="blue">Assess</Button>
           </menu>
         </div>
-        <ImageGallery images={space?.pictures} />
+        <ImageGallery
+          images={space?.pictures}
+          onSelectImage={handleImageSelect}
+        />
       </div>
       <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
         <div className="flex flex-col gap-4 justify-center">
