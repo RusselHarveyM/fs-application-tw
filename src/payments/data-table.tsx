@@ -239,7 +239,7 @@ export function DataTable<TData, TValue>({
                         type="password"
                         value={newUser.password}
                         onChange={(e) => handleInputChange(e, "password")}
-                        placeholder="************"
+                        placeholder="*************"
                         className="col-span-3"
                       />
                   </div>
