@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Button from "./Button";
-import Page from "@/payments/page";
+import Page from "@/payments/page copy";
 
 export default function ManageContent() {
   const [tableContent, setTableContent] = useState("users");
