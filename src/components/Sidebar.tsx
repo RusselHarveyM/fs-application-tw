@@ -15,15 +15,15 @@ export default function Sidebar({
     "font-bold border-red-500 text-red-500 rounded-none";
 
   return (
-    <aside className="flex flex-col py-4 px-2 gap-4 items-center w-[19rem] h-screen bg-white shadow-md">
+    <aside className="flex flex-col py-8 px-2 gap-4 items-center w-[19rem] h-screen bg-white shadow-md">
       <NavLink
         to={`/${buildingData?.id}`}
-        className={"justify-start w-full flex gap-2 hover:text-red-500"}
+        className={"justify-start w-[90%] flex gap-2 hover:text-red-500"}
       >
         <ArrowLeft />
         {buildingData?.buildingName}
       </NavLink>
-      <div className="flex gap-4 items-center w-[90%] h-24 mb-4 ">
+      <div className="flex gap-4 items-center w-[90%] h-24 mb-4 mt-4 ">
         <img
           src={`data:image/jpeg;base64,${roomData.image}`}
           alt="room-image"

@@ -5,6 +5,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import ImageGallery from "./ImageGallery";
+import Button from "./Button";
 
 export default function Space() {
   return (
@@ -22,12 +24,19 @@ export default function Space() {
           </Select>
         </div>
       </div>
-      <div className="flex flex-col bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
-        <img
-          src=""
-          alt="space-image"
-          className="w-[45rem] h-[25rem] bg-neutral-500 rounded-xl"
-        />
+      <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
+        <div className="flex flex-col justify-between w-2/3">
+          <img
+            src=""
+            alt="space-image"
+            className=" h-[25rem] bg-neutral-100 rounded-xl"
+          />
+          <menu className="flex gap-4 justify-end">
+            <Button variant="blue">Upload</Button>
+            <Button variant="blue">Assess</Button>
+          </menu>
+        </div>
+        <ImageGallery />
       </div>
     </div>
   );
