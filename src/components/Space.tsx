@@ -14,33 +14,46 @@ import { useState, useContext, useEffect } from "react";
 import { DataContext } from "@/data/data-context";
 
 export default function Space({ data }) {
-  const { spaceImages, useEntry } = useContext(DataContext);
+  const { spaceImages, ratings, useEntry } = useContext(DataContext);
   const [space, setSpace] = useState({
     id: undefined,
     name: "",
     pictures: [],
     roomId: undefined,
     selectedImage: "",
+    rating: [],
   });
 
   useEffect(() => {
     setSpace((prev) => {
+      let latestRating = [];
+      if (space.id !== undefined) {
+        const matchedRatings = ratings.filter(
+          (rating) => rating.spaceId === space.id
+        );
+        latestRating = matchedRatings.sort(
+          (a, b) =>
+            new Date(b.dateModified).getTime() -
+            new Date(a.dateModified).getTime()
+        )[0];
+      }
+      console.log("latestRating >>> ", latestRating);
       return {
         ...prev,
-        pictures: spaceImages,
+        pictures: space.id !== undefined && spaceImages,
+        rating: space.id !== undefined && latestRating,
       };
     });
   }, [spaceImages]);
 
-  function getSpaceImages(id) {
-    const action = {
+  function getSpaceData(id) {
+    let action = {
       type: "spaceimages",
       method: "get",
       data: {
         id,
       },
     };
-    console.log(spaceImages);
     useEntry(action);
   }
 
@@ -56,7 +69,7 @@ export default function Space({ data }) {
   function handleSpaceSelect(selectedSpace) {
     const currentSpace = data.find((space) => space.name === selectedSpace);
     console.log(currentSpace);
-    getSpaceImages(currentSpace.id);
+    getSpaceData(currentSpace.id);
     setSpace(currentSpace);
   }
 
@@ -113,9 +126,9 @@ export default function Space({ data }) {
       </div>
       <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
         <div className="flex flex-col gap-4 justify-center">
-          <ScoreCard />
-          <ScoreCard type="set" />
-          <ScoreCard type="shine" />
+          <ScoreCard score={space.rating?.sort} />
+          <ScoreCard type="set" score={space.rating?.setInOrder} />
+          <ScoreCard type="shine" score={space.rating?.shine} />
         </div>
         <article className="flex flex-col gap-4 w-full h-90 border-dashed border-4 rounded-lg bg-neutral-100 py-4 px-6">
           <h2 className="uppercase text-xl font-semibold">SORT</h2>

@@ -22,6 +22,7 @@ export default function DataContextProvider({ children }) {
     rooms: undefined,
     spaces: undefined,
     spaceImages: undefined,
+    ratings: undefined,
   });
 
   async function fetchAllData() {
@@ -31,11 +32,13 @@ export default function DataContextProvider({ children }) {
         buildings: [],
         rooms: [],
         spaces: [],
+        ratings: [],
       };
       newData.users = (await axios.get(`${endpoint}/api/user`)).data;
       newData.buildings = (await axios.get(`${endpoint}/api/buildings`)).data;
       newData.rooms = (await axios.get(`${endpoint}/api/rooms`)).data;
       newData.spaces = (await axios.get(`${endpoint}/api/space`)).data;
+      newData.ratings = (await axios.get(`${endpoint}/api/ratings`)).data;
       console.log(newData);
       setData(newData);
     } catch (error) {
@@ -69,6 +72,19 @@ export default function DataContextProvider({ children }) {
         });
       }
     }
+    // if (action.type === "ratings") {
+    //   if (action.method === "get") {
+
+    //     console.log(ratings);
+
+    //     setData((prev) => {
+    //       return {
+    //         ...prev,
+    //         ratings: latestRating,
+    //       };
+    //     });
+    //   }
+    // }
   }
 
   useEffect(() => {
@@ -81,6 +97,7 @@ export default function DataContextProvider({ children }) {
     rooms: data.rooms,
     spaces: data.spaces,
     spaceImages: data.spaceImages,
+    ratings: data.ratings,
     useEntry: handleUseEntry,
   };
   return (
