@@ -139,9 +139,7 @@ export default function Space({ data }) {
         ref={uploadModal}
         onSubmit={handleImageSubmit}
       >
-        <div className="flex flex-col w-full">
-          <h2 className="text-neutral-500 text-xl mb-4">Upload an Image</h2>
-        </div>
+        <h2 className="text-neutral-500 text-xl mb-4">Upload an Image</h2>
       </Modal>
       <div className="flex flex-col gap-4 p-6 w-[82rem] mx-auto">
         <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
