@@ -12,10 +12,10 @@ export default function ImageGallery({ images, onSelectImage }) {
           />
         ))
       ) : (
-        <p className="text-neutral-500 text-lg w-40 h-fit relative top-52 left-32">
-          No Images yet
+        <article className="text-neutral-500 text-lg w-40 h-fit relative top-52 left-32">
+          <p>No Images yet</p>
           <p className="animate-bounce text-2xl w-fit h-fit">...</p>
-        </p>
+        </article>
       )}
     </div>
   );

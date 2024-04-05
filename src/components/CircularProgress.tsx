@@ -5,9 +5,15 @@ export default function CircularProgress({
   title = undefined,
   strokeColor,
   trailColor,
+  isLoad = false,
 }) {
+  let loadCss = "animate-spin";
   return (
-    <div className="flex flex-col items-center justify-center gap-4 object-contain w-80 h-full relative">
+    <div
+      className={`flex flex-col items-center justify-center gap-4 object-contain w-80 h-full relative ${
+        isLoad && loadCss
+      }`}
+    >
       <p
         className={`absolute top-0 ${
           title ? "bottom-10" : "bottom-0"
@@ -18,7 +24,7 @@ export default function CircularProgress({
           width: "fit-content",
         }}
       >
-        {percent}%
+        {!isLoad ? percent + " %" : ""}
       </p>
       <Circle
         percent={percent}
