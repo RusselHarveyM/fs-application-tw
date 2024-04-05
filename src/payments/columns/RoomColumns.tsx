@@ -9,6 +9,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useRef } from "react";
+import Modal from "@/components/Modal";
 
 export type Room = {
   id: string;
@@ -75,21 +77,49 @@ export const roomColumns: ColumnDef<Room>[] = [
     id: "actions",
     cell: ({ row }) => {
       const user = row.original;
+      const editModal = useRef();
+      const deleteModal = useRef();
+
+      function handleDropdownSelect(selected){
+        selected === "edit"
+          ? editModal.current.open()  
+          : deleteModal.current.open();
+      }
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          <Modal
+            buttonCaption="Edit Entry"
+            buttonVariant="blue"
+            ref={editModal}
+          >
+            <p>Edit</p>
+          </Modal>
+          <Modal
+            buttonCaption="Delete Entry"
+            buttonVariant="red"
+            ref={deleteModal}
+          >
+            <p>Are you sure you want to delete?</p>
+          </Modal>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => handleDropdownSelect("edit")}>
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDropdownSelect("delete")}>
+                  Delete
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </>
       );
     },
   },

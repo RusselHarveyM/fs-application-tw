@@ -122,7 +122,7 @@ export const userColumns: ColumnDef<User>[] = [
             buttonVariant="blue"
             ref={editModal}
           >
-            <p>edit</p>
+            <p>Edit</p>
           </Modal>
           <Modal
             buttonCaption="Delete Entry"

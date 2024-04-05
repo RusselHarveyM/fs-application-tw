@@ -1,4 +1,5 @@
 import { SetStateAction, useEffect, useState } from "react";
+import Loading from "react-loading";
 import Button from "../components/Button";
 import {
   getUsersData,
@@ -104,9 +105,11 @@ export default function ManageContent() {
       </div>
       <div className="container mx-auto py-10">
         {loading ? (
-          <p>Loading...</p>
+          <div className="flex justify-center items-center h-full">
+          <Loading type={'spin'} color={'#000'} height={50} width={50} /> 
+          </div>
         ) : (
-          <DataTable columns={getColumns(tableContent)} data={tableData} />
+          <DataTable columns={getColumns(tableContent)} data={tableData} tableContent={tableContent} />
         )}
       </div>
     </div>
