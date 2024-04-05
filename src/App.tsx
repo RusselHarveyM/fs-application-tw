@@ -6,6 +6,7 @@ import SettingsContent from "./components/SettingsContent";
 import Popup from "./components/Popup";
 
 import DataContextProvider from "./data/data-context";
+import Spaces from "./components/Spaces";
 
 function App() {
   const [contentDisplay, setContentDisplay] = useState("dashboard");
@@ -29,7 +30,7 @@ function App() {
 
   return (
     <main className="flex flex-col m-auto">
-      <TopNavigation
+      {/* <TopNavigation
         onChangeDisplay={handleContentDisplay}
         selectedTab={contentDisplay}
       />
@@ -44,7 +45,8 @@ function App() {
           </p>
         </Popup>
       )}
-      <DataContextProvider>{content}</DataContextProvider>
+      <DataContextProvider>{content}</DataContextProvider> */}
+      <Spaces />
     </main>
   );
 }
