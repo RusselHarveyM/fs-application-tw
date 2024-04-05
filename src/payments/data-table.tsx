@@ -41,15 +41,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Input } from "@/components/ui/input";
+import { Plus } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  tableContent: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  tableContent,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -59,7 +62,7 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-
+  console.log('tableContent:', tableContent);
   const table = useReactTable({
     data,
     columns,
@@ -85,19 +88,63 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Search"
-          value={
-            (table.getColumn("username"||"lastname"||"firstname"||"role")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("username"||"lastname"||"firstname"||"role")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+      <Input
+        placeholder={
+          tableContent === 'users'
+            ? 'Search by Username'
+            : tableContent === 'buildings'
+            ? 'Search by Building Code'
+            : tableContent === 'rooms'
+            ? 'Search by Room Number'
+            : tableContent === 'spaces'
+            ? 'Search by Name'
+            : 'Search'
+        }
+        value={
+          tableContent === 'users'
+            ? (
+                (table.getColumn("username")?.getFilterValue() as string)
+                ?? ""
+              )
+            : tableContent === 'buildings'
+            ? (
+                (table.getColumn("buildingCode")?.getFilterValue() as string)
+                ?? ""
+              )
+            : tableContent === 'rooms'
+            ? (
+                (table.getColumn("roomNumber")?.getFilterValue() as string)
+                ?? ""
+              )  
+            : tableContent === 'spaces'
+            ? (
+                (table.getColumn("name")?.getFilterValue() as string)
+                ?? ""
+              )   
+            : ""
+        }
+        onChange={(event) =>
+          table.getColumn(
+            tableContent === 'users'
+              ? "username"
+              : tableContent === 'buildings'
+              ? "buildingCode"
+              : tableContent === 'rooms'
+              ? "roomNumber"
+              : tableContent === 'spaces'
+              ? "name"
+              : ""
+          )?.setFilterValue(event.target.value)
+        }
+        className="max-w-sm mi-4"
+      />
+        <Button variant="outline" className="ml-2" style={{ backgroundColor: '#D70040', color: 'white'}}>
+          Add Entry 
+          <Plus />
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="ml-auto mr-1">
               Columns
             </Button>
           </DropdownMenuTrigger>
