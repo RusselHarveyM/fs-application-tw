@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/select";
 import ImageGallery from "./ImageGallery";
 import Button from "./Button";
+import ScoreCard from "./ScoreCard";
+import Details from "./Details";
 
 export default function Space() {
   return (
@@ -36,13 +38,31 @@ export default function Space() {
             <Button variant="blue">Assess</Button>
           </menu>
         </div>
-        <ImageGallery />
+        <ImageGallery images={[]} />
       </div>
-      <div className="flex flex-col bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
-        <h2>Scores</h2>
-        <div>
-          <div className="w-64 h-64 bg-green-400"></div>
+      <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
+        <div className="flex flex-col gap-4 justify-center">
+          <ScoreCard />
+          <ScoreCard type="set" />
+          <ScoreCard type="shine" />
         </div>
+        <article className="flex flex-col gap-4 w-full h-90 border-dashed border-4 rounded-lg bg-neutral-100 py-4 px-6">
+          <h2 className="uppercase text-xl font-semibold">SORT</h2>
+          <Details
+            title="Summary"
+            text={` Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Reprehenderit suscipit vero dolores fugiat natus tempora quidem
+              voluptates libero, praesentium, atque aut? Pariatur, provident rem
+              quod hic minus quis id non?`}
+          />
+          <Details
+            title="Things to improve"
+            text={` Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Reprehenderit suscipit vero dolores fugiat natus tempora quidem
+              voluptates libero, praesentium, atque aut? Pariatur, provident rem
+              quod hic minus quis id non?`}
+          />
+        </article>
       </div>
     </div>
   );
