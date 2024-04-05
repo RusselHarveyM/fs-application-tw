@@ -102,25 +102,57 @@ export function DataTable<TData, TValue>({
   function handleInputChange(event, field) {
     setNewUser({ ...newUser, [field]: event.target.value });
   }
-
-  function handleAddSave() {
-    // Perform save operation, for example, adding user information
-    // Here, you can call an API to add the new user
-    console.log("Adding new user:", newUser);
-    // Reset new user state after saving
-    setNewUser({
-      id: "",
-      lastName: "",
-      firstName: "",
-      username: "",
-      role: "",
-      password: ""
+  
+  function handleAddedUser() {
+    // Construct the request body
+    const requestBody = {
+      id: newUser.id,
+      lastName: newUser.lastName,
+      firstName: newUser.firstName,
+      username: newUser.username,
+      role: newUser.role,
+      password: newUser.password
+    };
+    
+    // Perform the POST request
+    fetch('https://fs-backend-copy-production.up.railway.app/api/user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to add user');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('New user added successfully:', data);
+      // Reset new user state after saving
+      setNewUser({
+        id: '',
+        lastName: '',
+        firstName: '',
+        username: '',
+        role: '',
+        password: ''
+      });
+      closeAddModal();
+    })
+    .catch(error => {
+      console.error('Error adding user:', error);
+      // Handle error, e.g., display error message to user
     });
-    addModal.current.close();
   }
 
   function openAddModal() {
     addModal.current.open();
+  }
+
+  function closeAddModal() {
+    addModal.current.close();
   }
 
   return (
@@ -178,9 +210,9 @@ export function DataTable<TData, TValue>({
         />
         {tableContent === 'users' && (
           <>
-            <Button variant="outline" onClick={openAddModal}>Add Entry</Button>
+            <Button variant="outline" className="ml-2" style={{ backgroundColor: '#D70040', color: 'white'}} onClick={openAddModal}>Add Entry <Plus /> </Button>
             <Modal 
-              ref={addModal} 
+              ref={addModal}
             >
               <div className="sm:max-w-[425px]">
                 <div>
@@ -197,6 +229,7 @@ export function DataTable<TData, TValue>({
                     >
                       <option value="user">User</option>
                       <option value="admin">Admin</option>
+                    
                     </select>
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
@@ -245,10 +278,7 @@ export function DataTable<TData, TValue>({
                   </div>
                 </div>
                 <div className="flex justify-end">
-                  <Button variant="outline" className="ml-2" style={{ backgroundColor: '#D70040', color: 'white'}} onClick={openAddModal}>
-                    Add Entry 
-                    <Plus />
-                  </Button>
+                  <Button type="submit" className="ml-2" onClick={handleAddedUser}>Save</Button>
                 </div>
               </div>
             </Modal>
