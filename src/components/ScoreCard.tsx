@@ -1,6 +1,6 @@
 export default function ScoreCard({ type = "sort", score = 0 }) {
-  let cssContainerHighlight = "bg-white";
-  let cssTextHighlight = "text-neutral-400";
+  let cssContainerHighlight = " bg-white";
+  let cssTextHighlight = " text-neutral-400";
   if (score > 3 && score < 8) {
     cssContainerHighlight = " bg-orange-300";
     cssTextHighlight = " text-white";
