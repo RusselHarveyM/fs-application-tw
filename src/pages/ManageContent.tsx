@@ -1,27 +1,31 @@
-import { SetStateAction, useEffect, useState } from 'react';
-import Button from './Button';
-import { getUsersData, getBuildingsData, getRoomsData, getSpacesData } from '@/data/Api';
-import { DataTable } from '@/payments/data-table';
-import { userColumns } from '@/payments/columns/UserColumns';
-import { buildingColumns } from '@/payments/columns/BuildingColumns';
-import { roomColumns } from '@/payments/columns/RoomColumns';
-import { spaceColumns } from '@/payments/columns/SpaceColumns';
-import Loading from 'react-loading';
+import { SetStateAction, useEffect, useState } from "react";
+import Button from "../components/Button";
+import {
+  getUsersData,
+  getBuildingsData,
+  getRoomsData,
+  getSpacesData,
+} from "@/data/Api";
+import { DataTable } from "@/payments/data-table";
+import { userColumns } from "@/payments/columns/UserColumns";
+import { buildingColumns } from "@/payments/columns/BuildingColumns";
+import { roomColumns } from "@/payments/columns/RoomColumns";
+import { spaceColumns } from "@/payments/columns/SpaceColumns";
 
 export default function ManageContent() {
-  const [tableContent, setTableContent] = useState('users');
-  const [tableData, setTableData] = useState([]); 
+  const [tableContent, setTableContent] = useState("users");
+  const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   function getColumns(tableContent: string) {
     switch (tableContent) {
-      case 'users':
+      case "users":
         return userColumns;
-      case 'buildings':
+      case "buildings":
         return buildingColumns;
-      case 'rooms':
+      case "rooms":
         return roomColumns;
-      case 'spaces':
+      case "spaces":
         return spaceColumns;
       default:
         throw new Error(`Invalid table content: ${tableContent}`);
@@ -34,16 +38,16 @@ export default function ManageContent() {
         setLoading(true);
         let data;
         switch (tableContent) {
-          case 'users':
+          case "users":
             data = await getUsersData();
             break;
-          case 'buildings':
+          case "buildings":
             data = await getBuildingsData();
             break;
-          case 'rooms':
+          case "rooms":
             data = await getRoomsData();
             break;
-          case 'spaces':
+          case "spaces":
             data = await getSpacesData();
             break;
           default:
@@ -64,35 +68,35 @@ export default function ManageContent() {
   }
 
   const highlightNavClass =
-    'border-b-4 font-bold border-red-500 text-red-500 rounded-none';
+    "border-b-4 font-bold border-red-500 text-red-500 rounded-none";
 
   return (
     <div className="flex flex-col w-full m-auto py-6 px-8 mb-20">
       <div className="flex justify-between">
         <menu className="flex mb-8">
           <Button
-            onClick={() => onChangeTableContent('users')}
-            cssAdOns={tableContent === 'users' ? highlightNavClass : undefined}
+            onClick={() => onChangeTableContent("users")}
+            cssAdOns={tableContent === "users" ? highlightNavClass : undefined}
           >
             Users
           </Button>
           <Button
-            onClick={() => onChangeTableContent('buildings')}
+            onClick={() => onChangeTableContent("buildings")}
             cssAdOns={
-              tableContent === 'buildings' ? highlightNavClass : undefined
+              tableContent === "buildings" ? highlightNavClass : undefined
             }
           >
             Buildings
           </Button>
           <Button
-            onClick={() => onChangeTableContent('rooms')}
-            cssAdOns={tableContent === 'rooms' ? highlightNavClass : undefined}
+            onClick={() => onChangeTableContent("rooms")}
+            cssAdOns={tableContent === "rooms" ? highlightNavClass : undefined}
           >
             Rooms
           </Button>
           <Button
-            onClick={() => onChangeTableContent('spaces')}
-            cssAdOns={tableContent === 'spaces' ? highlightNavClass : undefined}
+            onClick={() => onChangeTableContent("spaces")}
+            cssAdOns={tableContent === "spaces" ? highlightNavClass : undefined}
           >
             Spaces
           </Button>
@@ -100,15 +104,9 @@ export default function ManageContent() {
       </div>
       <div className="container mx-auto py-10">
         {loading ? (
-          <div className="flex justify-center items-center h-full">
-          <Loading type={'spin'} color={'#000'} height={50} width={50} /> 
-          </div>
+          <p>Loading...</p>
         ) : (
-          <DataTable
-            columns={getColumns(tableContent)}
-            data={tableData} 
-            tableContent={tableContent}
-          />  
+          <DataTable columns={getColumns(tableContent)} data={tableData} />
         )}
       </div>
     </div>
