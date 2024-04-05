@@ -16,6 +16,7 @@ export type User = {
   firstName: string;
   username: string;
   role: string;
+  fullName: string;
 };
 
 export const userColumns: ColumnDef<User>[] = [
@@ -48,7 +49,7 @@ export const userColumns: ColumnDef<User>[] = [
     header: "Id",
   },
   {
-    accessorKey: "lastName",
+    accessorKey: "Name",
     header: ({ column }) => {
       return (
         <Button
@@ -57,23 +58,7 @@ export const userColumns: ColumnDef<User>[] = [
             column.toggleSorting(column.getIsSorted() === "asc")
           }
         >
-          Last Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "firstName",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() =>
-            column.toggleSorting(column.getIsSorted() === "asc")
-          }
-        >
-          First Name
+          Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );

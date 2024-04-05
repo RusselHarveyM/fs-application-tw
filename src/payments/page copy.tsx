@@ -1,5 +1,5 @@
-import { Payment, columns } from "./columns/columns";
-import { DataTable } from "./data-table";
+import { Payment, columns } from "./columns/columns copy";
+import { DataTable } from "./data-table copy";
 
 export const payments: Payment[] = [
   {
