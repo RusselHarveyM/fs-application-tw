@@ -9,14 +9,39 @@ import ImageGallery from "./ImageGallery";
 import Button from "./Button";
 import ScoreCard from "./ScoreCard";
 import Details from "./Details";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
+
+import { DataContext } from "@/data/data-context";
 
 export default function Space({ data }) {
-  const [space, setSpace] = useState(data[0]);
+  const { spaceImages, useEntry } = useContext(DataContext);
+  const [space, setSpace] = useState({});
 
-  function handleSpaceSelect(space) {
-    console.log(space);
-    setSpace(space);
+  useEffect(() => {
+    setSpace((prev) => {
+      return {
+        ...prev,
+        pictures: spaceImages,
+      };
+    });
+  }, [spaceImages]);
+
+  function getSpaceImages(id) {
+    const action = {
+      type: "spaceimages",
+      method: "get",
+      data: {
+        id,
+      },
+    };
+    console.log(spaceImages);
+    useEntry(action);
+  }
+
+  function handleSpaceSelect(selectedSpace) {
+    const currentSpace = data.find((space) => space.name === selectedSpace);
+    getSpaceImages(currentSpace.id);
+    setSpace(currentSpace);
   }
 
   return (
@@ -24,21 +49,19 @@ export default function Space({ data }) {
       <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
         <div className="flex justify-between">
           <h2 className="text-neutral-600 text-2xl font-bold">
-            {space ? space.name : "Space"}
+            {space.name ? space.name : "Space"}
           </h2>
-          <Select>
+          <Select
+            onValueChange={(selectedName) => handleSpaceSelect(selectedName)}
+          >
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={space.name} />
+              <SelectValue placeholder="Select a space" />
             </SelectTrigger>
             <SelectContent>
-              {data.map((space) => {
+              {data.map((curr) => {
                 return (
-                  <SelectItem
-                    key={space.id}
-                    value={space.name}
-                    onClick={() => handleSpaceSelect(space)}
-                  >
-                    {space.name}
+                  <SelectItem key={curr.id} value={curr.name}>
+                    {curr.name}
                   </SelectItem>
                 );
               })}
@@ -48,17 +71,26 @@ export default function Space({ data }) {
       </div>
       <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
         <div className="flex flex-col justify-between w-2/3">
-          <img
-            src=""
-            alt="space-image"
-            className=" h-[25rem] bg-neutral-100 rounded-xl"
-          />
+          {space.pictures ? (
+            <img
+              src={`data:image/jpeg;base64,${space.pictures[0].image}`}
+              alt="space-image"
+              className=" h-[26rem] bg-neutral-100 rounded-xl list-image-none"
+            />
+          ) : (
+            <div className=" h-[26rem] animate-pulse bg-neutral-100 rounded-xl ">
+              <p className="text-neutral-600 w-fit mx-auto my-44">
+                Click an image from the gallery
+              </p>
+            </div>
+          )}
+
           <menu className="flex gap-4 justify-end">
             <Button variant="blue">Upload</Button>
             <Button variant="blue">Assess</Button>
           </menu>
         </div>
-        <ImageGallery images={[]} />
+        <ImageGallery images={space?.pictures} />
       </div>
       <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
         <div className="flex flex-col gap-4 justify-center">

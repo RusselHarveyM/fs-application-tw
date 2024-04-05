@@ -10,7 +10,7 @@ export const DataContext = createContext({
   ratings: undefined,
   comments: undefined,
   redTags: undefined,
-  editEntry: () => {},
+  useEntry: () => {},
 });
 
 const endpoint = "https://fs-backend-copy-production.up.railway.app";
@@ -21,6 +21,7 @@ export default function DataContextProvider({ children }) {
     buildings: undefined,
     rooms: undefined,
     spaces: undefined,
+    spaceImages: undefined,
   });
 
   async function fetchAllData() {
@@ -44,7 +45,7 @@ export default function DataContextProvider({ children }) {
 
   /*
   ------------------------
-  function handleEditEntry
+  function handleUseEntry
   ------------------------
     param: action = {
         type: buildings/users/rooms/..
@@ -52,8 +53,22 @@ export default function DataContextProvider({ children }) {
         data: {} // if necessary
     }  
   */
-  function handleEditEntry(action) {
+  async function handleUseEntry(action) {
     //..
+    if (action.type === "spaceimages") {
+      if (action.method === "get") {
+        const spaceImages = (
+          await axios.get(`${endpoint}/api/spaceImage/get/${action.data.id}`)
+        ).data;
+        console.log(spaceImages);
+        setData((prev) => {
+          return {
+            ...prev,
+            spaceImages,
+          };
+        });
+      }
+    }
   }
 
   useEffect(() => {
@@ -65,7 +80,8 @@ export default function DataContextProvider({ children }) {
     buildings: data.buildings,
     rooms: data.rooms,
     spaces: data.spaces,
-    editEntry: handleEditEntry,
+    spaceImages: data.spaceImages,
+    useEntry: handleUseEntry,
   };
   return (
     <DataContext.Provider value={dataCtx}>{children}</DataContext.Provider>
