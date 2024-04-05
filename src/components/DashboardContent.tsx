@@ -14,6 +14,7 @@ import { DataContext } from "@/data/data-context";
 export default function DashboardContent() {
   const [content, setContent] = useState({
     selectedTab: "buildings",
+    buildingId: undefined,
     data: undefined,
   });
   const navigate = useNavigate();
@@ -34,8 +35,9 @@ export default function DashboardContent() {
       const filteredRooms = rooms.filter(
         (room) => room.buildingId === params.id
       );
-      setContent(() => {
+      setContent((prev) => {
         return {
+          ...prev,
           selectedTab: "rooms",
           data: filteredRooms,
         };
@@ -45,11 +47,12 @@ export default function DashboardContent() {
 
   function handleTabSelect(selected) {
     if (selected !== content.selectedTab)
-      setContent(() => {
+      setContent((prev) => {
         let newData;
         if (selected === "buildings") newData = buildings;
         else newData = rooms;
         return {
+          ...prev,
           selectedTab: selected,
           data: newData,
         };
@@ -62,6 +65,7 @@ export default function DashboardContent() {
       setContent(() => {
         return {
           selectedTab: "rooms",
+          buildingId: id,
           data: filteredRooms,
         };
       });
@@ -69,9 +73,8 @@ export default function DashboardContent() {
       navigate(`/room/${id}`);
     }
   }
-
   return (
-    <div className="flex flex-col w-full m-auto py-6 px-8 mb-20">
+    <div className="flex flex-col w-full m-auto py-6 px-8 mb-18">
       <div className="flex justify-center items-center h-2/5 gap-56 mt-8 mb-16">
         <CircularProgress
           percent={10}
@@ -86,7 +89,7 @@ export default function DashboardContent() {
           trailColor="#c5d1f7"
         />
       </div>
-      <div className="flex items-center justify-center h-1/6 mt-8 mb-16 ">
+      <div className="flex flex-col gap-8 items-center justify-center h-1/6 my-8 ">
         <menu className="flex bg-stone-100 rounded-full py-2 px-4">
           <NavLink
             to="/"
@@ -118,8 +121,20 @@ export default function DashboardContent() {
             <h3 className="text-neutral-600">Rooms</h3>
           </Button>
         </menu>
+        <p className="text-neutral-500">
+          /{" "}
+          <span className="text-neutral-600">
+            {content.selectedTab === "rooms" &&
+              buildings.find((building) => {
+                let id;
+                if (content.buildingId) id = content.buildingId;
+                else id = params.id;
+                return building.id === id;
+              })?.buildingName}
+          </span>
+        </p>
       </div>
-      <div className="flex flex-wrap justify-center pt-16 m-auto gap-4 w-[95rem] h-[40rem] rounded-[2rem] hover:cursor-pointer">
+      <div className="flex flex-wrap justify-center pt-8 m-auto gap-4 w-[95rem] h-[40rem] rounded-[2rem] hover:cursor-pointer">
         {content.data?.length > 0 ? (
           content.data.map((item, index) => (
             <div

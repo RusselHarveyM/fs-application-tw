@@ -25,7 +25,7 @@ export default function Home() {
           </p>
         </Popup>
       )}
-      <DashboardContent />;
+      <DashboardContent />
     </div>
   );
 }
