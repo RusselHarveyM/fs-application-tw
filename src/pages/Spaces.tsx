@@ -50,7 +50,7 @@ export default function Spaces() {
     if (content.selectedSpaceId === undefined) {
       display = <NoSpace />;
     } else {
-      display = <Space />;
+      display = <Space data={content.data.spaces} />;
     }
   } else if (content.selectedTab === "redtags") {
     display = <RedTag />;

@@ -9,19 +9,39 @@ import ImageGallery from "./ImageGallery";
 import Button from "./Button";
 import ScoreCard from "./ScoreCard";
 import Details from "./Details";
+import { useState } from "react";
 
-export default function Space() {
+export default function Space({ data }) {
+  const [space, setSpace] = useState(data[0]);
+
+  function handleSpaceSelect(space) {
+    console.log(space);
+    setSpace(space);
+  }
+
   return (
     <div className="flex flex-col gap-4 p-6 w-[82rem] mx-auto">
       <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
         <div className="flex justify-between">
-          <h2 className="text-neutral-600 text-2xl font-bold">Space</h2>
+          <h2 className="text-neutral-600 text-2xl font-bold">
+            {space ? space.name : "Space"}
+          </h2>
           <Select>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Space" />
+              <SelectValue placeholder={space.name} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Space 1">Space 1</SelectItem>
+              {data.map((space) => {
+                return (
+                  <SelectItem
+                    key={space.id}
+                    value={space.name}
+                    onClick={() => handleSpaceSelect(space)}
+                  >
+                    {space.name}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
