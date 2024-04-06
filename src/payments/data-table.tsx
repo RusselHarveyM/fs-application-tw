@@ -96,63 +96,124 @@ export function DataTable<TData, TValue>({
     role: "",
     password: ""
   });
+  const [newBuilding, setNewBuilding] = useState({
+    id: "",
+    buildingName: "",
+    buildingCode: "",
+    image: "",
+  });
 
   const addModal = React.useRef();
+  const uploadModal = React.useRef();
+
+  function handleImageUpload(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      // The result contains the data URL of the image
+      const imgElement = document.getElementById("preview") as HTMLImageElement;
+      console.log(imgElement.src);
+      imgElement.src = reader.result as string;
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function handleImageSubmit(event) {
+    event.preventDefault();
+    uploadModal.current.close();
+    console.log(event);
+  }
 
   function handleInputChange(event, field) {
-    setNewUser({ ...newUser, [field]: event.target.value });
+    if (tableContent === 'users') {
+      setNewUser({ ...newUser, [field]: event.target.value });
+    } else if (tableContent === 'buildings') {
+      setNewBuilding({ ...newBuilding, [field]: event.target.value });
+    }
   }
   
-  function handleAddedUser() {
+  function handleAddEntry() {
     // Construct the request body
-    const requestBody = {
-      id: newUser.id,
-      lastName: newUser.lastName,
-      firstName: newUser.firstName,
-      username: newUser.username,
-      role: newUser.role,
-      password: newUser.password
-    };
+    let requestBody;
+  
+    if (tableContent === 'users') {
+      requestBody = {
+        id: newUser.id,
+        lastName: newUser.lastName,
+        firstName: newUser.firstName,
+        username: newUser.username,
+        role: newUser.role,
+        password: newUser.password
+      };
+    } else if (tableContent === 'buildings') {
+      requestBody = {
+        id: newBuilding.id,
+        buildingName: newBuilding.buildingName,
+        buildingCode: newBuilding.buildingCode,
+        image: newBuilding.image
+      };
+    }
     
     // Perform the POST request
-    fetch('https://fs-backend-copy-production.up.railway.app/api/user', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody)
-    })
+    fetch(
+      tableContent === 'users'
+        ? 'https://fs-backend-copy-production.up.railway.app/api/user'
+        : 'https://fs-backend-copy-production.up.railway.app/api/building',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      }
+    )
     .then(response => {
       if (!response.ok) {
-        throw new Error('Failed to add user');
+        throw new Error(
+          tableContent === 'users' 
+            ? 'Failed to add user' 
+            : 'Failed to add building'
+        );
       }
       return response.json();
     })
     .then(data => {
-      console.log('New user added successfully:', data);
-      // Reset new user state after saving
-      setNewUser({
-        id: '',
-        lastName: '',
-        firstName: '',
-        username: '',
-        role: '',
-        password: ''
-      });
+      console.log(
+        `New ${tableContent} added successfully:`,
+        data
+      );
+      // Reset state after saving
+      if (tableContent === 'users') {
+        setNewUser({
+          id: '',
+          lastName: '',
+          firstName: '',
+          username: '',
+          role: '',
+          password: ''
+        });
+      } else if (tableContent === 'buildings') {
+        setNewBuilding({
+          id: '',
+          buildingName: '',
+          buildingCode: '',
+          image: ''
+        });
+      }
       closeAddModal();
     })
     .catch(error => {
-      console.error('Error adding user:', error);
+      console.error(`Error adding ${tableContent}:`, error);
       // Handle error, e.g., display error message to user
     });
   }
-
+  
   function openAddModal() {
     addModal.current.open();
-  }
-
-  function closeAddModal() {
-    addModal.current.close();
   }
 
   return (
@@ -213,6 +274,9 @@ export function DataTable<TData, TValue>({
             <Button variant="outline" className="ml-2" style={{ backgroundColor: '#D70040', color: 'white'}} onClick={openAddModal}>Add Entry <Plus /> </Button>
             <Modal 
               ref={addModal}
+              onSubmit={handleAddEntry}
+              buttonVariant="red"
+              buttonCaption="Submit"
             >
               <div className="sm:max-w-[425px]">
                 <div>
@@ -277,8 +341,64 @@ export function DataTable<TData, TValue>({
                       />
                   </div>
                 </div>
-                <div className="flex justify-end">
-                  <Button type="submit" className="ml-2" onClick={handleAddedUser}>Save</Button>
+              </div>
+            </Modal>
+          </>
+        )}
+        {tableContent === "buildings" && (
+          <>
+            <Button
+              variant="outline"
+              className="ml-2"
+              style={{ backgroundColor: "#D70040", color: "white" }}
+              onClick={() => addModal.current.open()}
+            >
+              Add Building <Plus />
+            </Button>
+            <Modal
+              ref={addModal}
+              onSubmit={handleAddEntry}
+              buttonVariant="red"
+              buttonCaption="Submit"
+            >
+              <div className="sm:max-w-[425px]">
+                <div>
+                  <h2 className="text-lg font-semibold mb-2 text-center">
+                    Add Building
+                  </h2>
+                </div>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="buildingName" className="text-right">
+                      Building Name:
+                    </Label>
+                    <Input
+                      id="buildingName"
+                      type="text"
+                      value={newBuilding.buildingName}
+                      onChange={(e) => handleInputChange(e, "buildingName")}
+                      placeholder="Building Name"
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="buildingCode" className="text-right">
+                      Building Code:
+                    </Label>
+                    <Input
+                      id="buildingCode"
+                      type="text"
+                      value={newBuilding.buildingCode}
+                      onChange={(e) => handleInputChange(e, "buildingCode")}
+                      placeholder="Building Code"
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="image" className="text-right">Upload Image:</Label>
+                    <Input id="picture" type="file" onChange={handleImageUpload} />
+                  </div>
+                  <img id="preview" className="h-24 w-full object-contain" />
                 </div>
               </div>
             </Modal>
