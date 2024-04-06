@@ -31,7 +31,7 @@ const Modal = forwardRef(function Modal(
       className="backdrop:bg-stone-900/90 p-4 rounded-md shadow-md"
     >
       {children}
-      <form method="dialog" className="flex flex-col gap-4 ">
+      <form method="dialog" action="post" className="flex flex-col gap-4 ">
         {input}
         <div className="flex justify-end gap-4">
           <Button variant={buttonVariant}>Close</Button>

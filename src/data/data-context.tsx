@@ -71,6 +71,15 @@ export default function DataContextProvider({ children }) {
           };
         });
       }
+      if (action.method === "post") {
+        const spaceImages = (
+          await axios.post(
+            `${endpoint}/api/spaceImage/upload/${action.data.id}`,
+            action.data.file
+          )
+        ).data;
+        console.log(spaceImages);
+      }
     }
     // if (action.type === "ratings") {
     //   if (action.method === "get") {

@@ -118,6 +118,18 @@ export default function Space({ data }) {
     event.preventDefault();
     uploadModal.current.close();
     console.log(event);
+    let value = event.target.form[0].value;
+    let base64Value = btoa(value);
+    console.log(base64Value);
+    let action = {
+      type: "spaceimages",
+      method: "post",
+      data: {
+        id: space.id,
+        file: base64Value,
+      },
+    };
+    useEntry(action);
   }
 
   return (
@@ -144,7 +156,7 @@ export default function Space({ data }) {
       <div className="flex flex-col gap-4 p-6 w-[82rem] mx-auto">
         <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
           <div className="flex justify-between">
-            <h2 className="text-neutral-600 text-2xl font-bold">
+            <h2 className="text-neutral-600 text-2xl">
               {space.name ? space.name : "Space"}
             </h2>
             <Select
@@ -175,10 +187,10 @@ export default function Space({ data }) {
               <img
                 src={`data:image/jpeg;base64,${space.selectedImage}`}
                 alt="space-image"
-                className=" h-[26rem] bg-neutral-100 rounded-xl list-image-none"
+                className=" h-[26rem] bg-neutral-100 rounded-lg list-image-none"
               />
             ) : (
-              <div className=" h-[26rem] animate-pulse bg-neutral-100 rounded-xl ">
+              <div className=" h-[26rem] animate-pulse bg-neutral-100 rounded-lg ">
                 <p className="text-neutral-600 w-fit mx-auto my-44">
                   Click an image from the gallery
                 </p>
@@ -189,10 +201,16 @@ export default function Space({ data }) {
               <Button
                 variant="blue"
                 onClick={() => handleUploadClick("upload")}
+                disabled={space.id === undefined ? true : false}
               >
                 Upload
               </Button>
-              <Button variant="blue">Assess</Button>
+              <Button
+                variant="blue"
+                disabled={space.id === undefined ? true : false}
+              >
+                Assess
+              </Button>
             </menu>
           </div>
           <ImageGallery
