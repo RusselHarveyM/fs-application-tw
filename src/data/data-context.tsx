@@ -72,10 +72,13 @@ export default function DataContextProvider({ children }) {
         });
       }
       if (action.method === "post") {
+        const image = action.data.file;
+        const formData = new FormData();
+        formData.append("file", image);
         const spaceImages = (
           await axios.post(
             `${endpoint}/api/spaceImage/upload/${action.data.id}`,
-            action.data.file
+            formData
           )
         ).data;
         console.log(spaceImages);

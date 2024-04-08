@@ -14,8 +14,6 @@ import { useState, useContext, useEffect, useRef } from "react";
 import { DataContext } from "@/data/data-context";
 import Modal from "./Modal";
 import { Input } from "./ui/input";
-import Popup from "./Popup";
-import CircularProgress from "./CircularProgress";
 
 const SPACE_DEFINITION = {
   id: undefined,
@@ -29,14 +27,17 @@ const SPACE_DEFINITION = {
     shine: undefined,
   },
   isLoad: false,
+  isUpload: false,
 };
 
 export default function Space({ data }) {
   const { spaceImages, ratings, useEntry } = useContext(DataContext);
   const [space, setSpace] = useState(SPACE_DEFINITION);
   const uploadModal = useRef();
+  const selectedUploadImages = useRef();
 
   useEffect(() => {
+    console.log("im in");
     setSpace((prev) => {
       let latestRating = [];
       if (space.id !== undefined) {
@@ -55,6 +56,7 @@ export default function Space({ data }) {
         pictures: space.id !== undefined && spaceImages,
         rating: space.id !== undefined && latestRating,
         isLoad: space.pictures !== undefined && false,
+        isUpload: false,
       };
     });
   }, [spaceImages]);
@@ -100,12 +102,14 @@ export default function Space({ data }) {
 
   function handleImageUpload(event) {
     const file = event.target.files[0];
+    selectedUploadImages.current = file;
+
+    const files = Array.from(event.target.files);
     const reader = new FileReader();
 
     reader.onloadend = () => {
       // The result contains the data URL of the image
       const imgElement = document.getElementById("preview") as HTMLImageElement;
-      console.log(imgElement.src);
       imgElement.src = reader.result as string;
     };
 
@@ -117,19 +121,22 @@ export default function Space({ data }) {
   function handleImageSubmit(event) {
     event.preventDefault();
     uploadModal.current.close();
-    console.log(event);
-    let value = event.target.form[0].value;
-    let base64Value = btoa(value);
-    console.log(base64Value);
     let action = {
       type: "spaceimages",
       method: "post",
       data: {
         id: space.id,
-        file: base64Value,
+        file: selectedUploadImages.current,
       },
     };
     useEntry(action);
+    getSpaceData(space.id);
+    setSpace((prev) => {
+      return {
+        ...prev,
+        isUpload: true,
+      };
+    });
   }
 
   return (
@@ -144,7 +151,13 @@ export default function Space({ data }) {
         buttonCaption="Submit"
         input={
           <>
-            <Input id="picture" type="file" onChange={handleImageUpload} />
+            <Input
+              id="picture"
+              type="file"
+              accept="image/png, image/jpeg"
+              onChange={handleImageUpload}
+              multiple
+            />
             <img id="preview" className="h-24 w-full object-contain" />
           </>
         }
@@ -214,6 +227,7 @@ export default function Space({ data }) {
             </menu>
           </div>
           <ImageGallery
+            isUpload={space.isUpload}
             images={space.pictures}
             onSelectImage={handleImageSelect}
           />

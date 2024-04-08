@@ -1,12 +1,19 @@
-export default function ImageGallery({ images, onSelectImage }) {
+export default function ImageGallery({ images, onSelectImage, isUpload }) {
   let cssLoad = " animate-pulse";
 
   return (
     <div
       className={`grid grid-cols-4 grid-rows-5 w-1/3 h-[30rem] bg-neutral-100 ${
-        images && images?.length > 0 ? undefined : cssLoad
+        (images && images?.length > 0) || isUpload ? undefined : cssLoad
       }`}
     >
+      {isUpload ? (
+        <div className="flex justify-center items-center  w-[25rem] h-[30rem] bg-red-50 relative  opacity-90">
+          <h3 className="text-neutral-600 font-semibold ">
+            Uploading<p className="animate-bounce">...</p>
+          </h3>
+        </div>
+      ) : undefined}
       {images && images?.length > 0 ? (
         images.map((image: any) => {
           return (
@@ -20,9 +27,9 @@ export default function ImageGallery({ images, onSelectImage }) {
           );
         })
       ) : (
-        <p className="text-neutral-600 w-40 h-fit relative top-52 left-32">
-          No Images yet...
-        </p>
+        <div className="flex justify-center items-center text-neutral-600 w-[25rem] h-[30rem] relative">
+          <p>No Images yet...</p>
+        </div>
       )}
     </div>
   );
