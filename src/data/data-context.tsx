@@ -59,6 +59,7 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (error) {
+      console.log(error);
       setData((prev) => {
         return {
           ...prev,
@@ -92,15 +93,15 @@ export default function DataContextProvider({ children }) {
     //..
     if (action.type === "spaceimages") {
       if (action.method === "get") {
-        getSpaceImagesBySpaceId(action.data.id);
+        await getSpaceImagesBySpaceId(action.data.id);
       }
       if (action.method === "post") {
         const image = action.data.file;
-        addSpaceImage(image, action.data.id);
-        getSpaceImagesBySpaceId(action.data.id);
+        await addSpaceImage(image, action.data.id);
+        await getSpaceImagesBySpaceId(action.data.id);
       }
       if (action.method === "delete") {
-        deleteSpaceImage(action.data.id);
+        await deleteSpaceImage(action.data.id);
         console.log("deleted");
       }
     }

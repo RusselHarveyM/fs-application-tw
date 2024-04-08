@@ -17,7 +17,6 @@ import { Input } from "./ui/input";
 import ImageDisplay from "./ImageDisplay";
 
 import evaluate from "../helper/evaluate";
-import scoreHandler from "../helper/score";
 
 const SPACE_DEFINITION = {
   id: undefined,
