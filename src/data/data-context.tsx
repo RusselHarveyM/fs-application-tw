@@ -56,57 +56,53 @@ export default function DataContextProvider({ children }) {
         data: {} // if necessary
     }  
   */
+
+  async function getSpaceImagesBySpaceId(id) {
+    try {
+      const spaceImages = (
+        await axios.get(`${endpoint}/api/spaceImage/get/${id}`)
+      ).data;
+      console.log(spaceImages);
+      setData((prev) => {
+        return {
+          ...prev,
+          spaceImages,
+        };
+      });
+    } catch (error) {
+      setData((prev) => {
+        return {
+          ...prev,
+          spaceImages: [],
+        };
+      });
+    }
+  }
+
+  async function addSpaceImage(image, id) {
+    const formData = new FormData();
+    formData.append("file", image);
+    (await axios.post(`${endpoint}/api/spaceImage/upload/${id}`, formData))
+      .data;
+  }
+
+  async function deleteSpaceImage(id) {
+    await axios.delete(`${endpoint}/api/spaceImage/delete/${id}`);
+  }
+
   async function handleUseEntry(action) {
     //..
     if (action.type === "spaceimages") {
       if (action.method === "get") {
-        try {
-          const spaceImages = (
-            await axios.get(`${endpoint}/api/spaceImage/get/${action.data.id}`)
-          ).data;
-          console.log(spaceImages);
-          setData((prev) => {
-            return {
-              ...prev,
-              spaceImages,
-            };
-          });
-        } catch (error) {
-          setData((prev) => {
-            return {
-              ...prev,
-              spaceImages: [],
-            };
-          });
-        }
+        getSpaceImagesBySpaceId(action.data.id);
       }
       if (action.method === "post") {
         const image = action.data.file;
-        const formData = new FormData();
-        formData.append("file", image);
-        (
-          await axios.post(
-            `${endpoint}/api/spaceImage/upload/${action.data.id}`,
-            formData
-          )
-        ).data;
-        const spaceImages = (
-          await axios.get(`${endpoint}/api/spaceImage/get/${action.data.id}`)
-        ).data;
-        console.log(spaceImages);
-        setData((prev) => {
-          return {
-            ...prev,
-            spaceImages,
-          };
-        });
+        addSpaceImage(image, action.data.id);
+        getSpaceImagesBySpaceId(action.data.id);
       }
       if (action.method === "delete") {
-        (
-          await axios.delete(
-            `${endpoint}/api/spaceImage/delete/${action.data.id}`
-          )
-        ).data;
+        deleteSpaceImage(action.data.id);
         console.log("deleted");
       }
     }
