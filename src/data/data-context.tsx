@@ -110,19 +110,34 @@ export default function DataContextProvider({ children }) {
         console.log("deleted");
       }
     }
-    // if (action.type === "ratings") {
-    //   if (action.method === "get") {
+    if (action.type === "ratings") {
+      if (action.method === "get") {
+        const ratings = (await axios.get(`${endpoint}/api/ratings`)).data;
+        console.log(ratings);
 
-    //     console.log(ratings);
+        setData((prev) => {
+          return {
+            ...prev,
+            ratings,
+          };
+        });
+      }
+      if (action.method === "post") {
+        const rating = (
+          await axios.post(`${endpoint}/api/ratings`, action.data.rate)
+        ).data;
+        console.log(rating);
+        const ratings = (await axios.get(`${endpoint}/api/ratings`)).data;
+        console.log(ratings);
 
-    //     setData((prev) => {
-    //       return {
-    //         ...prev,
-    //         ratings: latestRating,
-    //       };
-    //     });
-    //   }
-    // }
+        setData((prev) => {
+          return {
+            ...prev,
+            ratings,
+          };
+        });
+      }
+    }
   }
 
   useEffect(() => {

@@ -16,6 +16,9 @@ import Modal from "./Modal";
 import { Input } from "./ui/input";
 import ImageDisplay from "./ImageDisplay";
 
+import evaluate from "../helper/evaluate";
+import scoreHandler from "../helper/score";
+
 const SPACE_DEFINITION = {
   id: undefined,
   name: "",
@@ -29,6 +32,7 @@ const SPACE_DEFINITION = {
   },
   isLoad: false,
   isUpload: false,
+  isAssess: false,
 };
 
 export default function Space({ data }) {
@@ -59,9 +63,10 @@ export default function Space({ data }) {
         rating: space.id !== undefined && latestRating,
         isLoad: space.pictures !== undefined && false,
         isUpload: false,
+        isAssess: false,
       };
     });
-  }, [spaceImages]);
+  }, [spaceImages, ratings]);
 
   function getSpaceData(id) {
     let action = {
@@ -166,6 +171,61 @@ export default function Space({ data }) {
     });
   }
 
+  async function handleAssessBtn() {
+    const images = [
+      space.pictures.map((picture) => "data:image/png;base64," + picture.image),
+    ];
+    setSpace((prev) => {
+      return {
+        ...prev,
+        isAssess: true,
+      };
+    });
+    const raw5s = await evaluate(images);
+    console.log(" III raw5s III", raw5s);
+
+    // const { sort, set, shine } = raw5s.comment;
+    const { score: sortScore } = raw5s.result.sort;
+    const { score: setScore } = raw5s.result.set;
+    const { score: shineScore } = raw5s.result.shine;
+
+    const sortScoreFixed = parseFloat(sortScore.toFixed(1));
+    const setScoreFixed = parseFloat(setScore.toFixed(1));
+    const shineScoreFixed = parseFloat(shineScore.toFixed(1));
+
+    console.log(" III data III", data);
+
+    const totalScore = data.scores?.reduce(
+      (acc, score) => acc + (score.sort + score.setInOrder + score.shine) / 3,
+      0
+    );
+
+    let averageScore = totalScore / data.scores?.length;
+    averageScore = Math.min(Math.max(averageScore, 1), 10);
+
+    const newRate = {
+      id: "",
+      sort: sortScoreFixed,
+      setInOrder: setScoreFixed,
+      shine: shineScoreFixed,
+      standarize: 0,
+      sustain: 0,
+      security: 0,
+      isActive: true,
+      spaceId: space.id,
+    };
+
+    let action = {
+      type: "ratings",
+      method: "post",
+      data: {
+        rate: newRate,
+      },
+    };
+
+    useEntry(action);
+  }
+
   return (
     <>
       {space.isLoad && (
@@ -245,13 +305,22 @@ export default function Space({ data }) {
               <Button
                 variant="blue"
                 onClick={() => handleUploadClick("upload")}
-                disabled={space.id === undefined ? true : false}
+                disabled={
+                  space.id === undefined || space.isUpload || space.isAssess
+                    ? true
+                    : false
+                }
               >
                 Upload
               </Button>
               <Button
                 variant="blue"
-                disabled={space.id === undefined ? true : false}
+                onClick={handleAssessBtn}
+                disabled={
+                  space.id === undefined || space.isUpload || space.isAssess
+                    ? true
+                    : false
+                }
               >
                 Assess
               </Button>
@@ -259,6 +328,7 @@ export default function Space({ data }) {
           </div>
           <ImageGallery
             isUpload={space.isUpload}
+            isAssess={space.isAssess}
             images={space.pictures}
             onSelectImage={handleImageSelect}
           />

@@ -1,4 +1,9 @@
-export default function ImageGallery({ images, onSelectImage, isUpload }) {
+export default function ImageGallery({
+  images,
+  onSelectImage,
+  isUpload,
+  isAssess,
+}) {
   let cssLoad = " animate-pulse";
 
   return (
@@ -7,13 +12,20 @@ export default function ImageGallery({ images, onSelectImage, isUpload }) {
         (images && images?.length > 0) || isUpload ? undefined : cssLoad
       }`}
     >
-      {isUpload ? (
+      {isUpload && (
         <div className="flex justify-center items-center  w-[25rem] h-[30rem] bg-neutral-50 relative  opacity-90">
           <h3 className="text-neutral-600 ">
             Uploading<p className="animate-bounce">...</p>
           </h3>
         </div>
-      ) : undefined}
+      )}
+      {isAssess && (
+        <div className="flex justify-center items-center  w-[25rem] h-[30rem] bg-neutral-50 relative  opacity-90">
+          <h3 className="text-neutral-600 ">
+            Assessing<p className="animate-bounce">...</p>
+          </h3>
+        </div>
+      )}
       {images && images?.length > 0
         ? images.map((image: any) => {
             const imageData = {

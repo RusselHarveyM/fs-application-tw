@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const API_KEY = "zKSEIJWU9jceFvUIL8pz";
 
 const SORT = {
@@ -263,7 +265,7 @@ async function computeScores(s3, isClutterResults) {
   return s3;
 }
 
-export async function evaluate(images) {
+export default async function evaluate(images) {
   const s3Results = [];
 
   let overalls3 = {
