@@ -29,6 +29,7 @@ const SPACE_DEFINITION = {
     setInOrder: undefined,
     shine: undefined,
   },
+  assessmentDuration: 0,
   isLoad: false,
   isUpload: false,
   isAssess: false,
@@ -40,6 +41,8 @@ export default function Space({ data }) {
   const uploadModal = useRef();
   const selectedUploadImages = useRef();
   const deleteModal = useRef();
+  const timer = useRef<NodeJS.Timeout | undefined>();
+  const duration = useRef();
 
   useEffect(() => {
     console.log("im in");
@@ -55,6 +58,9 @@ export default function Space({ data }) {
             new Date(a.dateModified).getTime()
         )[0];
       }
+      if (timer.current) {
+        clearInterval(timer.current);
+      }
       console.log("latestRating >>> ", latestRating);
       return {
         ...prev,
@@ -63,6 +69,7 @@ export default function Space({ data }) {
         isLoad: space.pictures !== undefined && false,
         isUpload: false,
         isAssess: false,
+        assessmentDuration: timer.current ? duration.current : 0,
       };
     });
   }, [spaceImages, ratings]);
@@ -180,6 +187,11 @@ export default function Space({ data }) {
         isAssess: true,
       };
     });
+
+    duration.current = 0;
+    timer.current = setInterval(() => {
+      duration.current += 1;
+    }, 1000);
     const raw5s = await evaluate(images);
     console.log(" III raw5s III", raw5s);
 
@@ -328,6 +340,7 @@ export default function Space({ data }) {
           <ImageGallery
             isUpload={space.isUpload}
             isAssess={space.isAssess}
+            duration={space.assessmentDuration}
             images={space.pictures}
             onSelectImage={handleImageSelect}
           />

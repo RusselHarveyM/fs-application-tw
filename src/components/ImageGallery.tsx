@@ -3,6 +3,7 @@ export default function ImageGallery({
   onSelectImage,
   isUpload,
   isAssess,
+  duration,
 }) {
   let cssLoad = " animate-pulse";
 
@@ -10,22 +11,26 @@ export default function ImageGallery({
     <div
       className={`grid grid-cols-4 grid-rows-5 w-1/3 h-[30rem] bg-neutral-100 ${
         (images && images?.length > 0) || isUpload ? undefined : cssLoad
-      }`}
+      } relative`} // Add relative here to position the child absolute elements
     >
+      <p className="absolute m-2 bottom-2 right-2 text-neutral-600 text-xs">
+        {duration.toFixed(2)}s
+      </p>
       {isUpload && (
-        <div className="flex justify-center items-center  w-[25rem] h-[30rem] bg-neutral-50 relative  opacity-90">
+        <div className="absolute top-0 left-0 flex justify-center items-center  w-[25rem] h-[30rem] bg-neutral-50 opacity-90">
           <h3 className="text-neutral-600 ">
             Uploading<p className="animate-bounce">...</p>
           </h3>
         </div>
       )}
       {isAssess && (
-        <div className="flex justify-center items-center  w-[25rem] h-[30rem] bg-neutral-50 relative  opacity-90">
+        <div className="absolute top-0 left-0 flex justify-center items-center  w-[25rem] h-[30rem] bg-neutral-50 opacity-90">
           <h3 className="text-neutral-600 ">
             Assessing<p className="animate-bounce">...</p>
           </h3>
         </div>
       )}
+
       {images && images?.length > 0
         ? images.map((image: any) => {
             const imageData = {
@@ -43,7 +48,7 @@ export default function ImageGallery({
             );
           })
         : !isUpload && (
-            <div className="flex justify-center items-center text-neutral-600 w-[25rem] h-[30rem] relative">
+            <div className="absolute top-0 left-0 flex justify-center items-center text-neutral-600 w-[25rem] h-[30rem]">
               <p>No Images yet...</p>
             </div>
           )}
