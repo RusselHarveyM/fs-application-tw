@@ -46,6 +46,39 @@ export default function DataContextProvider({ children }) {
     }
   }
 
+  async function getSpaceImagesBySpaceId(id) {
+    try {
+      const spaceImages = (
+        await axios.get(`${endpoint}/api/spaceImage/get/${id}`)
+      ).data;
+      console.log(spaceImages);
+      setData((prev) => {
+        return {
+          ...prev,
+          spaceImages,
+        };
+      });
+    } catch (error) {
+      console.log(error);
+      setData((prev) => {
+        return {
+          ...prev,
+          spaceImages: [],
+        };
+      });
+    }
+  }
+
+  async function addSpaceImage(image, id) {
+    const formData = new FormData();
+    formData.append("file", image);
+    await axios.post(`${endpoint}/api/spaceImage/upload/${id}`, formData);
+  }
+
+  async function deleteSpaceImage(id) {
+    await axios.delete(`${endpoint}/api/spaceImage/delete/${id}`);
+  }
+
   /*
   ------------------------
   function handleUseEntry
@@ -60,43 +93,46 @@ export default function DataContextProvider({ children }) {
     //..
     if (action.type === "spaceimages") {
       if (action.method === "get") {
-        const spaceImages = (
-          await axios.get(`${endpoint}/api/spaceImage/get/${action.data.id}`)
-        ).data;
-        console.log(spaceImages);
+        await getSpaceImagesBySpaceId(action.data.id);
+      }
+      if (action.method === "post") {
+        const image = action.data.file;
+        await addSpaceImage(image, action.data.id);
+        await getSpaceImagesBySpaceId(action.data.id);
+      }
+      if (action.method === "delete") {
+        await deleteSpaceImage(action.data.id);
+        console.log("deleted");
+      }
+    }
+    if (action.type === "ratings") {
+      if (action.method === "get") {
+        const ratings = (await axios.get(`${endpoint}/api/ratings`)).data;
+        console.log(ratings);
+
         setData((prev) => {
           return {
             ...prev,
-            spaceImages,
+            ratings,
           };
         });
       }
       if (action.method === "post") {
-        const image = action.data.file;
-        const formData = new FormData();
-        formData.append("file", image);
-        const spaceImages = (
-          await axios.post(
-            `${endpoint}/api/spaceImage/upload/${action.data.id}`,
-            formData
-          )
+        const rating = (
+          await axios.post(`${endpoint}/api/ratings`, action.data.rate)
         ).data;
-        console.log(spaceImages);
+        console.log(rating);
+        const ratings = (await axios.get(`${endpoint}/api/ratings`)).data;
+        console.log(ratings);
+
+        setData((prev) => {
+          return {
+            ...prev,
+            ratings,
+          };
+        });
       }
     }
-    // if (action.type === "ratings") {
-    //   if (action.method === "get") {
-
-    //     console.log(ratings);
-
-    //     setData((prev) => {
-    //       return {
-    //         ...prev,
-    //         ratings: latestRating,
-    //       };
-    //     });
-    //   }
-    // }
   }
 
   useEffect(() => {

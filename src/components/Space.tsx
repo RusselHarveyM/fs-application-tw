@@ -14,6 +14,9 @@ import { useState, useContext, useEffect, useRef } from "react";
 import { DataContext } from "@/data/data-context";
 import Modal from "./Modal";
 import { Input } from "./ui/input";
+import ImageDisplay from "./ImageDisplay";
+
+import evaluate from "../helper/evaluate";
 
 const SPACE_DEFINITION = {
   id: undefined,
@@ -28,6 +31,7 @@ const SPACE_DEFINITION = {
   },
   isLoad: false,
   isUpload: false,
+  isAssess: false,
 };
 
 export default function Space({ data }) {
@@ -35,6 +39,7 @@ export default function Space({ data }) {
   const [space, setSpace] = useState(SPACE_DEFINITION);
   const uploadModal = useRef();
   const selectedUploadImages = useRef();
+  const deleteModal = useRef();
 
   useEffect(() => {
     console.log("im in");
@@ -57,9 +62,10 @@ export default function Space({ data }) {
         rating: space.id !== undefined && latestRating,
         isLoad: space.pictures !== undefined && false,
         isUpload: false,
+        isAssess: false,
       };
     });
-  }, [spaceImages]);
+  }, [spaceImages, ratings]);
 
   function getSpaceData(id) {
     let action = {
@@ -89,6 +95,7 @@ export default function Space({ data }) {
       return {
         ...prev,
         ...currentSpace,
+        selectedImage: "",
         isLoad: true,
       };
     });
@@ -130,13 +137,92 @@ export default function Space({ data }) {
       },
     };
     useEntry(action);
-    getSpaceData(space.id);
     setSpace((prev) => {
       return {
         ...prev,
         isUpload: true,
       };
     });
+  }
+
+  function showOnDeleteMessage() {
+    deleteModal.current.open();
+  }
+
+  function handleImageDelete() {
+    let action = {
+      type: "spaceimages",
+      method: "delete",
+      data: {
+        id: space.selectedImage.id,
+      },
+    };
+    useEntry(action);
+    setSpace((prev) => {
+      const newPictures = prev.pictures.filter(
+        (picture) => picture.id !== prev.selectedImage.id
+      );
+      return {
+        ...prev,
+        pictures: newPictures,
+        selectedImage: "",
+      };
+    });
+  }
+
+  async function handleAssessBtn() {
+    const images = [
+      space.pictures.map((picture) => "data:image/png;base64," + picture.image),
+    ];
+    setSpace((prev) => {
+      return {
+        ...prev,
+        isAssess: true,
+      };
+    });
+    const raw5s = await evaluate(images);
+    console.log(" III raw5s III", raw5s);
+
+    // const { sort, set, shine } = raw5s.comment;
+    const { score: sortScore } = raw5s.result.sort;
+    const { score: setScore } = raw5s.result.set;
+    const { score: shineScore } = raw5s.result.shine;
+
+    const sortScoreFixed = parseFloat(sortScore.toFixed(1));
+    const setScoreFixed = parseFloat(setScore.toFixed(1));
+    const shineScoreFixed = parseFloat(shineScore.toFixed(1));
+
+    console.log(" III data III", data);
+
+    const totalScore = data.scores?.reduce(
+      (acc, score) => acc + (score.sort + score.setInOrder + score.shine) / 3,
+      0
+    );
+
+    let averageScore = totalScore / data.scores?.length;
+    averageScore = Math.min(Math.max(averageScore, 1), 10);
+
+    const newRate = {
+      id: "",
+      sort: sortScoreFixed,
+      setInOrder: setScoreFixed,
+      shine: shineScoreFixed,
+      standarize: 0,
+      sustain: 0,
+      security: 0,
+      isActive: true,
+      spaceId: space.id,
+    };
+
+    let action = {
+      type: "ratings",
+      method: "post",
+      data: {
+        rate: newRate,
+      },
+    };
+
+    useEntry(action);
   }
 
   return (
@@ -166,6 +252,19 @@ export default function Space({ data }) {
       >
         <h2 className="text-neutral-500 text-xl mb-4">Upload an Image</h2>
       </Modal>
+      <Modal
+        ref={deleteModal}
+        buttonCaption="Delete"
+        buttonVariant="red"
+        onSubmit={handleImageDelete}
+      >
+        <h2 className="text-neutral-500 text-xl mb-4">
+          Are you sure you want to delete this image?
+        </h2>
+        {/* <p className="text-red-300 text-md mb-6">
+          *This action is irreversible*
+        </p> */}
+      </Modal>
       <div className="flex flex-col gap-4 p-6 w-[82rem] mx-auto">
         <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
           <div className="flex justify-between">
@@ -174,6 +273,7 @@ export default function Space({ data }) {
             </h2>
             <Select
               onValueChange={(selectedName) => handleSpaceSelect(selectedName)}
+              disabled={space.isLoad}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select a space" />
@@ -196,31 +296,30 @@ export default function Space({ data }) {
         </div>
         <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
           <div className="flex flex-col justify-between w-2/3">
-            {space.selectedImage ? (
-              <img
-                src={`data:image/jpeg;base64,${space.selectedImage.image}`}
-                alt="space-image"
-                className=" h-[26rem] bg-neutral-100 rounded-lg list-image-none"
-              />
-            ) : (
-              <div className=" h-[26rem] animate-pulse bg-neutral-100 rounded-lg ">
-                <p className="text-neutral-600 w-fit mx-auto my-44">
-                  Click an image from the gallery
-                </p>
-              </div>
-            )}
-
+            <ImageDisplay
+              onDelete={showOnDeleteMessage}
+              selectedImage={space.selectedImage}
+            />
             <menu className="flex gap-4 justify-end">
               <Button
                 variant="blue"
                 onClick={() => handleUploadClick("upload")}
-                disabled={space.id === undefined ? true : false}
+                disabled={
+                  space.id === undefined || space.isUpload || space.isAssess
+                    ? true
+                    : false
+                }
               >
                 Upload
               </Button>
               <Button
                 variant="blue"
-                disabled={space.id === undefined ? true : false}
+                onClick={handleAssessBtn}
+                disabled={
+                  space.id === undefined || space.isUpload || space.isAssess
+                    ? true
+                    : false
+                }
               >
                 Assess
               </Button>
@@ -228,6 +327,7 @@ export default function Space({ data }) {
           </div>
           <ImageGallery
             isUpload={space.isUpload}
+            isAssess={space.isAssess}
             images={space.pictures}
             onSelectImage={handleImageSelect}
           />
