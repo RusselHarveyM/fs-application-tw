@@ -34,7 +34,10 @@ export default function DataContextProvider({ children }) {
         spaces: [],
         ratings: [],
       };
-      newData.users = (await axios.get(`${endpoint}/api/user`)).data;
+      newData.users = (await axios.get(`${endpoint}/api/user`)).data.map(user => ({
+        ...user,
+        Name: `${user.firstName} ${user.lastName}` // Calculate fullname
+      }));
       newData.buildings = (await axios.get(`${endpoint}/api/buildings`)).data;
       newData.rooms = (await axios.get(`${endpoint}/api/rooms`)).data;
       newData.spaces = (await axios.get(`${endpoint}/api/space`)).data;

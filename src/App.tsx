@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./pages/Home";
 import RootLayout from "./pages/Root";
-import ManageContent from "./pages/ManageContent";
+import ManageContent from "./pages/ManageContent copy";
 import SettingsContent from "./components/SettingsContent";
 import DataContextProvider from "./data/data-context";
 import Spaces from "./pages/Spaces";

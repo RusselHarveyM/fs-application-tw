@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Button from "./Button";
-import Page from "@/payments/page copy";
+import Button from "../components/Button";
+import Page from "../payments/page copy"; // Import the Page component
 
 export default function ManageContent() {
   const [tableContent, setTableContent] = useState("users");
@@ -8,6 +8,8 @@ export default function ManageContent() {
   function onChangeTableContent(selected) {
     setTableContent(selected);
   }
+
+  // CSS classes for highlighting the selected tab
   const highlightNavClass =
     "border-b-4 font-bold border-red-500 text-red-500 rounded-none";
 
@@ -43,7 +45,9 @@ export default function ManageContent() {
           </Button>
         </menu>
       </div>
-      <Page />
+      {/* Render different content based on the selected tab */}
+      <Page tableContent={tableContent} /> 
+      {/* Add similar conditional rendering for other tabs */}
     </div>
   );
 }
