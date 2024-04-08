@@ -108,12 +108,6 @@ export default function Space({ data }) {
     });
   }
 
-  function handleUploadClick(type) {
-    if (type === "upload") {
-      uploadModal.current.open();
-    }
-  }
-
   function handleImageUpload(event) {
     const file = event.target.files[0];
     selectedUploadImages.current = file;
@@ -152,8 +146,13 @@ export default function Space({ data }) {
     });
   }
 
-  function showOnDeleteMessage() {
-    deleteModal.current.open();
+  function showModal(type) {
+    if (type === "upload") {
+      uploadModal.current.open();
+    }
+    if (type === "delete") {
+      deleteModal.current.open();
+    }
   }
 
   function handleImageDelete() {
@@ -309,13 +308,13 @@ export default function Space({ data }) {
         <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
           <div className="flex flex-col justify-between w-2/3">
             <ImageDisplay
-              onDelete={showOnDeleteMessage}
+              onDelete={() => showModal("delete")}
               selectedImage={space.selectedImage}
             />
             <menu className="flex gap-4 justify-end">
               <Button
                 variant="blue"
-                onClick={() => handleUploadClick("upload")}
+                onClick={() => showModal("upload")}
                 disabled={
                   space.id === undefined || space.isUpload || space.isAssess
                     ? true
