@@ -14,6 +14,8 @@ import { useState, useContext, useEffect, useRef } from "react";
 import { DataContext } from "@/data/data-context";
 import Modal from "./Modal";
 import { Input } from "./ui/input";
+import { Trash } from "lucide-react";
+import ImageDisplay from "./ImageDisplay";
 
 const SPACE_DEFINITION = {
   id: undefined,
@@ -139,6 +141,27 @@ export default function Space({ data }) {
     });
   }
 
+  function handleDeleteImage() {
+    let action = {
+      type: "spaceimages",
+      method: "delete",
+      data: {
+        id: space.selectedImage.id,
+      },
+    };
+    useEntry(action);
+    setSpace((prev) => {
+      const newPictures = prev.pictures.filter(
+        (picture) => picture.id !== prev.selectedImage.id
+      );
+      return {
+        ...prev,
+        pictures: newPictures,
+        selectedImage: "",
+      };
+    });
+  }
+
   return (
     <>
       {space.isLoad && (
@@ -196,20 +219,10 @@ export default function Space({ data }) {
         </div>
         <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
           <div className="flex flex-col justify-between w-2/3">
-            {space.selectedImage ? (
-              <img
-                src={`data:image/jpeg;base64,${space.selectedImage.image}`}
-                alt="space-image"
-                className=" h-[26rem] bg-neutral-100 rounded-lg list-image-none"
-              />
-            ) : (
-              <div className=" h-[26rem] animate-pulse bg-neutral-100 rounded-lg ">
-                <p className="text-neutral-600 w-fit mx-auto my-44">
-                  Click an image from the gallery
-                </p>
-              </div>
-            )}
-
+            <ImageDisplay
+              onDelete={handleDeleteImage}
+              selectedImage={space.selectedImage}
+            />
             <menu className="flex gap-4 justify-end">
               <Button
                 variant="blue"

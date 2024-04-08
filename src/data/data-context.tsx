@@ -83,6 +83,13 @@ export default function DataContextProvider({ children }) {
         ).data;
         console.log(spaceImages);
       }
+      if (action.method === "delete") {
+        (
+          await axios.delete(
+            `${endpoint}/api/spaceImage/delete/${action.data.id}`
+          )
+        ).data;
+      }
     }
     // if (action.type === "ratings") {
     //   if (action.method === "get") {
