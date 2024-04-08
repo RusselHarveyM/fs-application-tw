@@ -91,6 +91,7 @@ export default function Space({ data }) {
       return {
         ...prev,
         ...currentSpace,
+        selectedImage: "",
         isLoad: true,
       };
     });
@@ -132,7 +133,6 @@ export default function Space({ data }) {
       },
     };
     useEntry(action);
-    getSpaceData(space.id);
     setSpace((prev) => {
       return {
         ...prev,
@@ -214,6 +214,7 @@ export default function Space({ data }) {
             </h2>
             <Select
               onValueChange={(selectedName) => handleSpaceSelect(selectedName)}
+              disabled={space.isLoad}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select a space" />

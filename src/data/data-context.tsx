@@ -60,6 +60,36 @@ export default function DataContextProvider({ children }) {
     //..
     if (action.type === "spaceimages") {
       if (action.method === "get") {
+        try {
+          const spaceImages = (
+            await axios.get(`${endpoint}/api/spaceImage/get/${action.data.id}`)
+          ).data;
+          console.log(spaceImages);
+          setData((prev) => {
+            return {
+              ...prev,
+              spaceImages,
+            };
+          });
+        } catch (error) {
+          setData((prev) => {
+            return {
+              ...prev,
+              spaceImages: [],
+            };
+          });
+        }
+      }
+      if (action.method === "post") {
+        const image = action.data.file;
+        const formData = new FormData();
+        formData.append("file", image);
+        (
+          await axios.post(
+            `${endpoint}/api/spaceImage/upload/${action.data.id}`,
+            formData
+          )
+        ).data;
         const spaceImages = (
           await axios.get(`${endpoint}/api/spaceImage/get/${action.data.id}`)
         ).data;
@@ -71,24 +101,13 @@ export default function DataContextProvider({ children }) {
           };
         });
       }
-      if (action.method === "post") {
-        const image = action.data.file;
-        const formData = new FormData();
-        formData.append("file", image);
-        const spaceImages = (
-          await axios.post(
-            `${endpoint}/api/spaceImage/upload/${action.data.id}`,
-            formData
-          )
-        ).data;
-        console.log(spaceImages);
-      }
       if (action.method === "delete") {
         (
           await axios.delete(
             `${endpoint}/api/spaceImage/delete/${action.data.id}`
           )
         ).data;
+        console.log("deleted");
       }
     }
     // if (action.type === "ratings") {
