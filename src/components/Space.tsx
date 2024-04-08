@@ -198,7 +198,7 @@ export default function Space({ data }) {
           <div className="flex flex-col justify-between w-2/3">
             {space.selectedImage ? (
               <img
-                src={`data:image/jpeg;base64,${space.selectedImage}`}
+                src={`data:image/jpeg;base64,${space.selectedImage.image}`}
                 alt="space-image"
                 className=" h-[26rem] bg-neutral-100 rounded-lg list-image-none"
               />

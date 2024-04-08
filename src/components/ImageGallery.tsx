@@ -16,12 +16,16 @@ export default function ImageGallery({ images, onSelectImage, isUpload }) {
       ) : undefined}
       {images && images?.length > 0 ? (
         images.map((image: any) => {
+          const imageData = {
+            id: image.id,
+            image: image.image,
+          };
           return (
             <img
               key={image.id}
               src={`data:image/jpeg;base64,${image.image}`}
               alt="gallery-image"
-              onClick={() => onSelectImage(image.image)}
+              onClick={() => onSelectImage(imageData)}
               className={`h-full w-full object-fit  hover:scale-105 hover:cursor-pointer`}
             />
           );
