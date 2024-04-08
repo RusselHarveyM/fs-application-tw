@@ -2,6 +2,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRef } from "react";
+import Modal from "@/components/Modal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,8 +21,22 @@ export type User = {
   fullName: string;
 };
 
-import { useRef } from "react";
-import Modal from "@/components/Modal";
+async function deleteUser(userId) {
+  try {
+    const response = await fetch(`https://fs-backend-copy-production.up.railway.app/api/user/${userId}`, {
+      method: 'DELETE',
+      // Add any necessary headers, authentication, etc.
+    });
+
+    if (response.ok) {
+      console.log('User deleted successfully');
+    } else {
+      console.error('Failed to delete user');
+    }
+  } catch (error) {
+    console.error('Error deleting user:', error);
+  }
+}
 
 export const userColumns: ColumnDef<User>[] = [
   {
@@ -110,9 +126,12 @@ export const userColumns: ColumnDef<User>[] = [
       const deleteModal = useRef();
 
       function handleDropdownSelect(selected) {
-        selected === "edit"
-          ? editModal.current.open()
-          : deleteModal.current.open();
+        if (selected === "delete") {
+          const userId = user.id;
+          deleteModal.current.open(() => deleteUser(userId));
+        } else {
+          editModal.current.open();
+        }
       }
 
       return (
@@ -124,7 +143,7 @@ export const userColumns: ColumnDef<User>[] = [
           >
             <p>Edit</p>
           </Modal>
-          <Modal
+          <Modal onClick={() => deleteUser(user.id)}
             buttonCaption="Delete Entry"
             buttonVariant="red"
             ref={deleteModal}
