@@ -46,17 +46,6 @@ export default function DataContextProvider({ children }) {
     }
   }
 
-  /*
-  ------------------------
-  function handleUseEntry
-  ------------------------
-    param: action = {
-        type: buildings/users/rooms/..
-        method: GET/POST/..
-        data: {} // if necessary
-    }  
-  */
-
   async function getSpaceImagesBySpaceId(id) {
     try {
       const spaceImages = (
@@ -82,14 +71,23 @@ export default function DataContextProvider({ children }) {
   async function addSpaceImage(image, id) {
     const formData = new FormData();
     formData.append("file", image);
-    (await axios.post(`${endpoint}/api/spaceImage/upload/${id}`, formData))
-      .data;
+    await axios.post(`${endpoint}/api/spaceImage/upload/${id}`, formData);
   }
 
   async function deleteSpaceImage(id) {
     await axios.delete(`${endpoint}/api/spaceImage/delete/${id}`);
   }
 
+  /*
+  ------------------------
+  function handleUseEntry
+  ------------------------
+    param: action = {
+        type: buildings/users/rooms/..
+        method: GET/POST/..
+        data: {} // if necessary
+    }  
+  */
   async function handleUseEntry(action) {
     //..
     if (action.type === "spaceimages") {
