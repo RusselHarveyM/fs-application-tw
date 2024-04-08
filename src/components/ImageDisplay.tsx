@@ -18,7 +18,7 @@ export default function ImageDisplay({ onDelete, selectedImage }) {
         />
       ) : (
         <div className=" animate-pulse bg-neutral-100 rounded-lg ">
-          <p className="text-neutral-600 w-fit mx-auto my-44">
+          <p className="text-neutral-600 w-fit mx-auto my-44 rounded-lg">
             Click an image from the gallery
           </p>
         </div>

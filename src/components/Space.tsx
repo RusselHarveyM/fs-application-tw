@@ -14,7 +14,6 @@ import { useState, useContext, useEffect, useRef } from "react";
 import { DataContext } from "@/data/data-context";
 import Modal from "./Modal";
 import { Input } from "./ui/input";
-import { Trash } from "lucide-react";
 import ImageDisplay from "./ImageDisplay";
 
 const SPACE_DEFINITION = {
@@ -37,6 +36,7 @@ export default function Space({ data }) {
   const [space, setSpace] = useState(SPACE_DEFINITION);
   const uploadModal = useRef();
   const selectedUploadImages = useRef();
+  const deleteModal = useRef();
 
   useEffect(() => {
     console.log("im in");
@@ -141,7 +141,11 @@ export default function Space({ data }) {
     });
   }
 
-  function handleDeleteImage() {
+  function showOnDeleteMessage() {
+    deleteModal.current.open();
+  }
+
+  function handleImageDelete() {
     let action = {
       type: "spaceimages",
       method: "delete",
@@ -189,6 +193,19 @@ export default function Space({ data }) {
       >
         <h2 className="text-neutral-500 text-xl mb-4">Upload an Image</h2>
       </Modal>
+      <Modal
+        ref={deleteModal}
+        buttonCaption="Delete"
+        buttonVariant="red"
+        onSubmit={handleImageDelete}
+      >
+        <h2 className="text-neutral-500 text-xl mb-4">
+          Are you sure you want to delete this image?
+        </h2>
+        {/* <p className="text-red-300 text-md mb-6">
+          *This action is irreversible*
+        </p> */}
+      </Modal>
       <div className="flex flex-col gap-4 p-6 w-[82rem] mx-auto">
         <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
           <div className="flex justify-between">
@@ -220,7 +237,7 @@ export default function Space({ data }) {
         <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
           <div className="flex flex-col justify-between w-2/3">
             <ImageDisplay
-              onDelete={handleDeleteImage}
+              onDelete={showOnDeleteMessage}
               selectedImage={space.selectedImage}
             />
             <menu className="flex gap-4 justify-end">
