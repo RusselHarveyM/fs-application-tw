@@ -1,4 +1,8 @@
-export default function ScoreCard({ type = "sort", score = 0 }) {
+export default function ScoreCard({
+  type = "sort",
+  score = 0,
+  isLoad = false,
+}) {
   let cssContainerHighlight = " bg-white";
   let cssTextHighlight = " text-neutral-400";
   if (score > 3 && score < 8) {
@@ -15,10 +19,16 @@ export default function ScoreCard({ type = "sort", score = 0 }) {
   return (
     <div
       className={
-        "flex flex-col gap-4 w-64 h-32 shadow-md px-4 py-2 rounded-lg hover:cursor-pointer transition delay-150 ease-in-out hover:scale-105 hover:brightness-110" +
+        "relative flex flex-col gap-4 w-64 h-32 shadow-md px-4 py-2 rounded-lg hover:cursor-pointer transition delay-150 ease-in-out hover:scale-105 hover:brightness-110" +
         cssContainerHighlight
       }
     >
+      {isLoad && (
+        <div
+          className={`absolute top-0 left-0 bg-neutral-50 w-full h-full rounded-md opacity-70 animate-pulse`}
+        />
+      )}
+
       <h2 className={"text-3xl font-semibold uppercase" + cssTextHighlight}>
         {type}
       </h2>

@@ -8,7 +8,6 @@ import {
 import ImageGallery from "./ImageGallery";
 import Button from "./Button";
 import ScoreCard from "./ScoreCard";
-import Details from "./Details";
 import { useState, useContext, useEffect, useRef } from "react";
 
 import { DataContext } from "@/data/data-context";
@@ -18,6 +17,8 @@ import ImageDisplay from "./ImageDisplay";
 
 import evaluate from "../helper/evaluate";
 import comment from "../helper/comment";
+
+import Comment from "./Comment";
 
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
@@ -382,33 +383,22 @@ export default function Space({ data }) {
         </div>
         <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
           <div className="flex flex-col gap-4 justify-center">
-            <ScoreCard score={space.isLoad ? 0 : space.rating?.sort} />
             <ScoreCard
+              isLoad={space.isAssess}
+              score={space.isLoad ? 0 : space.rating?.sort}
+            />
+            <ScoreCard
+              isLoad={space.isAssess}
               type="set"
               score={space.isLoad ? 0 : space.rating?.setInOrder}
             />
             <ScoreCard
+              isLoad={space.isAssess}
               type="shine"
               score={space.isLoad ? 0 : space.rating?.shine}
             />
           </div>
-          <article className="flex flex-col gap-4 w-full h-90 border-dashed border-4 rounded-lg bg-neutral-100 py-4 px-6">
-            <h2 className="uppercase text-xl font-semibold">SORT</h2>
-            <Details
-              title="Summary"
-              text={` Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Reprehenderit suscipit vero dolores fugiat natus tempora quidem
-              voluptates libero, praesentium, atque aut? Pariatur, provident rem
-              quod hic minus quis id non?`}
-            />
-            <Details
-              title="Things to improve"
-              text={` Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Reprehenderit suscipit vero dolores fugiat natus tempora quidem
-              voluptates libero, praesentium, atque aut? Pariatur, provident rem
-              quod hic minus quis id non?`}
-            />
-          </article>
+          <Comment isLoad={space.isAssess} />
         </div>
       </div>
     </>
