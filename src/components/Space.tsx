@@ -385,17 +385,19 @@ export default function Space({ data }) {
           <div className="flex flex-col gap-4 justify-center">
             <ScoreCard
               isLoad={space.isAssess}
-              score={space.isLoad ? 0 : space.rating?.sort}
+              score={space.isLoad || space.isAssess ? 0 : space.rating?.sort}
             />
             <ScoreCard
               isLoad={space.isAssess}
               type="set"
-              score={space.isLoad ? 0 : space.rating?.setInOrder}
+              score={
+                space.isLoad || space.isAssess ? 0 : space.rating?.setInOrder
+              }
             />
             <ScoreCard
               isLoad={space.isAssess}
               type="shine"
-              score={space.isLoad ? 0 : space.rating?.shine}
+              score={space.isLoad || space.isAssess ? 0 : space.rating?.shine}
             />
           </div>
           <Comment isLoad={space.isAssess} />
