@@ -29,6 +29,7 @@ const SPACE_DEFINITION = {
   pictures: undefined,
   roomId: undefined,
   selectedImage: "",
+  selectedScore: "",
   rating: {
     sort: undefined,
     setInOrder: undefined,
@@ -101,6 +102,7 @@ export default function Space({ data }) {
         isUpload: false,
         isAssess: false,
         selectedImage: "",
+        selectedScore: "",
         assessmentDuration: prevTimer ? duration.current : 0,
       };
     });
@@ -225,7 +227,8 @@ export default function Space({ data }) {
       duration.current += 1;
     }, 1000);
     const raw5s = await evaluate(images);
-    comment(raw5s);
+    const commentResult = comment(raw5s.result);
+    const { sort, set, shine } = commentResult;
     console.log(" III raw5s III", raw5s);
 
     // const { sort, set, shine } = raw5s.comment;
@@ -247,27 +250,36 @@ export default function Space({ data }) {
     let averageScore = totalScore / data.scores?.length;
     averageScore = Math.min(Math.max(averageScore, 1), 10);
 
-    const newRate = {
-      id: "",
+    let scores = {
+      spaceId: space.id,
       sort: sortScoreFixed,
       setInOrder: setScoreFixed,
       shine: shineScoreFixed,
-      standarize: 0,
-      sustain: 0,
-      security: 0,
-      isActive: true,
-      spaceId: space.id,
+      comment: {
+        sort: sort,
+        setInOrder: set,
+        shine: shine,
+      },
     };
 
     let action = {
       type: "ratings",
       method: "post",
       data: {
-        rate: newRate,
+        scores,
       },
     };
 
     useEntry(action);
+  }
+
+  function handleScoreClick(type) {
+    setSpace((prev) => {
+      return {
+        ...prev,
+        selectedScore: type,
+      };
+    });
   }
 
   return (
@@ -318,7 +330,7 @@ export default function Space({ data }) {
             </h2>
             <Select
               onValueChange={(selectedName) => handleSpaceSelect(selectedName)}
-              disabled={space.isLoad}
+              disabled={space.isLoad || space.isAssess}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select a space" />
@@ -371,21 +383,23 @@ export default function Space({ data }) {
             </menu>
           </div>
           <ImageGallery
-            isLoad={
-              space.isUpload ||
-              space.isAssess ||
-              space.selectedImage === undefined
-            }
+            isLoad={space.isUpload || space.selectedImage === undefined}
             duration={space.assessmentDuration}
             images={space.pictures}
             onSelectImage={handleImageSelect}
           />
         </div>
+        {space.isAssess && (
+          <div className=" w-32 h-fit text-center m-auto pt-2 mt-2">
+            <p className="text-neutral-600 animate-bounce">Please wait...</p>
+          </div>
+        )}
         <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
           <div className="flex flex-col gap-4 justify-center">
             <ScoreCard
               isLoad={space.isAssess}
               score={space.isLoad || space.isAssess ? 0 : space.rating?.sort}
+              onClick={() => handleScoreClick("sort")}
             />
             <ScoreCard
               isLoad={space.isAssess}
@@ -393,14 +407,20 @@ export default function Space({ data }) {
               score={
                 space.isLoad || space.isAssess ? 0 : space.rating?.setInOrder
               }
+              onClick={() => handleScoreClick("set in order")}
             />
             <ScoreCard
               isLoad={space.isAssess}
               type="shine"
               score={space.isLoad || space.isAssess ? 0 : space.rating?.shine}
+              onClick={() => handleScoreClick("shine")}
             />
           </div>
-          <Comment isLoad={space.isAssess} />
+          <Comment
+            isLoad={space.isAssess || space.isLoad}
+            selected={space.selectedScore}
+            ratingId={space.rating?.id}
+          />
         </div>
       </div>
     </>

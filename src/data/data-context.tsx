@@ -23,6 +23,7 @@ export default function DataContextProvider({ children }) {
     spaces: undefined,
     spaceImages: undefined,
     ratings: undefined,
+    comments: undefined,
   });
 
   async function fetchAllData() {
@@ -33,12 +34,14 @@ export default function DataContextProvider({ children }) {
         rooms: [],
         spaces: [],
         ratings: [],
+        comments: [],
       };
       newData.users = (await axios.get(`${endpoint}/api/user`)).data;
       newData.buildings = (await axios.get(`${endpoint}/api/buildings`)).data;
       newData.rooms = (await axios.get(`${endpoint}/api/rooms`)).data;
       newData.spaces = (await axios.get(`${endpoint}/api/space`)).data;
       newData.ratings = (await axios.get(`${endpoint}/api/ratings`)).data;
+      newData.comments = (await axios.get(`${endpoint}/api/comment`)).data;
       console.log(newData);
       setData(newData);
     } catch (error) {
@@ -119,16 +122,43 @@ export default function DataContextProvider({ children }) {
         });
       }
       if (action.method === "post") {
-        const rating = (
-          await axios.post(`${endpoint}/api/ratings`, action.data.rate)
-        ).data;
+        let scores = action.data.scores;
+        console.log("scores", scores);
+        const newRate = {
+          id: "",
+          sort: scores.sort,
+          setInOrder: scores.setInOrder,
+          shine: scores.shine,
+          standarize: 0,
+          sustain: 0,
+          security: 0,
+          isActive: true,
+          spaceId: scores.spaceId,
+        };
+        const rating = (await axios.post(`${endpoint}/api/ratings`, newRate))
+          .data;
         console.log(rating);
+        const newComment = {
+          id: "",
+          sort: scores.comment.sort,
+          setInOrder: scores.comment.setInOrder,
+          shine: scores.comment.shine,
+          standarize: "",
+          sustain: "",
+          security: "",
+          isActive: true,
+          ratingId: rating,
+        };
+        await axios.post(`${endpoint}/api/comment`, newComment);
+        const comments = (await axios.get(`${endpoint}/api/comment`)).data;
         const ratings = (await axios.get(`${endpoint}/api/ratings`)).data;
         console.log(ratings);
+        console.log(comments);
 
         setData((prev) => {
           return {
             ...prev,
+            comments,
             ratings,
           };
         });
@@ -147,6 +177,7 @@ export default function DataContextProvider({ children }) {
     spaces: data.spaces,
     spaceImages: data.spaceImages,
     ratings: data.ratings,
+    comments: data.comments,
     useEntry: handleUseEntry,
   };
   return (

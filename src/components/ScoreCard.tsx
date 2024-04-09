@@ -2,6 +2,7 @@ export default function ScoreCard({
   type = "sort",
   score = 0,
   isLoad = false,
+  ...props
 }) {
   let cssContainerHighlight = " bg-white";
   let cssTextHighlight = " text-neutral-400";
@@ -22,6 +23,7 @@ export default function ScoreCard({
         "relative flex flex-col gap-4 w-64 h-32 shadow-md px-4 py-2 rounded-lg hover:cursor-pointer transition delay-150 ease-in-out hover:scale-105 hover:brightness-110" +
         cssContainerHighlight
       }
+      {...props}
     >
       {isLoad && (
         <div
