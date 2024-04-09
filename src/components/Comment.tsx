@@ -49,16 +49,25 @@ export default function Comment({ isLoad = false, selected, ratingId }) {
       {isLoad ? (
         <Skeleton className="h-6 w-[100px]" />
       ) : (
-        <h2 className="uppercase text-xl font-semibold">{selected}</h2>
+        <h2
+          className={`text-neutral-600 text-xl font-semibol ${
+            selected === "" ? " animate-pulse" : "uppercase"
+          }`}
+        >
+          {selected !== "" ? selected : "Please click a score card"}
+        </h2>
       )}
-
-      <Details isLoad={isLoad} title="Summary" text={summary} />
-      <Details
-        isLoad={isLoad}
-        list={true}
-        title="Things to improve"
-        text={thingsToImprove}
-      />
+      {selected !== "" && (
+        <>
+          <Details isLoad={isLoad} title="Summary" text={summary} />
+          <Details
+            isLoad={isLoad}
+            list={true}
+            title="Things to improve"
+            text={thingsToImprove}
+          />
+        </>
+      )}
     </article>
   );
 }
