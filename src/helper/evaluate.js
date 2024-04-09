@@ -57,10 +57,15 @@ async function countDesksChairs(image) {
     .catch(function (error) {
       console.log(error.message);
     });
-  return { count: response.predictions.length, data: response };
+  return {
+    count: response.predictions.length,
+    data: response,
+    predictions: response.predictions,
+  };
 }
 
 async function organizationCheck(image, set) {
+  let prediction;
   await axios({
     method: "POST",
     url: "https://detect.roboflow.com/classroom-order-seg/9",
@@ -73,6 +78,7 @@ async function organizationCheck(image, set) {
     },
   })
     .then(function (res) {
+      prediction = res.data.predictions;
       console.log("organize check >>>", res.data);
       res.data.predictions.map((prediction) => {
         if (prediction.class === "disorganized") set.disorganizedRow++;
@@ -84,12 +90,14 @@ async function organizationCheck(image, set) {
     });
   let overall = set.organizedRow + set.disorganizedRow;
   set.organization = (set.organizedRow / overall) * 10;
+  return prediction;
 }
 
 async function personalBelongingsCheck(image) {
   let response = {
     predictions: [],
   };
+  let predictions;
   await axios({
     method: "POST",
     url: "https://detect.roboflow.com/classroom-3igmn/11",
@@ -103,6 +111,7 @@ async function personalBelongingsCheck(image) {
   })
     .then(function (res) {
       response = res.data;
+      predictions = res.data.predictions;
       console.log("personalBelongings check >>> ", res.data);
     })
     .catch(function (error) {
@@ -112,13 +121,14 @@ async function personalBelongingsCheck(image) {
   let personalBelongings = response.predictions.filter(
     (pred) => pred.class === "personal belongings"
   );
-  return personalBelongings;
+  return { personalBelongings, predictions };
 }
 
 async function blueDetection(image, sort, set) {
   let response = {
     predictions: [],
   };
+  let predictions;
 
   await axios({
     method: "POST",
@@ -135,6 +145,7 @@ async function blueDetection(image, sort, set) {
       // Log the response data for each request
       console.log("blue >>>", res.data);
       response = res.data;
+      predictions = res.data.predictions;
     })
     .catch(function (error) {
       console.log(error.message);
@@ -150,12 +161,14 @@ async function blueDetection(image, sort, set) {
     if (prediction.class == "exhaust fan") set.exhaust++;
     if (prediction.class == "ventilation") set.ventilation++;
   });
+  return predictions;
 }
 
 async function cleanlinessDetection(image, shine) {
   let response = {
     predictions: [],
   };
+  let prediction;
   await axios({
     method: "POST",
     url: "https://detect.roboflow.com/classroom-yellow-seg/7",
@@ -168,6 +181,7 @@ async function cleanlinessDetection(image, shine) {
     },
   })
     .then(function (res) {
+      prediction = res.data.predictions;
       console.log("cleanliness detection >>> ", res.data);
       response = res.data;
     })
@@ -180,6 +194,8 @@ async function cleanlinessDetection(image, shine) {
     if (prediction.class == "damage") shine.damage++;
     if (prediction.class == "litter") shine.litter++;
   });
+
+  return prediction;
 }
 
 function isCluttered(dcObjects, pbObjects) {
@@ -274,6 +290,8 @@ export default async function evaluate(images) {
     shine: { ...SHINE },
   };
 
+  let allPredictions = [];
+
   let organizationCountImage = 0;
   let length = images[0].length;
 
@@ -284,10 +302,12 @@ export default async function evaluate(images) {
     let sort = { ...SORT };
     let set = { ...SET };
     let shine = { ...SHINE };
+    let predictionsPoints = [];
 
     const image = images[0][index];
 
     const count = await countDesksChairs(image);
+    predictionsPoints.push(count.predictions);
     const predictions = count.data.predictions;
     console.log("count {}{}{}{}{}{}", count);
     predictions.map((prediction) => {
@@ -297,14 +317,16 @@ export default async function evaluate(images) {
     });
 
     if (count.count >= 10) {
-      await organizationCheck(image, set);
+      predictionsPoints.push(await organizationCheck(image, set));
       // organizeScore += set.organization;
       organizationCountImage++;
     }
-    await blueDetection(image, sort, set);
-    const pb_result = await personalBelongingsCheck(image);
+    predictionsPoints.push(await blueDetection(image, sort, set));
+    const pb_result_temp = await personalBelongingsCheck(image);
+    predictionsPoints.push(pb_result_temp.predictions);
+    const pb_result = pb_result_temp.personalBelongings;
     const ic_result = isCluttered(predictions, pb_result);
-    await cleanlinessDetection(image, shine);
+    predictionsPoints.push(await cleanlinessDetection(image, shine));
     let s3 = {
       sort: sort,
       set: set,
@@ -323,6 +345,7 @@ export default async function evaluate(images) {
     for (let prop in shine) {
       overalls3.shine[prop] += shine[prop];
     }
+    allPredictions.push(predictionsPoints);
   }
   overalls3.sort.score /= length;
   overalls3.sort.clutter /= length;
@@ -333,41 +356,9 @@ export default async function evaluate(images) {
 
   overalls3.shine.score /= length;
 
-  // let comments = {
-  //   sort: "",
-  //   set: "",
-  //   shine: "",
-  // };
-
-  // let overallS3Copy = { ...overalls3 };
-  // console.log("overallS3Copy ^^^^^ overallS3Copy", overallS3Copy);
-
-  // for (let prop in overallS3Copy) {
-  //   for (let subProp in overallS3Copy[prop]) {
-  //     if (subProp !== "score" && subProp !== "organization") {
-  //       comments[prop] += `\n• ${subProp}: ${overallS3Copy[prop][subProp]};`;
-  //     }
-  //   }
-  //   if (prop === "sort" && overallS3Copy[prop].score < 10)
-  //     comments[
-  //       prop
-  //     ] += `\n\n To achieve a high score in ${prop}, please make sure that the area is clutter-free.`;
-  //   if (prop === "set" && overallS3Copy[prop].score < 10)
-  //     comments[
-  //       prop
-  //     ] += `\n\n To achieve a high score in ${prop}, desks and chairs should be properly organized.`;
-  //   if (prop === "shine" && overallS3Copy[prop].score < 10)
-  //     comments[
-  //       prop
-  //     ] += `\n\n To achieve a high score in ${prop}, Aim for a score of 0 for each criteria listed.`;
-  // }
-
-  // console.log("comments >>>>> ", comments);
-
   console.log("srResultsssss >>>>> ", s3Results);
   return {
     result: overalls3,
-    // comment: overallS3Copy,
-    // standardize: organizeScore / length,
+    predictions: allPredictions,
   };
 }

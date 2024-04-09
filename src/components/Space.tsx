@@ -227,6 +227,7 @@ export default function Space({ data }) {
       duration.current += 1;
     }, 1000);
     const raw5s = await evaluate(images);
+    console.log("predictions >> ", raw5s.predictions);
     const commentResult = comment(raw5s.result);
     const { sort, set, shine } = commentResult;
     console.log(" III raw5s III", raw5s);

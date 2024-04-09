@@ -6,7 +6,6 @@ import { DataContext } from "@/data/data-context";
 export default function Comment({ isLoad = false, selected, ratingId }) {
   const { comments } = useContext(DataContext);
 
-  let commentObject;
   let thingsToImprove = [];
   let summary;
 
@@ -57,7 +56,7 @@ export default function Comment({ isLoad = false, selected, ratingId }) {
           {selected !== "" ? selected : "Please click a score card"}
         </h2>
       )}
-      {selected !== "" && (
+      {(selected !== "" || isLoad) && (
         <>
           <Details isLoad={isLoad} title="Summary" text={summary} />
           <Details
