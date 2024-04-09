@@ -82,6 +82,22 @@ export default function DataContextProvider({ children }) {
     await axios.delete(`${endpoint}/api/spaceImage/delete/${id}`);
   }
 
+  async function deleteUser(userId) {
+    await axios.delete(`${endpoint}/api/user/${userId}`);
+  }
+
+  async function deleteBuilding(buildingName) {
+    await axios.delete(`${endpoint}/api/buildings/${buildingName}`);
+  }
+
+  async function deleteRoom(roomNumber, buildingId) {
+    await axios.delete(`${endpoint}/api/rooms/${buildingId}?roomNumber=${roomNumber}`);
+  }
+
+  async function deleteSpace(spaceId) {
+    await axios.delete(`${endpoint}/api/space/${spaceId}`);
+  }
+
   /*
   ------------------------
   function handleUseEntry
@@ -134,6 +150,81 @@ export default function DataContextProvider({ children }) {
             ratings,
           };
         });
+      }
+    }
+    if (action.type === 'users') {
+      if (action.method === 'delete') {
+        const userId = action.data.id;
+        // Perform the deletion logic here, such as making a DELETE request to your backend API
+        try {
+          // Assuming your API endpoint for deleting a user is `${endpoint}/api/user/${userId}`
+          await deleteUser(userId);
+          // After successful deletion, update the users data in state
+          setData((prevData) => ({
+            ...prevData,
+            users: prevData.users.filter(user => user.id !== userId)
+          }));
+          console.log(`User with ID ${userId} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting user:', error);
+        }
+      }
+    }
+    if (action.type === 'buildings') {
+      if (action.method === 'delete') {
+        const buildingName = action.data.buildingName;
+        console.log(buildingName);
+        // Perform the deletion logic here, such as making a DELETE request to your backend API
+        try {
+          // Assuming your API endpoint for deleting a building is `${endpoint}/api/buildings/${buildingName}`
+          await deleteBuilding(buildingName);
+          // After successful deletion, update the building data in state
+          setData((prevData) => ({
+            ...prevData,
+            buildings: prevData.buildings.filter(building => building.buildingName !== buildingName)
+          }));
+          console.log(`Building with Name ${buildingName} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting Building:', error);
+        }
+      }
+    }
+    if (action.type === 'rooms') {
+      if (action.method === 'delete') {
+        const { roomNumber, buildingId } = action.data;
+        console.log(roomNumber, buildingId);
+        // Perform the deletion logic here, such as making a DELETE request to your backend API
+        try {
+          // Assuming your API endpoint for deleting a room is `${endpoint}/api/rooms/${roomNumber}`
+          await deleteRoom(roomNumber, buildingId);
+          // After successful deletion, update the room data in state
+          setData((prevData) => ({
+            ...prevData,
+            rooms: prevData.rooms.filter(room => room.roomNumber !== roomNumber)
+          }));
+          console.log(`Room with number ${roomNumber} in building ${buildingId} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting room:', error);
+        }
+      }
+    }
+    if (action.type === 'spaces') {
+      if (action.method === 'delete') {
+        const spaceId = action.data.id;
+        console.log(spaceId);
+        // Perform the deletion logic here, such as making a DELETE request to your backend API
+        try {
+          // Assuming your API endpoint for deleting a room is `${endpoint}/api/space/${spaceId}`
+          await deleteSpace(spaceId);
+          // After successful deletion, update the space data in state
+          setData((prevData) => ({
+            ...prevData,
+            spaces: prevData.spaces.filter(space => space.id !== spaceId)
+          }));
+          console.log(`Space with ID ${spaceId} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting space:', error);
+        }
       }
     }
   }

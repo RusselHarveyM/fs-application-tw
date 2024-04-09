@@ -10,7 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Modal from "@/components/Modal";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
+import { DataContext } from "@/data/data-context";
 
 export type Space = {
   id: string;
@@ -68,14 +69,34 @@ export const spaceColumns: ColumnDef<Space>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const user = row.original;
+      const space = row.original;
       const editModal = useRef();
       const deleteModal = useRef();
+      const { useEntry } = useContext(DataContext); // Get useEntry function from DataContext
 
-      function handleDropdownSelect(selected){
-        selected === "edit"
-          ? editModal.current.open()
-          : deleteModal.current.open();
+      async function handleSpaceDelete() {
+        try {
+          const action = {
+            type: "spaces",
+            method: "delete",
+            data: {
+              id: space.id
+            },
+          };
+          // Call the useEntry function to delete the space
+          useEntry(action);
+          console.log(`Space with ID ${space.id} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting space:', error);
+        }
+      }
+
+      function handleDropdownSelect(selected) {
+        if (selected === "edit") {
+          editModal.current.open();
+        } else if (selected === "delete") {
+          deleteModal.current.open(space); 
+        }
       }
 
       return (
@@ -91,6 +112,7 @@ export const spaceColumns: ColumnDef<Space>[] = [
             buttonCaption="Delete Entry"
             buttonVariant="red"
             ref={deleteModal}
+            onSubmit={handleSpaceDelete}
           >
             <p>Are you sure you want to delete?</p>
           </Modal>

@@ -9,8 +9,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import Modal from "@/components/Modal";
+import { DataContext } from "@/data/data-context";
 
 export type Room = {
   id: string;
@@ -76,14 +77,35 @@ export const roomColumns: ColumnDef<Room>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const user = row.original;
+      const room = row.original;
       const editModal = useRef();
       const deleteModal = useRef();
+      const { useEntry } = useContext(DataContext); // Get useEntry function from DataContext
 
-      function handleDropdownSelect(selected){
-        selected === "edit"
-          ? editModal.current.open()  
-          : deleteModal.current.open();
+      async function handleRoomDelete() {
+        try {
+          const action = {
+            type: "rooms",
+            method: "delete",
+            data: {
+              roomNumber: room.roomNumber,
+              buildingId: room.buildingId
+            },
+          };
+          // Call the useEntry function to delete the room
+          useEntry(action);
+          console.log(`Room with number ${room.roomNumber} in building ${room.buildingId} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting room:', error);
+        }
+      }
+
+      function handleDropdownSelect(selected) {
+        if (selected === "edit") {
+          editModal.current.open();
+        } else if (selected === "delete") {
+          deleteModal.current.open(room); 
+        }
       }
 
       return (
@@ -99,6 +121,7 @@ export const roomColumns: ColumnDef<Room>[] = [
             buttonCaption="Delete Entry"
             buttonVariant="red"
             ref={deleteModal}
+            onSubmit={handleRoomDelete}
           >
             <p>Are you sure you want to delete?</p>
           </Modal>

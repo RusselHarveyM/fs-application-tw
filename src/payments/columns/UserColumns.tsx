@@ -19,8 +19,9 @@ export type User = {
   fullName: string;
 };
 
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import Modal from "@/components/Modal";
+import { DataContext } from "@/data/data-context";
 
 export const userColumns: ColumnDef<User>[] = [
   {
@@ -108,11 +109,31 @@ export const userColumns: ColumnDef<User>[] = [
       const user = row.original;
       const editModal = useRef();
       const deleteModal = useRef();
+      const { useEntry } = useContext(DataContext); // Get useEntry function from DataContext
+
+      async function handleUserDelete() {
+        try {
+          const action = {
+            type: "users",
+            method: "delete",
+            data: {
+              id: user.id,
+            },
+          };
+          // Call the useEntry function to delete the user
+          useEntry(action);
+          console.log(`User with ID ${user.id} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting user:', error);
+        }
+      }
 
       function handleDropdownSelect(selected) {
-        selected === "edit"
-          ? editModal.current.open()
-          : deleteModal.current.open();
+        if (selected === "edit") {
+          editModal.current.open();
+        } else if (selected === "delete") {
+          deleteModal.current.open(user); // Open delete modal with user object
+        }
       }
 
       return (
@@ -128,6 +149,7 @@ export const userColumns: ColumnDef<User>[] = [
             buttonCaption="Delete Entry"
             buttonVariant="red"
             ref={deleteModal}
+            onSubmit={handleUserDelete}
           >
             <p>Are you sure you want to delete?</p>
           </Modal>
