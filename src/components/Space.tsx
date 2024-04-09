@@ -399,7 +399,9 @@ export default function Space({ data }) {
             <ScoreCard
               isLoad={space.isAssess}
               score={space.isLoad || space.isAssess ? 0 : space.rating?.sort}
-              onClick={() => handleScoreClick("sort")}
+              onClick={() => {
+                if (space.selectedScore !== "sort") handleScoreClick("sort");
+              }}
             />
             <ScoreCard
               isLoad={space.isAssess}
@@ -407,13 +409,18 @@ export default function Space({ data }) {
               score={
                 space.isLoad || space.isAssess ? 0 : space.rating?.setInOrder
               }
-              onClick={() => handleScoreClick("set in order")}
+              onClick={() => {
+                if (space.selectedScore !== "set in order")
+                  handleScoreClick("set in order");
+              }}
             />
             <ScoreCard
               isLoad={space.isAssess}
               type="shine"
               score={space.isLoad || space.isAssess ? 0 : space.rating?.shine}
-              onClick={() => handleScoreClick("shine")}
+              onClick={() => {
+                if (space.selectedScore !== "shine") handleScoreClick("shine");
+              }}
             />
           </div>
           <Comment

@@ -18,7 +18,7 @@ export default function ScoreCard({
   }
 
   return (
-    <div
+    <button
       className={
         "relative flex flex-col gap-4 w-64 h-32 shadow-md px-4 py-2 rounded-lg hover:cursor-pointer transition delay-150 ease-in-out hover:scale-105 hover:brightness-110" +
         cssContainerHighlight
@@ -37,6 +37,6 @@ export default function ScoreCard({
       <code className={"text-6xl font-semibold" + cssTextHighlight}>
         {score}
       </code>
-    </div>
+    </button>
   );
 }
