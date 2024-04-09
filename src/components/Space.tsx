@@ -52,6 +52,32 @@ export default function Space({ data }) {
 
   useEffect(() => {
     console.log("im in");
+    let prevTimer = timer.current;
+    if (timer.current) {
+      timer.current = undefined;
+      clearInterval(timer.current);
+      toast({
+        title: "Task is Complete",
+        variant: "success",
+        description: "Assessment Task is complete!",
+        action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
+      });
+    }
+    if (space.selectedImage === undefined) {
+      toast({
+        title: "Image Deleted",
+        variant: "destructive",
+        action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
+      });
+    }
+    if (space.isUpload) {
+      toast({
+        title: "Task is Complete",
+        variant: "success",
+        description: "Upload Task is complete!",
+        action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
+      });
+    }
     setSpace((prev) => {
       let latestRating = [];
       if (space.id !== undefined) {
@@ -64,33 +90,7 @@ export default function Space({ data }) {
             new Date(a.dateModified).getTime()
         )[0];
       }
-      let prevTimer = timer.current;
-      if (timer.current) {
-        timer.current = undefined;
-        clearInterval(timer.current);
-        toast({
-          title: "Task is Complete",
-          variant: "success",
-          description: "Assessment Task is complete!",
-          action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
-        });
-      }
-      if (space.isUpload) {
-        toast({
-          title: "Task is Complete",
-          variant: "success",
-          description: "Upload Task is complete!",
-          action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
-        });
-      }
-      if (space.selectedImage === undefined) {
-        toast({
-          title: "Image Deleted",
-          variant: "destructive",
-          // description: "",
-          action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
-        });
-      }
+
       console.log("latestRating >>> ", latestRating);
       return {
         ...prev,
@@ -191,17 +191,18 @@ export default function Space({ data }) {
       type: "spaceimages",
       method: "delete",
       data: {
-        id: space.selectedImage.id,
+        imageId: space.selectedImage.id,
+        spaceId: space.id,
       },
     };
     useEntry(action);
     setSpace((prev) => {
-      const newPictures = prev.pictures.filter(
-        (picture) => picture.id !== prev.selectedImage.id
-      );
+      // const newPictures = prev.pictures.filter(
+      //   (picture) => picture.id !== prev.selectedImage.id
+      // );
       return {
         ...prev,
-        pictures: newPictures,
+        // pictures: newPictures,
         selectedImage: undefined,
       };
     });
@@ -369,8 +370,11 @@ export default function Space({ data }) {
             </menu>
           </div>
           <ImageGallery
-            isUpload={space.isUpload}
-            isAssess={space.isAssess}
+            isLoad={
+              space.isUpload ||
+              space.isAssess ||
+              space.selectedImage === undefined
+            }
             duration={space.assessmentDuration}
             images={space.pictures}
             onSelectImage={handleImageSelect}

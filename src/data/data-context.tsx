@@ -51,7 +51,7 @@ export default function DataContextProvider({ children }) {
       const spaceImages = (
         await axios.get(`${endpoint}/api/spaceImage/get/${id}`)
       ).data;
-      console.log(spaceImages);
+      console.log("space images {} ", spaceImages);
       setData((prev) => {
         return {
           ...prev,
@@ -101,8 +101,8 @@ export default function DataContextProvider({ children }) {
         await getSpaceImagesBySpaceId(action.data.id);
       }
       if (action.method === "delete") {
-        await deleteSpaceImage(action.data.id);
-        await getSpaceImagesBySpaceId(action.data.id);
+        await deleteSpaceImage(action.data.imageId);
+        await getSpaceImagesBySpaceId(action.data.spaceId);
         console.log("deleted");
       }
     }
