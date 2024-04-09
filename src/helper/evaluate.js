@@ -41,7 +41,7 @@ async function countDesksChairs(image) {
   };
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-count-det/5",
+    url: "https://detect.roboflow.com/classroom-count-det/8",
     params: {
       api_key: API_KEY,
     },
@@ -92,7 +92,7 @@ async function personalBelongingsCheck(image) {
   };
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-3igmn/7",
+    url: "https://detect.roboflow.com/classroom-3igmn/11",
     params: {
       api_key: API_KEY,
     },
@@ -158,7 +158,7 @@ async function cleanlinessDetection(image, shine) {
   };
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-yellow-seg/1",
+    url: "https://detect.roboflow.com/classroom-yellow-seg/7",
     params: {
       api_key: API_KEY,
     },
