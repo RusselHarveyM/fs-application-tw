@@ -6,6 +6,7 @@ import SettingsContent from "./components/SettingsContent";
 import DataContextProvider from "./data/data-context";
 import Spaces from "./pages/Spaces";
 import { Login } from "./pages/Login";
+import { Toaster } from "./components/ui/toaster";
 
 function App() {
   const router = createBrowserRouter([
@@ -32,6 +33,7 @@ function App() {
   return (
     <DataContextProvider>
       <RouterProvider router={router} />
+      <Toaster />
     </DataContextProvider>
   );
 }

@@ -333,40 +333,41 @@ export default async function evaluate(images) {
 
   overalls3.shine.score /= length;
 
-  let comments = {
-    sort: "",
-    set: "",
-    shine: "",
-  };
+  // let comments = {
+  //   sort: "",
+  //   set: "",
+  //   shine: "",
+  // };
 
-  let overallS3Copy = { ...overalls3 };
+  // let overallS3Copy = { ...overalls3 };
+  // console.log("overallS3Copy ^^^^^ overallS3Copy", overallS3Copy);
 
-  for (let prop in overallS3Copy) {
-    for (let subProp in overallS3Copy[prop]) {
-      if (subProp !== "score" && subProp !== "organization") {
-        comments[prop] += `\n• ${subProp}: ${overallS3Copy[prop][subProp]};`;
-      }
-    }
-    if (prop === "sort" && overallS3Copy[prop].score < 10)
-      comments[
-        prop
-      ] += `\n\n To achieve a high score in ${prop}, please make sure that the area is clutter-free.`;
-    if (prop === "set" && overallS3Copy[prop].score < 10)
-      comments[
-        prop
-      ] += `\n\n To achieve a high score in ${prop}, desks and chairs should be properly organized.`;
-    if (prop === "shine" && overallS3Copy[prop].score < 10)
-      comments[
-        prop
-      ] += `\n\n To achieve a high score in ${prop}, Aim for a score of 0 for each criteria listed.`;
-  }
+  // for (let prop in overallS3Copy) {
+  //   for (let subProp in overallS3Copy[prop]) {
+  //     if (subProp !== "score" && subProp !== "organization") {
+  //       comments[prop] += `\n• ${subProp}: ${overallS3Copy[prop][subProp]};`;
+  //     }
+  //   }
+  //   if (prop === "sort" && overallS3Copy[prop].score < 10)
+  //     comments[
+  //       prop
+  //     ] += `\n\n To achieve a high score in ${prop}, please make sure that the area is clutter-free.`;
+  //   if (prop === "set" && overallS3Copy[prop].score < 10)
+  //     comments[
+  //       prop
+  //     ] += `\n\n To achieve a high score in ${prop}, desks and chairs should be properly organized.`;
+  //   if (prop === "shine" && overallS3Copy[prop].score < 10)
+  //     comments[
+  //       prop
+  //     ] += `\n\n To achieve a high score in ${prop}, Aim for a score of 0 for each criteria listed.`;
+  // }
 
-  console.log("comments >>>>> ", comments);
+  // console.log("comments >>>>> ", comments);
 
   console.log("srResultsssss >>>>> ", s3Results);
   return {
     result: overalls3,
-    comment: comments,
+    // comment: overallS3Copy,
     // standardize: organizeScore / length,
   };
 }

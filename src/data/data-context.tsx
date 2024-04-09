@@ -102,6 +102,7 @@ export default function DataContextProvider({ children }) {
       }
       if (action.method === "delete") {
         await deleteSpaceImage(action.data.id);
+        await getSpaceImagesBySpaceId(action.data.id);
         console.log("deleted");
       }
     }

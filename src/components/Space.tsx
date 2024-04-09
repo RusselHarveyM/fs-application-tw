@@ -17,6 +17,10 @@ import { Input } from "./ui/input";
 import ImageDisplay from "./ImageDisplay";
 
 import evaluate from "../helper/evaluate";
+import comment from "../helper/comment";
+
+import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "@radix-ui/react-toast";
 
 const SPACE_DEFINITION = {
   id: undefined,
@@ -44,6 +48,8 @@ export default function Space({ data }) {
   const timer = useRef<NodeJS.Timeout | undefined>();
   const duration = useRef();
 
+  const { toast } = useToast();
+
   useEffect(() => {
     console.log("im in");
     setSpace((prev) => {
@@ -58,8 +64,32 @@ export default function Space({ data }) {
             new Date(a.dateModified).getTime()
         )[0];
       }
+      let prevTimer = timer.current;
       if (timer.current) {
+        timer.current = undefined;
         clearInterval(timer.current);
+        toast({
+          title: "Task is Complete",
+          variant: "success",
+          description: "Assessment Task is complete!",
+          action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
+        });
+      }
+      if (space.isUpload) {
+        toast({
+          title: "Task is Complete",
+          variant: "success",
+          description: "Upload Task is complete!",
+          action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
+        });
+      }
+      if (space.selectedImage === undefined) {
+        toast({
+          title: "Image Deleted",
+          variant: "destructive",
+          // description: "",
+          action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
+        });
       }
       console.log("latestRating >>> ", latestRating);
       return {
@@ -69,7 +99,8 @@ export default function Space({ data }) {
         isLoad: space.pictures !== undefined && false,
         isUpload: false,
         isAssess: false,
-        assessmentDuration: timer.current ? duration.current : 0,
+        selectedImage: "",
+        assessmentDuration: prevTimer ? duration.current : 0,
       };
     });
   }, [spaceImages, ratings]);
@@ -171,7 +202,7 @@ export default function Space({ data }) {
       return {
         ...prev,
         pictures: newPictures,
-        selectedImage: "",
+        selectedImage: undefined,
       };
     });
   }
@@ -192,6 +223,7 @@ export default function Space({ data }) {
       duration.current += 1;
     }, 1000);
     const raw5s = await evaluate(images);
+    comment(raw5s);
     console.log(" III raw5s III", raw5s);
 
     // const { sort, set, shine } = raw5s.comment;
