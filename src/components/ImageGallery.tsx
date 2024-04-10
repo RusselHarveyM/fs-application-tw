@@ -1,3 +1,5 @@
+import { Skeleton } from "./ui/skeleton";
+
 export default function ImageGallery({
   images,
   onSelectImage,
@@ -11,9 +13,14 @@ export default function ImageGallery({
         (images && images?.length > 0) || isLoad ? undefined : cssLoad
       } relative`} // Add relative here to position the child absolute elements
     >
-      <p className="absolute m-2 bottom-2 right-2 text-neutral-600 text-xs">
-        {duration.toFixed(2)}s
-      </p>
+      {!isLoad ? (
+        <p className="absolute m-2 bottom-2 right-2 text-neutral-600 text-xs">
+          {duration.toFixed(2)}s
+        </p>
+      ) : (
+        <Skeleton className="absolute m-2 bottom-2 right-2 w-20 h-6 z-40 bg-neutral-200" />
+      )}
+
       {isLoad && (
         <div className="absolute top-0 left-0 flex justify-center items-center  w-[25rem] h-[30rem] bg-neutral-50 opacity-90">
           <h3 className="text-neutral-600 ">

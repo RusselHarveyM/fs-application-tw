@@ -44,7 +44,7 @@ export default function Comment({ isLoad = false, selected, ratingId }) {
   return (
     <article className="flex flex-col gap-4 w-full h-90 border-dashed border-4 rounded-lg  py-4 px-6">
       {isLoad ? (
-        <Skeleton className="h-6 w-[100px]" />
+        <Skeleton className="h-6 w-[100px] bg-neutral-200" />
       ) : (
         <h2
           className={`text-neutral-600 text-xl font-semibol ${

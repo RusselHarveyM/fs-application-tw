@@ -426,7 +426,11 @@ export default function Space({ data }) {
             </div>
           </div>
           <ImageGallery
-            isLoad={space.isUpload || space.selectedImage === undefined}
+            isLoad={
+              space.isUpload ||
+              space.selectedImage === undefined ||
+              space.isAssess
+            }
             duration={space.assessmentDuration}
             images={space.pictures}
             onSelectImage={handleImageSelect}
