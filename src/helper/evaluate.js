@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_KEY = "zKSEIJWU9jceFvUIL8pz";
+const API_KEY = "OeSBdrSNcfGEme3a9fDf";
 
 const SORT = {
   wasteDisposal: 0,

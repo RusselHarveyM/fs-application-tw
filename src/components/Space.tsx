@@ -96,9 +96,14 @@ export default function Space({ data }) {
       console.log("latestRating >>> ", latestRating);
       return {
         ...prev,
-        pictures: space.id !== undefined && spaceImages,
-        rating: space.id !== undefined && latestRating,
-        isLoad: space.pictures !== undefined && false,
+        pictures:
+          prev.id !== undefined && !prev.isAssess
+            ? spaceImages.map((spi) => {
+                return { image: spi, prediction: undefined };
+              })
+            : prev.pictures,
+        rating: prev.id !== undefined && latestRating,
+        isLoad: prev.pictures !== undefined && false,
         isUpload: false,
         isAssess: false,
         selectedImage: "",
@@ -213,7 +218,9 @@ export default function Space({ data }) {
 
   async function handleAssessBtn() {
     const images = [
-      space.pictures.map((picture) => "data:image/png;base64," + picture.image),
+      space.pictures.map(
+        (imageObject) => "data:image/png;base64," + imageObject.image.image
+      ),
     ];
     setSpace((prev) => {
       return {
@@ -228,6 +235,7 @@ export default function Space({ data }) {
     }, 1000);
     const raw5s = await evaluate(images);
     console.log("predictions >> ", raw5s.predictions);
+
     const commentResult = comment(raw5s.result);
     const { sort, set, shine } = commentResult;
     console.log(" III raw5s III", raw5s);
@@ -272,6 +280,20 @@ export default function Space({ data }) {
     };
 
     useEntry(action);
+    setSpace((prev) => {
+      let newPictures = [];
+      for (let i = 0; i < prev?.pictures.length; i++) {
+        newPictures.push({
+          image: prev?.pictures[i].image,
+          prediction: raw5s.predictions[i],
+        });
+      }
+      console.log("newPictures >> ", newPictures);
+      return {
+        ...prev,
+        pictures: newPictures,
+      };
+    });
   }
 
   function handleScoreClick(type) {

@@ -39,8 +39,6 @@ export default function Comment({ isLoad = false, selected, ratingId }) {
         ); // Apply the replace and trim to each item in the array
       }
     }
-
-    console.log(thingsToImprove);
   }
 
   return (

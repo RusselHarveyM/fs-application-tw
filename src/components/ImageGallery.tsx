@@ -23,15 +23,16 @@ export default function ImageGallery({
       )}
 
       {images && images?.length > 0
-        ? images.map((image: any) => {
+        ? images.map((imageObject: any) => {
             const imageData = {
-              id: image.id,
-              image: image.image,
+              id: imageObject.image.id,
+              image: imageObject.image.image,
+              prediction: imageObject.prediction,
             };
             return (
               <img
-                key={image.id}
-                src={`data:image/jpeg;base64,${image.image}`}
+                key={imageObject.image.id}
+                src={`data:image/jpeg;base64,${imageObject.image.image}`}
                 alt="gallery-image"
                 onClick={() => onSelectImage(imageData)}
                 className={`h-full w-full object-fit  hover:scale-105 hover:cursor-pointer`}
