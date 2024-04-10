@@ -44,12 +44,12 @@ const SPACE_DEFINITION = {
 export default function Space({ data }) {
   const { spaceImages, ratings, useEntry } = useContext(DataContext);
   const [space, setSpace] = useState(SPACE_DEFINITION);
+  const [model, setModel] = useState(undefined);
   const uploadModal = useRef();
   const selectedUploadImages = useRef();
   const deleteModal = useRef();
   const timer = useRef<NodeJS.Timeout | undefined>();
   const duration = useRef();
-
   const { toast } = useToast();
 
   useEffect(() => {
@@ -377,33 +377,53 @@ export default function Space({ data }) {
         <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
           <div className="flex flex-col justify-between w-2/3">
             <ImageDisplay
+              model={model}
               onDelete={() => showModal("delete")}
               selectedImage={space.selectedImage}
             />
-            <menu className="flex gap-4 justify-end">
-              <Button
-                variant="blue"
-                onClick={() => showModal("upload")}
-                disabled={
-                  space.id === undefined || space.isUpload || space.isAssess
-                    ? true
-                    : false
-                }
+            <div className="flex justify-between">
+              <Select
+                onValueChange={(selected) => {
+                  setModel(selected);
+                }}
               >
-                Upload
-              </Button>
-              <Button
-                variant="blue"
-                onClick={handleAssessBtn}
-                disabled={
-                  space.id === undefined || space.isUpload || space.isAssess
-                    ? true
-                    : false
-                }
-              >
-                Assess
-              </Button>
-            </menu>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by Model" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="model1">Model 1</SelectItem>
+                  <SelectItem value="model2">Model 2</SelectItem>
+                  <SelectItem value="model3">Model 3</SelectItem>
+                  <SelectItem value="model4">Model 4</SelectItem>
+                  <SelectItem value="model5">Model 5</SelectItem>
+                </SelectContent>
+              </Select>
+              <menu className="flex gap-4 justify-end">
+                <Button
+                  variant="blue"
+                  onClick={() => showModal("upload")}
+                  disabled={
+                    space.id === undefined || space.isUpload || space.isAssess
+                      ? true
+                      : false
+                  }
+                >
+                  Upload
+                </Button>
+                <Button
+                  variant="blue"
+                  onClick={handleAssessBtn}
+                  disabled={
+                    space.id === undefined || space.isUpload || space.isAssess
+                      ? true
+                      : false
+                  }
+                >
+                  Assess
+                </Button>
+              </menu>
+            </div>
           </div>
           <ImageGallery
             isLoad={space.isUpload || space.selectedImage === undefined}

@@ -1,6 +1,6 @@
 import { Trash } from "lucide-react";
 import TargetBox from "./TargetBox";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useRef, useState, useEffect } from "react";
 
 interface ImageDisplayProps {
   onDelete: () => void;
@@ -13,6 +13,7 @@ interface ImageDisplayProps {
 export default function ImageDisplay({
   onDelete,
   selectedImage,
+  model,
 }: ImageDisplayProps) {
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -37,7 +38,7 @@ export default function ImageDisplay({
       )}
       {prediction && (
         <TargetBox>
-          {prediction.map((pred: any[]) => {
+          {prediction.map((pred: any[], outerIndex: number) => {
             if (pred && pred.length > 0) {
               return pred.map((innerPrediction: any[], index: number) => {
                 let style =
@@ -55,34 +56,55 @@ export default function ImageDisplay({
                     ? "border-neutral-400 bg-neutral-300"
                     : undefined;
 
-                const oldX = innerPrediction.x;
-                const oldY = innerPrediction.y;
-                const oldWidth = innerPrediction.width;
-                const oldHeight = innerPrediction.height;
+                let selectedModel =
+                  model === "model1"
+                    ? 0
+                    : model === "model2"
+                    ? 1
+                    : model === "model3"
+                    ? 2
+                    : model === "model4"
+                    ? 3
+                    : model === "model5"
+                    ? 4
+                    : undefined;
 
-                const currentImageWidth = imageRef?.current?.width;
-                const currentImageHeight = imageRef?.current?.height;
+                if (
+                  outerIndex === selectedModel ||
+                  selectedModel === undefined
+                ) {
+                  const oldX = innerPrediction.x;
+                  const oldY = innerPrediction.y;
+                  const oldWidth = innerPrediction.width;
+                  const oldHeight = innerPrediction.height;
 
-                const x = (oldX * currentImageWidth) / imageSize.width;
-                const y = (oldY * currentImageHeight) / imageSize.height;
-                const width = (oldWidth * currentImageWidth) / imageSize.width;
-                const height =
-                  (oldHeight * currentImageHeight) / imageSize.height;
+                  const currentImageWidth = imageRef?.current?.width;
+                  const currentImageHeight = imageRef?.current?.height;
 
-                return (
-                  <div
-                    key={index}
-                    style={{
-                      left: `${x - width / 2}px`,
-                      top: `${y - height / 2}px`,
-                      width: `${width}px`,
-                      height: `${height}px`,
-                    }}
-                    className={`absolute rounded-sm border-4 ${style} opacity-60 hover:scale-105 hover:z-40 hover:cursor-pointer hover:brightness-105 hover:text-white `}
-                  >
-                    <p className={``}>{innerPrediction.class}</p>
-                  </div>
-                );
+                  const x = (oldX * currentImageWidth) / imageSize.width;
+                  const y = (oldY * currentImageHeight) / imageSize.height;
+                  const width =
+                    (oldWidth * currentImageWidth) / imageSize.width;
+                  const height =
+                    (oldHeight * currentImageHeight) / imageSize.height;
+
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        left: `${x - width / 2}px`,
+                        top: `${y - height / 2}px`,
+                        width: `${width}px`,
+                        height: `${height}px`,
+                      }}
+                      className={`absolute rounded-sm border-4 ${style} opacity-60 hover:scale-105 hover:z-40 hover:cursor-pointer hover:brightness-105 hover:text-white `}
+                    >
+                      <p className={``}>{innerPrediction.class}</p>
+                    </div>
+                  );
+                } else {
+                  return null;
+                }
               });
             } else {
               return null;
