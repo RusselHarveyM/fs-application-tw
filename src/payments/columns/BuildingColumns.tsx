@@ -12,6 +12,7 @@ import {
 import Modal from "@/components/Modal";
 import { useContext, useRef } from "react";
 import { DataContext } from "@/data/data-context";
+import EditBuildingModal from "@/components/EditBuildingModal";
 
 export type Building = {
   id: string;
@@ -92,6 +93,25 @@ export const buildingColumns: ColumnDef<Building>[] = [
       const deleteModal = useRef();
       const { useEntry } = useContext(DataContext); // Get useEntry function from DataContext
 
+      async function handleBuildingEdit(updatedBuildingData) {
+        try {
+          const action = {
+            type: "buildings",
+            method: "put",
+            data: {
+              id: building.id,
+              ...updatedBuildingData,
+            },
+          };
+          // Call the useEntry function to update the user
+          useEntry(action);
+          console.log(`Building with ID ${building.id} updated successfully`);
+          editModal.current.close(); // Close the modal after successful update
+        } catch (error) {
+          console.error('Error updating building:', error);
+        }
+      }
+
       async function handleBuildingDelete() {
         try {
           const action = {
@@ -119,13 +139,13 @@ export const buildingColumns: ColumnDef<Building>[] = [
 
       return (
         <>
-          <Modal
+          <EditBuildingModal
             buttonCaption="Edit Entry"
             buttonVariant="blue"
             ref={editModal}
-          >
-            <p>Edit</p>
-          </Modal>
+            onSubmit={handleBuildingEdit}
+            initialValues={building}
+          />
           <Modal
             buttonCaption="Delete Entry"
             buttonVariant="red"

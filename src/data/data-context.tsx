@@ -82,8 +82,29 @@ export default function DataContextProvider({ children }) {
     await axios.delete(`${endpoint}/api/spaceImage/delete/${id}`);
   }
 
+  async function updateUser(userId, updatedUserData) {
+    return axios.put(`${endpoint}/api/user/${userId}`, updatedUserData)
+        .then(() => console.log(`User with ID ${userId} updated successfully`))
+        .catch(error => console.error('Error updating user:', error));
+  }
+
   async function deleteUser(userId) {
     await axios.delete(`${endpoint}/api/user/${userId}`);
+  }
+
+  async function updateBuilding(buildingId, updatedBuildingData) {
+    try {
+      // Send a PUT request to the API endpoint with the updated data
+      const response = await axios.put(`/api/buildings/${buildingId}`, updatedBuildingData);
+      
+      // Return the updated building object from the response
+      console.log(updatedBuildingData);
+      return response.data;
+    } catch (error) {
+      // Handle any errors that occur during the request
+      console.error('Error updating building:', error);
+      throw error; // Optional: rethrow the error to be handled elsewhere
+    }
   }
 
   async function deleteBuilding(buildingName) {
@@ -153,6 +174,37 @@ export default function DataContextProvider({ children }) {
       }
     }
     if (action.type === 'users') {
+      if (action.method === 'put') {
+        const updatedUserData = action.data; // Assuming action.data contains the updated user data
+        const userId = updatedUserData.id;
+
+        // Extract username and password from updatedUserData
+        const { username, password, ...userData } = updatedUserData;
+
+        // Perform the edit logic here, such as making a PUT request to your backend API
+        try {
+          // Assuming your API endpoint for updating a user is `${endpoint}/api/user/${userId}`
+          await updateUser(userId, userData);
+
+          // After successful update, update the user data in state
+          setData((prevData) => ({
+            ...prevData,
+            users: prevData.users.map((user) => {
+              if (user.id === userId) {
+                // Merge existing user data with the updated data, excluding username and password
+                return {
+                  ...user,
+                  ...userData,
+                };
+              }
+              return user;
+            }),
+          }));
+          console.log(`User with ID ${userId} updated successfully`);
+        } catch (error) {
+          console.error('Error updating user:', error);
+        }
+      }
       if (action.method === 'delete') {
         const userId = action.data.id;
         // Perform the deletion logic here, such as making a DELETE request to your backend API
@@ -171,6 +223,32 @@ export default function DataContextProvider({ children }) {
       }
     }
     if (action.type === 'buildings') {
+      if (action.method === 'put') {
+        const updatedBuildingData = action.data; // Assuming action.data contains the updated Building data
+        const buildingId = updatedBuildingData.id;
+        // Perform the edit logic here, such as making a PUT request to your backend API
+        try {
+            // Assuming your API endpoint for updating a Building is `${endpoint}/api/user/${BuildingId}`
+            await updateBuilding(buildingId, updatedBuildingData);
+            // After successful update, update the user data in state
+            console.log(buildingId, updatedBuildingData)
+            setData((prevData) => ({
+                ...prevData,
+                buildings: prevData.buildings.map(building => {
+                    if (building.id === buildingId) {
+                        return {
+                            ...building,
+                            ...updatedBuildingData
+                        };
+                    }
+                    return building;
+                })
+            }));
+            console.log(`Building with ID ${buildingId} updated successfully`);
+        } catch (error) {
+            console.error('Error updating building:', error);
+        }
+      }
       if (action.method === 'delete') {
         const buildingName = action.data.buildingName;
         console.log(buildingName);
