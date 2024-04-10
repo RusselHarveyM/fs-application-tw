@@ -78,7 +78,7 @@ export default function ImageDisplay({
                       width: `${width}px`,
                       height: `${height}px`,
                     }}
-                    className={`absolute rounded-sm border-4 ${style} opacity-50 hover:scale-105 hover:cursor-pointer hover:brightness-105 hover:text-white `}
+                    className={`absolute rounded-sm border-4 ${style} opacity-60 hover:scale-105 hover:z-40 hover:cursor-pointer hover:brightness-105 hover:text-white `}
                   >
                     <p className={``}>{innerPrediction.class}</p>
                   </div>
