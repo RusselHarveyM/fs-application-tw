@@ -18,14 +18,35 @@ import {
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type Payment = {
+export type User = {
   id: string;
   lastname: string;
   firstname: string;
   username: string;
+  roles: string;
 };
 
-export const columns: ColumnDef<Payment>[] = [
+export type Building = {
+  id: string;
+  buildingName: string;
+  buildingCode: string;
+  image: string;
+};
+
+export type Room = {
+  id: string;
+  buildingId: string;
+  roomNumber: string;
+  image: string;
+};
+
+export type Space = {
+  id: string;
+  name: string;
+  roomId: string;
+};
+
+export const userColumns: ColumnDef<User>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -53,7 +74,7 @@ export const columns: ColumnDef<Payment>[] = [
     header: "Id",
   },
   {
-    accessorKey: "lastname",
+    accessorKey: "lastName",
     header: ({ column }) => {
       return (
         <Button
@@ -68,7 +89,7 @@ export const columns: ColumnDef<Payment>[] = [
   },
 
   {
-    accessorKey: "firstname",
+    accessorKey: "firstName",
     header: ({ column }) => {
       return (
         <Button
@@ -98,9 +119,35 @@ export const columns: ColumnDef<Payment>[] = [
   },
 
   {
+    accessorKey: "role",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Role
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <span
+        className={`inline-block px-2 py-1 rounded-full ${
+          row.original.role === "admin"
+            ? "bg-purple-200 text-purple-800"
+            : "bg-blue-200 text-blue-800"
+        }`}
+      >
+        {row.original.role}
+      </span>
+    ),
+  },
+
+  {
     id: "actions",
     cell: ({ row }) => {
-      const payment = row.original;
+      const user = row.original;
 
       return (
         <DropdownMenu>
@@ -113,7 +160,7 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(user.id)}
             >
               Copy payment ID
             </DropdownMenuItem>

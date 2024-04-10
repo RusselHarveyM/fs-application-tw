@@ -1,101 +1,36 @@
-import { Payment, columns } from "./columns/columns copy";
+import { useContext } from "react";
+import { DataContext } from "../data/data-context"; // Import DataContext
 import { DataTable } from "./data-table copy";
+import { userColumns } from "./columns/UserColumns";
+import { buildingColumns } from "./columns/BuildingColumns";
+import { roomColumns } from "./columns/RoomColumns";
+import { spaceColumns } from "./columns/SpaceColumns";
 
-export const payments: Payment[] = [
-  {
-    id: "728ed52f",
-    lastname: "Doe",
-    firstname: "JOhn",
-    username: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    lastname: "Moe",
-    firstname: "Hanz",
-    username: "example@gmail.com",
-  },
-  {
-    id: "728ed52f",
-    lastname: "Doe",
-    firstname: "JOhn",
-    username: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    lastname: "Moe",
-    firstname: "Hanz",
-    username: "example@gmail.com",
-  },
-  {
-    id: "728ed52f",
-    lastname: "Doe",
-    firstname: "JOhn",
-    username: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    lastname: "Moe",
-    firstname: "Hanz",
-    username: "example@gmail.com",
-  },
-  {
-    id: "728ed52f",
-    lastname: "Doe",
-    firstname: "JOhn",
-    username: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    lastname: "Moe",
-    firstname: "Hanz",
-    username: "example@gmail.com",
-  },
-  {
-    id: "728ed52f",
-    lastname: "Doe",
-    firstname: "JOhn",
-    username: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    lastname: "Moe",
-    firstname: "Hanz",
-    username: "example@gmail.com",
-  },
-  {
-    id: "728ed52f",
-    lastname: "Doe",
-    firstname: "JOhn",
-    username: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    lastname: "Moe",
-    firstname: "Hanz",
-    username: "example@gmail.com",
-  },
-  // ...
-];
+export default function Page({ tableContent }) {
+  // Access the data context
+  const { users, buildings, rooms, spaces } = useContext(DataContext);
+  
+  let data;
+  let column;
 
-// async function getData(): Promise<Payment[]> {
-//   // Fetch data from your API here.
-//   return [
-//     {
-//       id: "728ed52f",
-//       amount: 100,
-//       status: "pending",
-//       email: "m@example.com",
-//     },
-//     // ...
-//   ];
-// }
+  if (tableContent === "users") {
+    data = users;
+    column = userColumns;
+  } else if (tableContent === "buildings") {
+    data = buildings;
+    column = buildingColumns;
+  } else if (tableContent === "rooms") {
+    data = rooms;
+    column = roomColumns;
+  } else if (tableContent === "spaces") {
+    data = spaces;
+    column = spaceColumns;
+  }
 
-export default function page() {
-  // const data = await getData();
-
+  // Render the table with user data
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={payments} />
+      {data && <DataTable columns={column} data={data} />}
     </div>
   );
 }

@@ -21,22 +21,10 @@ export type User = {
   fullName: string;
 };
 
-async function deleteUser(userId) {
-  try {
-    const response = await fetch(`https://fs-backend-copy-production.up.railway.app/api/user/${userId}`, {
-      method: 'DELETE',
-      // Add any necessary headers, authentication, etc.
-    });
-
-    if (response.ok) {
-      console.log('User deleted successfully');
-    } else {
-      console.error('Failed to delete user');
-    }
-  } catch (error) {
-    console.error('Error deleting user:', error);
-  }
-}
+import { useContext, useRef } from "react";
+import Modal from "@/components/Modal";
+import EditUserModal from "@/components/EditUserModal";
+import { DataContext } from "@/data/data-context";
 
 export const userColumns: ColumnDef<User>[] = [
   {
@@ -124,29 +112,66 @@ export const userColumns: ColumnDef<User>[] = [
       const user = row.original;
       const editModal = useRef();
       const deleteModal = useRef();
+      const { useEntry } = useContext(DataContext); // Get useEntry function from DataContext
+
+      async function handleUserEdit(updatedUserData) {
+        try {
+          const action = {
+            type: "users",
+            method: "put",
+            data: {
+              id: user.id,
+              ...updatedUserData,
+            },
+          };
+          // Call the useEntry function to update the user
+          useEntry(action);
+          console.log(`User with ID ${user.id} updated successfully`);
+          editModal.current.close(); // Close the modal after successful update
+        } catch (error) {
+          console.error('Error updating user:', error);
+        }
+      }
+
+      async function handleUserDelete() {
+        try {
+          const action = {
+            type: "users",
+            method: "delete",
+            data: {
+              id: user.id,
+            },
+          };
+          // Call the useEntry function to delete the user
+          useEntry(action);
+          console.log(`User with ID ${user.id} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting user:', error);
+        }
+      }
 
       function handleDropdownSelect(selected) {
-        if (selected === "delete") {
-          const userId = user.id;
-          deleteModal.current.open(() => deleteUser(userId));
-        } else {
+        if (selected === "edit") {
           editModal.current.open();
+        } else if (selected === "delete") {
+          deleteModal.current.open(user); // Open delete modal with user object
         }
       }
 
       return (
         <>
-          <Modal
+          <EditUserModal
             buttonCaption="Edit Entry"
             buttonVariant="blue"
             ref={editModal}
-          >
-            <p>Edit</p>
-          </Modal>
-          <Modal onClick={() => deleteUser(user.id)}
+            onSubmit={handleUserEdit} // Pass handleUserEdit as onSubmit handler
+            initialValues={user} // Pass the selected user's data as initialValues
+          />
+          <Modal
             buttonCaption="Delete Entry"
             buttonVariant="red"
             ref={deleteModal}
+            onSubmit={handleUserDelete}
           >
             <p>Are you sure you want to delete?</p>
           </Modal>

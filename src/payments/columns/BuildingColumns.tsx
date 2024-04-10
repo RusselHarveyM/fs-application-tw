@@ -10,7 +10,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Modal from "@/components/Modal";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
+import { DataContext } from "@/data/data-context";
+import EditBuildingModal from "@/components/EditBuildingModal";
 
 export type Building = {
   id: string;
@@ -86,29 +88,69 @@ export const buildingColumns: ColumnDef<Building>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const user = row.original;
+      const building = row.original;
       const editModal = useRef();
       const deleteModal = useRef();
+      const { useEntry } = useContext(DataContext); // Get useEntry function from DataContext
+
+      async function handleBuildingEdit(updatedBuildingData) {
+        try {
+          const action = {
+            type: "buildings",
+            method: "put",
+            data: {
+              id: building.id,
+              ...updatedBuildingData,
+            },
+          };
+          // Call the useEntry function to update the user
+          useEntry(action);
+          console.log(`Building with ID ${building.id} updated successfully`);
+          editModal.current.close(); // Close the modal after successful update
+        } catch (error) {
+          console.error('Error updating building:', error);
+        }
+      }
+
+      async function handleBuildingDelete() {
+        try {
+          const action = {
+            type: "buildings",
+            method: "delete",
+            data: {
+              buildingName: building.buildingName,
+            },
+          };
+          // Call the useEntry function to delete the building
+          useEntry(action);
+          console.log(`Building with Name ${building.buildingName} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting building:', error);
+        }
+      }
 
       function handleDropdownSelect(selected) {
-        selected === "edit"
-          ? editModal.current.open()
-          : deleteModal.current.open();
+        if (selected === "edit") {
+          editModal.current.open();
+        } else if (selected === "delete") {
+          deleteModal.current.open(building);
+        }
       }
-      
+
       return (
         <>
-          <Modal
+          <EditBuildingModal
             buttonCaption="Edit Entry"
             buttonVariant="blue"
             ref={editModal}
-          >
-            <p>Edit</p>
-          </Modal>
+            onSubmit={handleBuildingEdit}
+            initialValues={building}
+          />
           <Modal
             buttonCaption="Delete Entry"
             buttonVariant="red"
             ref={deleteModal}
+            onSubmit={handleBuildingDelete}
           >
             <p>Are you sure you want to delete?</p>
           </Modal>

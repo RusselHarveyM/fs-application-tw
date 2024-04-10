@@ -36,7 +36,10 @@ export default function DataContextProvider({ children }) {
         ratings: [],
         comments: [],
       };
-      newData.users = (await axios.get(`${endpoint}/api/user`)).data;
+      newData.users = (await axios.get(`${endpoint}/api/user`)).data.map(user => ({
+        ...user,
+        Name: `${user.firstName} ${user.lastName}` // Calculate fullname
+      }));
       newData.buildings = (await axios.get(`${endpoint}/api/buildings`)).data;
       newData.rooms = (await axios.get(`${endpoint}/api/rooms`)).data;
       newData.spaces = (await axios.get(`${endpoint}/api/space`)).data;
@@ -80,6 +83,43 @@ export default function DataContextProvider({ children }) {
 
   async function deleteSpaceImage(id) {
     await axios.delete(`${endpoint}/api/spaceImage/delete/${id}`);
+  }
+
+  async function updateUser(userId, updatedUserData) {
+    return axios.put(`${endpoint}/api/user/${userId}`, updatedUserData)
+        .then(() => console.log(`User with ID ${userId} updated successfully`))
+        .catch(error => console.error('Error updating user:', error));
+  }
+
+  async function deleteUser(userId) {
+    await axios.delete(`${endpoint}/api/user/${userId}`);
+  }
+
+  async function updateBuilding(buildingId, updatedBuildingData) {
+    try {
+      // Send a PUT request to the API endpoint with the updated data
+      const response = await axios.put(`/api/buildings/${buildingId}`, updatedBuildingData);
+      
+      // Return the updated building object from the response
+      console.log(updatedBuildingData);
+      return response.data;
+    } catch (error) {
+      // Handle any errors that occur during the request
+      console.error('Error updating building:', error);
+      throw error; // Optional: rethrow the error to be handled elsewhere
+    }
+  }
+
+  async function deleteBuilding(buildingName) {
+    await axios.delete(`${endpoint}/api/buildings/${buildingName}`);
+  }
+
+  async function deleteRoom(roomNumber, buildingId) {
+    await axios.delete(`${endpoint}/api/rooms/${buildingId}?roomNumber=${roomNumber}`);
+  }
+
+  async function deleteSpace(spaceId) {
+    await axios.delete(`${endpoint}/api/space/${spaceId}`);
   }
 
   /*
@@ -162,6 +202,138 @@ export default function DataContextProvider({ children }) {
             ratings,
           };
         });
+      }
+    }
+    if (action.type === 'users') {
+      if (action.method === 'put') {
+        const updatedUserData = action.data; // Assuming action.data contains the updated user data
+        const userId = updatedUserData.id;
+
+        // Extract username and password from updatedUserData
+        const { username, password, ...userData } = updatedUserData;
+
+        // Perform the edit logic here, such as making a PUT request to your backend API
+        try {
+          // Assuming your API endpoint for updating a user is `${endpoint}/api/user/${userId}`
+          await updateUser(userId, userData);
+
+          // After successful update, update the user data in state
+          setData((prevData) => ({
+            ...prevData,
+            users: prevData.users.map((user) => {
+              if (user.id === userId) {
+                // Merge existing user data with the updated data, excluding username and password
+                return {
+                  ...user,
+                  ...userData,
+                };
+              }
+              return user;
+            }),
+          }));
+          console.log(`User with ID ${userId} updated successfully`);
+        } catch (error) {
+          console.error('Error updating user:', error);
+        }
+      }
+      if (action.method === 'delete') {
+        const userId = action.data.id;
+        // Perform the deletion logic here, such as making a DELETE request to your backend API
+        try {
+          // Assuming your API endpoint for deleting a user is `${endpoint}/api/user/${userId}`
+          await deleteUser(userId);
+          // After successful deletion, update the users data in state
+          setData((prevData) => ({
+            ...prevData,
+            users: prevData.users.filter(user => user.id !== userId)
+          }));
+          console.log(`User with ID ${userId} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting user:', error);
+        }
+      }
+    }
+    if (action.type === 'buildings') {
+      if (action.method === 'put') {
+        const updatedBuildingData = action.data; // Assuming action.data contains the updated Building data
+        const buildingId = updatedBuildingData.id;
+        // Perform the edit logic here, such as making a PUT request to your backend API
+        try {
+            // Assuming your API endpoint for updating a Building is `${endpoint}/api/user/${BuildingId}`
+            await updateBuilding(buildingId, updatedBuildingData);
+            // After successful update, update the user data in state
+            console.log(buildingId, updatedBuildingData)
+            setData((prevData) => ({
+                ...prevData,
+                buildings: prevData.buildings.map(building => {
+                    if (building.id === buildingId) {
+                        return {
+                            ...building,
+                            ...updatedBuildingData
+                        };
+                    }
+                    return building;
+                })
+            }));
+            console.log(`Building with ID ${buildingId} updated successfully`);
+        } catch (error) {
+            console.error('Error updating building:', error);
+        }
+      }
+      if (action.method === 'delete') {
+        const buildingName = action.data.buildingName;
+        console.log(buildingName);
+        // Perform the deletion logic here, such as making a DELETE request to your backend API
+        try {
+          // Assuming your API endpoint for deleting a building is `${endpoint}/api/buildings/${buildingName}`
+          await deleteBuilding(buildingName);
+          // After successful deletion, update the building data in state
+          setData((prevData) => ({
+            ...prevData,
+            buildings: prevData.buildings.filter(building => building.buildingName !== buildingName)
+          }));
+          console.log(`Building with Name ${buildingName} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting Building:', error);
+        }
+      }
+    }
+    if (action.type === 'rooms') {
+      if (action.method === 'delete') {
+        const { roomNumber, buildingId } = action.data;
+        console.log(roomNumber, buildingId);
+        // Perform the deletion logic here, such as making a DELETE request to your backend API
+        try {
+          // Assuming your API endpoint for deleting a room is `${endpoint}/api/rooms/${roomNumber}`
+          await deleteRoom(roomNumber, buildingId);
+          // After successful deletion, update the room data in state
+          setData((prevData) => ({
+            ...prevData,
+            rooms: prevData.rooms.filter(room => room.roomNumber !== roomNumber)
+          }));
+          console.log(`Room with number ${roomNumber} in building ${buildingId} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting room:', error);
+        }
+      }
+    }
+    if (action.type === 'spaces') {
+      if (action.method === 'delete') {
+        const spaceId = action.data.id;
+        console.log(spaceId);
+        // Perform the deletion logic here, such as making a DELETE request to your backend API
+        try {
+          // Assuming your API endpoint for deleting a room is `${endpoint}/api/space/${spaceId}`
+          await deleteSpace(spaceId);
+          // After successful deletion, update the space data in state
+          setData((prevData) => ({
+            ...prevData,
+            spaces: prevData.spaces.filter(space => space.id !== spaceId)
+          }));
+          console.log(`Space with ID ${spaceId} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting space:', error);
+        }
       }
     }
   }
