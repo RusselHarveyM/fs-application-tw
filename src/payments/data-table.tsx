@@ -396,7 +396,12 @@ export function DataTable<TData, TValue>({
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="image" className="text-right">Upload Image:</Label>
-                    <Input id="picture" type="file" onChange={handleImageUpload} />
+                    <div className="relative w-64">
+                      <Input id="picture" type="file" onChange={handleImageUpload} className="opacity-0 absolute left-0 top-0 w-full h-full cursor-pointer" />
+                      <div className="bg-white border border-gray-300 rounded-md py-2 px-5">
+                        <span className="block truncate">Choose image file</span>
+                      </div>
+                    </div>
                   </div>
                   <img id="preview" className="h-24 w-full object-contain" />
                 </div>
@@ -517,7 +522,7 @@ export function DataTable<TData, TValue>({
             table.nextPage();
           }}
           disabled={!table.getCanNextPage()}
-        >
+        > 
           <span className="sr-only">Go to next page</span>
           <ChevronRightIcon className="h-4 w-4" />
         </Button>

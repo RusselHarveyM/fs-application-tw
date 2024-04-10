@@ -2,6 +2,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRef } from "react";
+import Modal from "@/components/Modal";
 import {
   DropdownMenu,
   DropdownMenuContent,

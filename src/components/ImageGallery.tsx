@@ -1,49 +1,46 @@
 export default function ImageGallery({
   images,
   onSelectImage,
-  isUpload,
-  isAssess,
+  isLoad,
+  duration,
 }) {
   let cssLoad = " animate-pulse";
-
   return (
     <div
       className={`grid grid-cols-4 grid-rows-5 w-1/3 h-[30rem] bg-neutral-100 ${
-        (images && images?.length > 0) || isUpload ? undefined : cssLoad
-      }`}
+        (images && images?.length > 0) || isLoad ? undefined : cssLoad
+      } relative`} // Add relative here to position the child absolute elements
     >
-      {isUpload && (
-        <div className="flex justify-center items-center  w-[25rem] h-[30rem] bg-neutral-50 relative  opacity-90">
+      <p className="absolute m-2 bottom-2 right-2 text-neutral-600 text-xs">
+        {duration.toFixed(2)}s
+      </p>
+      {isLoad && (
+        <div className="absolute top-0 left-0 flex justify-center items-center  w-[25rem] h-[30rem] bg-neutral-50 opacity-90">
           <h3 className="text-neutral-600 ">
-            Uploading<p className="animate-bounce">...</p>
+            Please wait<p className="animate-bounce">...</p>
           </h3>
         </div>
       )}
-      {isAssess && (
-        <div className="flex justify-center items-center  w-[25rem] h-[30rem] bg-neutral-50 relative  opacity-90">
-          <h3 className="text-neutral-600 ">
-            Assessing<p className="animate-bounce">...</p>
-          </h3>
-        </div>
-      )}
+
       {images && images?.length > 0
-        ? images.map((image: any) => {
+        ? images.map((imageObject: any) => {
             const imageData = {
-              id: image.id,
-              image: image.image,
+              id: imageObject.image.id,
+              image: imageObject.image.image,
+              prediction: imageObject.prediction,
             };
             return (
               <img
-                key={image.id}
-                src={`data:image/jpeg;base64,${image.image}`}
+                key={imageObject.image.id}
+                src={`data:image/jpeg;base64,${imageObject.image.image}`}
                 alt="gallery-image"
                 onClick={() => onSelectImage(imageData)}
                 className={`h-full w-full object-fit  hover:scale-105 hover:cursor-pointer`}
               />
             );
           })
-        : !isUpload && (
-            <div className="flex justify-center items-center text-neutral-600 w-[25rem] h-[30rem] relative">
+        : !isLoad && (
+            <div className="absolute top-0 left-0 flex justify-center items-center text-neutral-600 w-[25rem] h-[30rem]">
               <p>No Images yet...</p>
             </div>
           )}

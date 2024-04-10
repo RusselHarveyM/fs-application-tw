@@ -8,7 +8,6 @@ import {
 import ImageGallery from "./ImageGallery";
 import Button from "./Button";
 import ScoreCard from "./ScoreCard";
-import Details from "./Details";
 import { useState, useContext, useEffect, useRef } from "react";
 
 import { DataContext } from "@/data/data-context";
@@ -17,6 +16,12 @@ import { Input } from "./ui/input";
 import ImageDisplay from "./ImageDisplay";
 
 import evaluate from "../helper/evaluate";
+import comment from "../helper/comment";
+
+import Comment from "./Comment";
+
+import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "@radix-ui/react-toast";
 
 const SPACE_DEFINITION = {
   id: undefined,
@@ -24,11 +29,13 @@ const SPACE_DEFINITION = {
   pictures: undefined,
   roomId: undefined,
   selectedImage: "",
+  selectedScore: "",
   rating: {
     sort: undefined,
     setInOrder: undefined,
     shine: undefined,
   },
+  assessmentDuration: 0,
   isLoad: false,
   isUpload: false,
   isAssess: false,
@@ -40,9 +47,39 @@ export default function Space({ data }) {
   const uploadModal = useRef();
   const selectedUploadImages = useRef();
   const deleteModal = useRef();
+  const timer = useRef<NodeJS.Timeout | undefined>();
+  const duration = useRef();
+
+  const { toast } = useToast();
 
   useEffect(() => {
     console.log("im in");
+    let prevTimer = timer.current;
+    if (timer.current) {
+      timer.current = undefined;
+      clearInterval(timer.current);
+      toast({
+        title: "Task is Complete",
+        variant: "success",
+        description: "Assessment Task is complete!",
+        action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
+      });
+    }
+    if (space.selectedImage === undefined) {
+      toast({
+        title: "Image Deleted",
+        variant: "destructive",
+        action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
+      });
+    }
+    if (space.isUpload) {
+      toast({
+        title: "Task is Complete",
+        variant: "success",
+        description: "Upload Task is complete!",
+        action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
+      });
+    }
     setSpace((prev) => {
       let latestRating = [];
       if (space.id !== undefined) {
@@ -55,14 +92,23 @@ export default function Space({ data }) {
             new Date(a.dateModified).getTime()
         )[0];
       }
+
       console.log("latestRating >>> ", latestRating);
       return {
         ...prev,
-        pictures: space.id !== undefined && spaceImages,
-        rating: space.id !== undefined && latestRating,
-        isLoad: space.pictures !== undefined && false,
+        pictures:
+          prev.id !== undefined && !prev.isAssess
+            ? spaceImages.map((spi) => {
+                return { image: spi, prediction: undefined };
+              })
+            : prev.pictures,
+        rating: prev.id !== undefined && latestRating,
+        isLoad: prev.pictures !== undefined && false,
         isUpload: false,
         isAssess: false,
+        selectedImage: "",
+        selectedScore: "",
+        assessmentDuration: prevTimer ? duration.current : 0,
       };
     });
   }, [spaceImages, ratings]);
@@ -99,12 +145,6 @@ export default function Space({ data }) {
         isLoad: true,
       };
     });
-  }
-
-  function handleUploadClick(type) {
-    if (type === "upload") {
-      uploadModal.current.open();
-    }
   }
 
   function handleImageUpload(event) {
@@ -145,8 +185,13 @@ export default function Space({ data }) {
     });
   }
 
-  function showOnDeleteMessage() {
-    deleteModal.current.open();
+  function showModal(type) {
+    if (type === "upload") {
+      uploadModal.current.open();
+    }
+    if (type === "delete") {
+      deleteModal.current.open();
+    }
   }
 
   function handleImageDelete() {
@@ -154,25 +199,28 @@ export default function Space({ data }) {
       type: "spaceimages",
       method: "delete",
       data: {
-        id: space.selectedImage.id,
+        imageId: space.selectedImage.id,
+        spaceId: space.id,
       },
     };
     useEntry(action);
     setSpace((prev) => {
-      const newPictures = prev.pictures.filter(
-        (picture) => picture.id !== prev.selectedImage.id
-      );
+      // const newPictures = prev.pictures.filter(
+      //   (picture) => picture.id !== prev.selectedImage.id
+      // );
       return {
         ...prev,
-        pictures: newPictures,
-        selectedImage: "",
+        // pictures: newPictures,
+        selectedImage: undefined,
       };
     });
   }
 
   async function handleAssessBtn() {
     const images = [
-      space.pictures.map((picture) => "data:image/png;base64," + picture.image),
+      space.pictures.map(
+        (imageObject) => "data:image/png;base64," + imageObject.image.image
+      ),
     ];
     setSpace((prev) => {
       return {
@@ -180,7 +228,16 @@ export default function Space({ data }) {
         isAssess: true,
       };
     });
+
+    duration.current = 0;
+    timer.current = setInterval(() => {
+      duration.current += 1;
+    }, 1000);
     const raw5s = await evaluate(images);
+    console.log("predictions >> ", raw5s.predictions);
+
+    const commentResult = comment(raw5s.result);
+    const { sort, set, shine } = commentResult;
     console.log(" III raw5s III", raw5s);
 
     // const { sort, set, shine } = raw5s.comment;
@@ -202,27 +259,50 @@ export default function Space({ data }) {
     let averageScore = totalScore / data.scores?.length;
     averageScore = Math.min(Math.max(averageScore, 1), 10);
 
-    const newRate = {
-      id: "",
+    let scores = {
+      spaceId: space.id,
       sort: sortScoreFixed,
       setInOrder: setScoreFixed,
       shine: shineScoreFixed,
-      standarize: 0,
-      sustain: 0,
-      security: 0,
-      isActive: true,
-      spaceId: space.id,
+      comment: {
+        sort: sort,
+        setInOrder: set,
+        shine: shine,
+      },
     };
 
     let action = {
       type: "ratings",
       method: "post",
       data: {
-        rate: newRate,
+        scores,
       },
     };
 
     useEntry(action);
+    setSpace((prev) => {
+      let newPictures = [];
+      for (let i = 0; i < prev?.pictures.length; i++) {
+        newPictures.push({
+          image: prev?.pictures[i].image,
+          prediction: raw5s.predictions[i],
+        });
+      }
+      console.log("newPictures >> ", newPictures);
+      return {
+        ...prev,
+        pictures: newPictures,
+      };
+    });
+  }
+
+  function handleScoreClick(type) {
+    setSpace((prev) => {
+      return {
+        ...prev,
+        selectedScore: type,
+      };
+    });
   }
 
   return (
@@ -273,7 +353,7 @@ export default function Space({ data }) {
             </h2>
             <Select
               onValueChange={(selectedName) => handleSpaceSelect(selectedName)}
-              disabled={space.isLoad}
+              disabled={space.isLoad || space.isAssess}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select a space" />
@@ -297,13 +377,13 @@ export default function Space({ data }) {
         <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
           <div className="flex flex-col justify-between w-2/3">
             <ImageDisplay
-              onDelete={showOnDeleteMessage}
+              onDelete={() => showModal("delete")}
               selectedImage={space.selectedImage}
             />
             <menu className="flex gap-4 justify-end">
               <Button
                 variant="blue"
-                onClick={() => handleUploadClick("upload")}
+                onClick={() => showModal("upload")}
                 disabled={
                   space.id === undefined || space.isUpload || space.isAssess
                     ? true
@@ -326,41 +406,51 @@ export default function Space({ data }) {
             </menu>
           </div>
           <ImageGallery
-            isUpload={space.isUpload}
-            isAssess={space.isAssess}
+            isLoad={space.isUpload || space.selectedImage === undefined}
+            duration={space.assessmentDuration}
             images={space.pictures}
             onSelectImage={handleImageSelect}
           />
         </div>
+        {space.isAssess && (
+          <div className=" w-32 h-fit text-center m-auto pt-2 mt-2">
+            <p className="text-neutral-600 animate-bounce">Please wait...</p>
+          </div>
+        )}
         <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
           <div className="flex flex-col gap-4 justify-center">
-            <ScoreCard score={space.isLoad ? 0 : space.rating?.sort} />
             <ScoreCard
-              type="set"
-              score={space.isLoad ? 0 : space.rating?.setInOrder}
+              isLoad={space.isAssess}
+              score={space.isLoad || space.isAssess ? 0 : space.rating?.sort}
+              onClick={() => {
+                if (space.selectedScore !== "sort") handleScoreClick("sort");
+              }}
             />
             <ScoreCard
+              isLoad={space.isAssess}
+              type="set"
+              score={
+                space.isLoad || space.isAssess ? 0 : space.rating?.setInOrder
+              }
+              onClick={() => {
+                if (space.selectedScore !== "set in order")
+                  handleScoreClick("set in order");
+              }}
+            />
+            <ScoreCard
+              isLoad={space.isAssess}
               type="shine"
-              score={space.isLoad ? 0 : space.rating?.shine}
+              score={space.isLoad || space.isAssess ? 0 : space.rating?.shine}
+              onClick={() => {
+                if (space.selectedScore !== "shine") handleScoreClick("shine");
+              }}
             />
           </div>
-          <article className="flex flex-col gap-4 w-full h-90 border-dashed border-4 rounded-lg bg-neutral-100 py-4 px-6">
-            <h2 className="uppercase text-xl font-semibold">SORT</h2>
-            <Details
-              title="Summary"
-              text={` Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Reprehenderit suscipit vero dolores fugiat natus tempora quidem
-              voluptates libero, praesentium, atque aut? Pariatur, provident rem
-              quod hic minus quis id non?`}
-            />
-            <Details
-              title="Things to improve"
-              text={` Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Reprehenderit suscipit vero dolores fugiat natus tempora quidem
-              voluptates libero, praesentium, atque aut? Pariatur, provident rem
-              quod hic minus quis id non?`}
-            />
-          </article>
+          <Comment
+            isLoad={space.isAssess || space.isLoad}
+            selected={space.selectedScore}
+            ratingId={space.rating?.id}
+          />
         </div>
       </div>
     </>
