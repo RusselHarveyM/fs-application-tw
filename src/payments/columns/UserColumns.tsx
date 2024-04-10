@@ -2,8 +2,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRef } from "react";
-import Modal from "@/components/Modal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -114,22 +112,22 @@ export const userColumns: ColumnDef<User>[] = [
       const deleteModal = useRef();
       const { useEntry } = useContext(DataContext); // Get useEntry function from DataContext
 
-      async function handleUserEdit(updatedUserData) {
+      async function handleUserEdit(data) {
         try {
           const action = {
             type: "users",
             method: "put",
             data: {
               id: user.id,
-              ...updatedUserData,
+              data: { id: user.id, ...data },
             },
           };
           // Call the useEntry function to update the user
           useEntry(action);
-          console.log(`User with ID ${user.id} updated successfully`);
+          // console.log(`User with ID ${user.id} updated successfully`);
           editModal.current.close(); // Close the modal after successful update
         } catch (error) {
-          console.error('Error updating user:', error);
+          console.error("Error updating user:", error);
         }
       }
 
@@ -146,7 +144,7 @@ export const userColumns: ColumnDef<User>[] = [
           useEntry(action);
           console.log(`User with ID ${user.id} deleted successfully`);
         } catch (error) {
-          console.error('Error deleting user:', error);
+          console.error("Error deleting user:", error);
         }
       }
 
