@@ -87,9 +87,22 @@ export default function DataContextProvider({ children }) {
     await axios.delete(`${endpoint}/api/spaceImage/delete/${id}`);
   }
 
-  //check my AddUserModal.tsx and usercolumns.tsx and modify the function addNewUser here
-  async function addNewUser(user) {
-    await axios.post(`${endpoint}/api/user`, user);
+  async function addNewUser(userData) {
+    try {
+      // Make the POST request to add a new user
+      const response = await axios.post(`${endpoint}/api/user`, userData);
+      
+      // Extract the ID of the newly created user from the response
+      const userId = response.data.id;
+
+      // Log the success message along with the user ID
+      console.log("User added successfully. User ID:", userId);
+
+      // Optionally, you can perform further actions with the user ID here
+      
+  } catch (error) {
+      console.error("Error adding new user:", error);
+  }
   }
 
   async function updateUser(userId, updatedUserData) {
@@ -101,6 +114,20 @@ export default function DataContextProvider({ children }) {
 
   async function deleteUser(userId) {
     await axios.delete(`${endpoint}/api/user/${userId}`);
+  }
+
+  async function addBuilding(buildingData) {
+    try {
+      // Send a POST request to the API endpoint with the new building data
+      const response = await axios.post("/api/buildings", buildingData);
+
+      // Return the newly created building object from the response
+      return response.data;
+    } catch (error) {
+      // Handle any errors that occur during the request
+      console.error("Error adding building:", error);
+      throw error; // Optional: rethrow the error to be handled elsewhere
+    }
   }
 
   async function updateBuilding(buildingId, updatedBuildingData) {
@@ -271,6 +298,20 @@ export default function DataContextProvider({ children }) {
       }
     }
     if (action.type === "buildings") {
+      // Handle the action for buildings here for post
+      if (action.method === "post") {
+        const newBuildingData = action.data; // Assuming action.data contains the new Building data
+        console.log(newBuildingData);
+        
+        try {
+          // Assuming your API endpoint for adding a Building is `${endpoint}/api/buildings`
+          await addBuilding(newBuildingData);
+          
+          console.log("Building added successfully");
+        } catch (error) {
+          console.error("Error adding building:", error);
+        }
+      }
       if (action.method === "put") {
         const updatedBuildingData = action.data; // Assuming action.data contains the updated Building data
         const buildingId = updatedBuildingData.id;

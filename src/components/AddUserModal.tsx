@@ -43,7 +43,7 @@ const AddUserModal = forwardRef(function AddUserModal(
       password: passwordRef.current.value,
     };
 
-    onSubmit(data); // Pass current form data to onSubmit handler
+    onSubmit(data); // Pass curren data to onSubmit handler
     dialog.current.close(); // Close the modal after submission
   };
 
@@ -128,6 +128,7 @@ const AddUserModal = forwardRef(function AddUserModal(
           </Button>
           <Button
             type="submit"
+            variant={buttonVariant}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline"
           >
             {buttonCaption}

@@ -110,15 +110,16 @@ export const userColumns: ColumnDef<User>[] = [
       const addUserModal = useRef();
       const { useEntry } = useContext(DataContext);
 
-      async function handleAddUser(data) {
+      async function handleAddUser(userData) {
         try {
+          const userDataWithId = { ...userData, Id: "string" }; // Include id with a placeholder value
           const action = {
-            type: "users",
-            method: "post",
-            data: { ...data },
+              type: "users",
+              method: "post",
+              data: userDataWithId,
           };
           // Call the useEntry function to add a new user
-          console.log(data);
+          console.log(userDataWithId);
           useEntry(action);
           console.log(`User added successfully`);
           addUserModal.current.close(); // Close the modal after successful addition
@@ -133,14 +134,15 @@ export const userColumns: ColumnDef<User>[] = [
             ref={addUserModal}
             onSubmit={handleAddUser} // Pass handleAddUser as onSubmit handler
             buttonCaption="Add Entry"
-            buttonVariant="Green"
+            buttonVariant="red"
           />
           <Button
             variant="ghost"
+            className="flex items-center"
             onClick={() => addUserModal.current.open()} // Open the AddUserModal when button is clicked
           >
             Add Entry
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="h-4 w-4" />
           </Button>
         </>
       );
