@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,6 +23,7 @@ import { useContext, useRef } from "react";
 import Modal from "@/components/Modal";
 import EditUserModal from "@/components/EditUserModal";
 import { DataContext } from "@/data/data-context";
+import AddUserModal from "@/components/AddUserModal";
 
 export const userColumns: ColumnDef<User>[] = [
   {
@@ -105,6 +106,45 @@ export const userColumns: ColumnDef<User>[] = [
     ),
   },
   {
+    header: ({ column }) => {
+      const addUserModal = useRef();
+      const { useEntry } = useContext(DataContext);
+
+      async function handleAddUser(data) {
+        try {
+          const action = {
+            type: "users",
+            method: "post",
+            data: { ...data },
+          };
+          // Call the useEntry function to add a new user
+          console.log(data);
+          useEntry(action);
+          console.log(`User added successfully`);
+          addUserModal.current.close(); // Close the modal after successful addition
+        } catch (error) {
+          console.error("Error adding user:", error);
+        }
+      }
+
+      return (
+        <>
+          <AddUserModal
+            ref={addUserModal}
+            onSubmit={handleAddUser} // Pass handleAddUser as onSubmit handler
+            buttonCaption="Add Entry"
+            buttonVariant="Green"
+          />
+          <Button
+            variant="ghost"
+            onClick={() => addUserModal.current.open()} // Open the AddUserModal when button is clicked
+          >
+            Add Entry
+            <Plus className="ml-2 h-4 w-4" />
+          </Button>
+        </>
+      );
+    },
     id: "actions",
     cell: ({ row }) => {
       const user = row.original;

@@ -87,6 +87,11 @@ export default function DataContextProvider({ children }) {
     await axios.delete(`${endpoint}/api/spaceImage/delete/${id}`);
   }
 
+  //check my AddUserModal.tsx and usercolumns.tsx and modify the function addNewUser here
+  async function addNewUser(user) {
+    await axios.post(`${endpoint}/api/user`, user);
+  }
+
   async function updateUser(userId, updatedUserData) {
     return axios
       .put(`${endpoint}/api/user/${userId}`, updatedUserData)
@@ -213,6 +218,10 @@ export default function DataContextProvider({ children }) {
       }
     }
     if (action.type === "users") {
+      if (action.method === "post") {
+        console.log(action.data);
+        await addNewUser(action.data);
+      }
       if (action.method === "put") {
         const updatedUserData = action.data.data; // Assuming action.data contains the updated user data
         const userId = action.data.id;

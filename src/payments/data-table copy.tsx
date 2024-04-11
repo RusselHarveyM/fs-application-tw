@@ -80,18 +80,22 @@ export function DataTable<TData, TValue>({
       rowSelection,
     },
   });
+  
+  const [globalSearchQuery, setGlobalSearchQuery] = React.useState<string>("");
+
+  const handleGlobalSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setGlobalSearchQuery(event.target.value);
+    // Apply global filter to all columns
+    table.setGlobalFilter(event.target.value);
+  };
 
   return (
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter username..."
-          value={
-            (table.getColumn("username")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("username")?.setFilterValue(event.target.value)
-          }
+          placeholder={"Search all columns..."}
+          value={globalSearchQuery}
+          onChange={handleGlobalSearchChange}
           className="max-w-sm"
         />
         <DropdownMenu>

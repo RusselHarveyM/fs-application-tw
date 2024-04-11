@@ -1,8 +1,8 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState, useContext } from "react";
 import { createPortal } from "react-dom";
 import Button from "./Button";
 
-const EditUserModal = forwardRef(function EditUserModal(
+const AddUserModal = forwardRef(function AddUserModal(
   {
     buttonVariant = undefined,
     buttonCaption,
@@ -13,11 +13,6 @@ const EditUserModal = forwardRef(function EditUserModal(
 ) {
   const dialog = useRef();
   const [formData, setFormData] = useState(initialValues);
-  const roleRef = useRef();
-  const firstnameRef = useRef();
-  const lastnameRef = useRef();
-  const usernameRef = useRef();
-  const passwordRef = useRef();
 
   useImperativeHandle(ref, () => ({
     open() {
@@ -31,6 +26,12 @@ const EditUserModal = forwardRef(function EditUserModal(
       setFormData(values);
     },
   }));
+
+  const roleRef = useRef();
+  const firstnameRef = useRef();
+  const lastnameRef = useRef();
+  const usernameRef = useRef();
+  const passwordRef = useRef();
 
   const handleSubmit = (e) => {
     e.preventDefault(); // Prevent default form submission
@@ -117,7 +118,7 @@ const EditUserModal = forwardRef(function EditUserModal(
             className="input rounded-md"
           />
         </div>
-        <div className="flex justify-between">
+        <div className="flex justify-end">
           <Button
             type="button"
             onClick={() => dialog.current.close()}
@@ -127,7 +128,6 @@ const EditUserModal = forwardRef(function EditUserModal(
           </Button>
           <Button
             type="submit"
-            variant={buttonVariant}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline"
           >
             {buttonCaption}
@@ -139,4 +139,4 @@ const EditUserModal = forwardRef(function EditUserModal(
   );
 });
 
-export default EditUserModal;
+export default AddUserModal;
