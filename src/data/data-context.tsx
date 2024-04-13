@@ -119,7 +119,7 @@ export default function DataContextProvider({ children }) {
   async function addBuilding(buildingData) {
     try {
       // Send a POST request to the API endpoint with the new building data
-      const response = await axios.post("/api/buildings", buildingData);
+      const response = await axios.post(`${endpoint}/api/buildings`, buildingData);
 
       // Return the newly created building object from the response
       return response.data;
@@ -131,22 +131,28 @@ export default function DataContextProvider({ children }) {
   }
 
   async function updateBuilding(buildingId, updatedBuildingData) {
-    try {
-      // Send a PUT request to the API endpoint with the updated data
-      const response = await axios.put(
-        `/api/buildings/${buildingId}`,
-        updatedBuildingData
-      );
-
-      // Return the updated building object from the response
-      console.log(updatedBuildingData);
-      return response.data;
-    } catch (error) {
-      // Handle any errors that occur during the request
-      console.error("Error updating building:", error);
-      throw error; // Optional: rethrow the error to be handled elsewhere
-    }
+    return axios
+      .put(`${endpoint}/api/buildings/${buildingId}`, updatedBuildingData)
+      .then(() => console.log(`Building with ID ${buildingId} updated successfully`))
+      .catch((error) => console.error("Error updating building:", error));
   }
+
+  // async function updateBuilding(buildingId, updatedBuildingData) {
+  //   try {
+  //     console.log(buildingId);
+  //     console.log(updatedBuildingData);
+  //     // Send a PUT request to the API endpoint with the updated data
+  //     const response = await axios.put(`${endpoint}/api/buildings/${buildingId}`,updatedBuildingData);
+
+  //     // Return the updated building object from the response
+  //     console.log(updatedBuildingData);
+  //     return response.data;
+  //   } catch (error) {
+  //     // Handle any errors that occur during the request
+  //     console.error("Error updating building:", error);
+  //     throw error; // Optional: rethrow the error to be handled elsewhere
+  //   }
+  // }
 
   async function deleteBuilding(buildingName) {
     await axios.delete(`${endpoint}/api/buildings/${buildingName}`);
