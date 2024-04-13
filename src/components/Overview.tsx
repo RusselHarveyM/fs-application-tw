@@ -13,39 +13,41 @@ export default function Overview() {
     const id = params.id;
     let spaceRatings = [];
     const spacesByRoomId = [...spaces.filter((space) => space.roomId === id)];
-    console.log(spacesByRoomId);
-    console.log(ratings);
     spacesByRoomId.forEach((space) => {
       let ratingsBySpaceId = [
         ...ratings.filter((rating) => rating.spaceId === space.id),
       ];
+      const latestRating = ratingsBySpaceId.sort(
+        (a, b) =>
+          new Date(b.dateModified).getTime() -
+          new Date(a.dateModified).getTime()
+      );
       console.log(space);
-      console.log(ratingsBySpaceId);
+      console.log(latestRating);
 
       const spaceRating = {
         space,
-        ratings: ratingsBySpaceId,
+        ratings: latestRating,
       };
       spaceRatings.push(spaceRating);
     });
     let avgScore = { sort: 0, set: 0, shine: 0 };
     spaceRatings.map((spaceRating) => {
-      const ratings = spaceRating.ratings;
-      const latestRating = ratings.sort(
-        (a, b) =>
-          new Date(b.dateModified).getTime() -
-          new Date(a.dateModified).getTime()
-      )[0];
-      console.log(latestRating);
-      avgScore.sort += latestRating.sort;
-      avgScore.set += latestRating.setInOrder;
-      avgScore.shine += latestRating.shine;
+      const ratings = spaceRating.ratings[0];
+      console.log(ratings);
+      avgScore.sort += ratings.sort;
+      avgScore.set += ratings.setInOrder;
+      avgScore.shine += ratings.shine;
     });
 
     setAverageScore(() => {
-      return (
-        (avgScore.sort + avgScore.set + avgScore.shine) / spacesByRoomId.length
-      );
+      const totalScores = avgScore.sort + avgScore.set + avgScore.shine;
+      console.log(totalScores);
+      const average = totalScores / spacesByRoomId.length;
+      const percScore = average / 30;
+      const score = percScore * 100;
+      const finalScore = Math.min(Math.max(score, 1), 100);
+      return finalScore.toFixed(1);
     });
 
     console.log(spaceRatings);
