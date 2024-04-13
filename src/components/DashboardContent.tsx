@@ -145,7 +145,7 @@ export default function DashboardContent() {
             >
               {Array.from({ length: index % 2 === 0 ? 3 : 4 }).map(
                 (_, columnIndex) => {
-                  const dataIndex = index * 4 + columnIndex;
+                  const dataIndex = index * 3 + columnIndex;
                   const dataItem = content.data[dataIndex];
                   if (!dataItem) return null;
                   let id;
@@ -191,6 +191,8 @@ export default function DashboardContent() {
                 (_, columnIndex) => {
                   const dataIndex = index * 4 + columnIndex;
                   const dataItem = dummy[dataIndex];
+                  if (!dataItem) return null;
+
                   let id = dataItem?.id;
                   return dataItem ? <Container key={id} /> : null;
                 }

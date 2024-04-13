@@ -1,6 +1,6 @@
 import { Trash } from "lucide-react";
 import TargetBox from "./TargetBox";
-import { forwardRef, useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 
 interface ImageDisplayProps {
   onDelete: () => void;
