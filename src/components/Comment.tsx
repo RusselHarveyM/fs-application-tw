@@ -33,9 +33,9 @@ export default function Comment({ isLoad = false, selected, ratingId }) {
         }
 
         // Remove titles using regex
-        summary = summary.replace(/(\bSummary:\b)/i, "").trim();
+        summary = summary?.replace(/(\bSummary:\b)/i, "")?.trim();
         thingsToImprove = thingsToImprove.map((item) =>
-          item.replace(/(\bThings to improve:\b)/i, "").trim()
+          item?.replace(/(\bThings to improve:\b)/i, "")?.trim()
         ); // Apply the replace and trim to each item in the array
       }
     }
