@@ -327,18 +327,6 @@ export default function DataContextProvider({ children }) {
           await updateBuilding(buildingId, updatedBuildingData);
           // After successful update, update the user data in state
           console.log(buildingId, updatedBuildingData);
-          setData((prevData) => ({
-            ...prevData,
-            buildings: prevData.buildings.map((building) => {
-              if (building.id === buildingId) {
-                return {
-                  ...building,
-                  ...updatedBuildingData,
-                };
-              }
-              return building;
-            }),
-          }));
           console.log(`Building with ID ${buildingId} updated successfully`);
         } catch (error) {
           console.error("Error updating building:", error);
@@ -367,6 +355,23 @@ export default function DataContextProvider({ children }) {
       }
     }
     if (action.type === "rooms") {
+      if (action.method === "post") {
+        const roomData = action.data;
+        console.log(roomData);
+        // Perform the creation logic here, such as making a POST request to your backend API
+        try {
+          // Assuming your API endpoint for creating a room is `${endpoint}/api/rooms`
+          const response = await axios.post(`${endpoint}/api/rooms`, roomData);
+          // After successful creation, update the room data in state
+          setData((prevData) => ({
+            ...prevData,
+            rooms: [...prevData.rooms, response.data],
+          }));
+          console.log("Room created successfully");
+        } catch (error) {
+          console.error("Error creating room:", error);
+        }
+      }
       if (action.method === "delete") {
         const { roomNumber, buildingId } = action.data;
         console.log(roomNumber, buildingId);

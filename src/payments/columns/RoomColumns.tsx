@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +12,7 @@ import {
 import { useContext, useRef } from "react";
 import Modal from "@/components/Modal";
 import { DataContext } from "@/data/data-context";
+import AddRoomModal from "@/components/AddRoomModal";
 
 export type Room = {
   id: string;
@@ -75,6 +76,47 @@ export const roomColumns: ColumnDef<Room>[] = [
     ),
   },
   {
+    header: ({ column }) => {
+      const addRoomModal = useRef();
+      const { useEntry } = useContext(DataContext);
+
+      async function handleAddRoom(roomData) {
+        try {
+          const roomDataWithId = { ...roomData, Id: "string" }; // Include id with a placeholder value
+          const action = {
+              type: "rooms",
+              method: "post",
+              data: roomDataWithId,
+          };
+          // Call the useEntry function to add a new user
+          console.log(roomDataWithId);
+          useEntry(action);
+          console.log(`Room added successfully`);
+          addRoomModal.current.close(); // Close the modal after successful addition
+        } catch (error) {
+          console.error("Error adding room:", error);
+        }
+      }
+
+      return (
+        <>
+          <AddRoomModal
+            ref={addRoomModal}
+            onSubmit={handleAddRoom}
+            buttonCaption="Add Entry"
+            buttonVariant="red"
+          />
+          <Button
+            variant="ghost"
+            className="flex items-center"
+            onClick={() => addRoomModal.current.open()}
+          >
+            Add Entry
+            <Plus className="h-4 w-4" />
+          </Button>
+        </>
+      );
+    },
     id: "actions",
     cell: ({ row }) => {
       const room = row.original;
