@@ -38,6 +38,10 @@ const EditBuildingModal = forwardRef(function EditBuildingModal(
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission
     const updatedBuildingData = { ...formData };
+    const { id } = formData;
+      updatedBuildingData.id = id;
+
+      console.log(updatedBuildingData.id);
     try {
       // Call the onSubmit handler to submit the form data
       await onSubmit(updatedBuildingData);

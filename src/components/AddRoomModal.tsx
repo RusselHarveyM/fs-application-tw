@@ -3,8 +3,9 @@ import { createPortal } from "react-dom";
 import Button from "./Button";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Input } from "./ui/input";
+import { DataContext } from "@/data/data-context"; // Import DataContext
 
-const AddBuildingModal = forwardRef(function AddBuildingModal(
+const AddRoomModal = forwardRef(function AddRoomModal(
   {
     buttonVariant = undefined,
     buttonCaption,
@@ -15,12 +16,15 @@ const AddBuildingModal = forwardRef(function AddBuildingModal(
 ) {
   const dialog = useRef();
   const [formData, setFormData] = useState(initialValues);
-  const [newBuilding, setNewBuilding] = useState({
+  const [newRoom, setNewRoom] = useState({
     id: "",
-    buildingName: "",
-    buildingCode: "",
+    buildingId: "",
+    roomNumber: "",
     image: "",
+    status: "",
   });
+
+  const { buildings } = useContext(DataContext); // Get buildings from DataContext
 
   useImperativeHandle(ref, () => ({
     open() {
@@ -36,7 +40,7 @@ const AddBuildingModal = forwardRef(function AddBuildingModal(
   }));
 
   function handleInputChange(event, field) {
-      setNewBuilding({ ...newBuilding, [field]: event.target.value });
+    setNewRoom({ ...newRoom, [field]: event.target.value });
   }
 
   function handleImageUpload(event) {
@@ -46,7 +50,7 @@ const AddBuildingModal = forwardRef(function AddBuildingModal(
     reader.onloadend = () => {
       // The result contains the data URL of the image
       const base64String = reader.result.split(",")[1]; // Extract base64 data from result
-      setNewBuilding({ ...newBuilding, image: base64String });
+      setNewRoom({ ...newRoom, image: base64String });
       const imgElement = document.getElementById("preview") as HTMLImageElement;
       imgElement.src = reader.result as string;
     };
@@ -54,15 +58,20 @@ const AddBuildingModal = forwardRef(function AddBuildingModal(
     if (file) {
       reader.readAsDataURL(file);
     }
-}
+  }
 
   const handleSubmit = (e) => {
-    let requestBody;
     e.preventDefault(); // Prevent default form submission
-    requestBody = {
-      buildingName: newBuilding.buildingName,
-      buildingCode: newBuilding.buildingCode,
-      image: newBuilding.image
+
+    // Find the building ID based on the selected building name
+    const selectedBuilding = buildings.find((building) => building.buildingName === newRoom.buildingId);
+    const buildingId = selectedBuilding ? selectedBuilding.id : "";
+
+    const requestBody = {
+      buildingId: buildingId,
+      roomNumber: newRoom.roomNumber,
+      image: newRoom.image,
+      status: newRoom.status,
     };
 
     onSubmit(requestBody); // Pass request to onSubmit handler
@@ -81,33 +90,52 @@ const AddBuildingModal = forwardRef(function AddBuildingModal(
         <div className="sm:max-w-[425px]">
           <div>
             <h2 className="text-lg font-semibold mb-2 text-center">
-              Add Building
+              Add Room
             </h2>
           </div>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="buildingName" className="text-right">
+              <Label htmlFor="buildingId" className="text-right">
                 Building Name:
               </Label>
+              <select
+                id="buildingId"
+                value={newRoom.buildingId}
+                onChange={(e) => handleInputChange(e, "buildingId")}
+                className="col-span-3"
+              >
+                <option value="">Select a building</option>
+                {buildings &&
+                  buildings.map((building) => (
+                    <option key={building.id} value={building.buildingName}>
+                      {building.buildingName}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="roomNumber" className="text-right">
+                Room Number:
+              </Label>
               <Input
-                id="buildingName"
+                id="roomNumber"
                 type="text"
-                value={newBuilding.buildingName}
-                onChange={(e) => handleInputChange(e, "buildingName")}
-                placeholder="Building Name"
+                value={newRoom.roomNumber}
+                onChange={(e) => handleInputChange(e, "roomNumber")}
+                placeholder="Room Number"
                 className="col-span-3"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="buildingCode" className="text-right">
-                Building Code:
+              <Label htmlFor="status" className="text-right">
+                Status:
               </Label>
               <Input
-                id="buildingCode"
+                id="status"
                 type="text"
-                value={newBuilding.buildingCode}
-                onChange={(e) => handleInputChange(e, "buildingCode")}
-                placeholder="Building Code"
+                value={newRoom.status}
+                onChange={(e) => handleInputChange(e, "status")}
+                placeholder="Status"
                 className="col-span-3"
               />
             </div>
@@ -154,4 +182,4 @@ const AddBuildingModal = forwardRef(function AddBuildingModal(
   );
 });
 
-export default AddBuildingModal;
+export default AddRoomModal;

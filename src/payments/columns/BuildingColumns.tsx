@@ -93,7 +93,7 @@ export const buildingColumns: ColumnDef<Building>[] = [
 
       async function handleAddBuilding(buildingData) {
         try {
-          const buildingDataWithId = { ...buildingData, id: "string" }; // Include id with a placeholder value
+          const buildingDataWithId = { ...buildingData, Id: "string" }; // Include id with a placeholder value
           const action = {
               type: "buildings",
               method: "post",
