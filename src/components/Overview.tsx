@@ -45,8 +45,8 @@ export default function Overview() {
       console.log(totalScores);
       const average = totalScores / spacesByRoomId.length;
       const percScore = average / 30;
-      const score = percScore * 100;
-      const finalScore = Math.min(Math.max(score, 1), 100);
+      const score = percScore * 10;
+      const finalScore = Math.min(Math.max(score, 1), 10);
       return finalScore.toFixed(1);
     });
 
@@ -60,6 +60,7 @@ export default function Overview() {
         <div className="flex">
           <CircularProgress
             percent={averageScore}
+            average={true}
             strokeColor="#1dd75b"
             trailColor="#b8f5cd"
           />

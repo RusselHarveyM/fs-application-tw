@@ -6,6 +6,7 @@ export default function CircularProgress({
   strokeColor,
   trailColor,
   isLoad = false,
+  average = false,
 }) {
   let loadCss = "animate-spin";
   return (
@@ -24,10 +25,10 @@ export default function CircularProgress({
           width: "fit-content",
         }}
       >
-        {!isLoad ? percent + " %" : ""}
+        {!isLoad ? (average ? percent + " /10" : percent + " %") : ""}
       </p>
       <Circle
-        percent={percent}
+        percent={average ? percent * 10 : percent}
         trailWidth={18}
         strokeWidth={18}
         strokeLinecap="butt"
