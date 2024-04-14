@@ -31,9 +31,7 @@ export const buildingColumns: ColumnDef<Building>[] = [
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
-        onCheckedChange={(value) =>
-          table.toggleAllPageRowsSelected(!!value)
-        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
     ),
@@ -83,7 +81,10 @@ export const buildingColumns: ColumnDef<Building>[] = [
     accessorKey: "image",
     header: "Image",
     cell: ({ row }) => (
-      <img src={`data:image/png;base64,${row.original.image}`} alt="Building Image" />
+      <img
+        src={`data:image/png;base64,${row.original.image}`}
+        alt="Building Image"
+      />
     ),
   },
   {
@@ -95,9 +96,9 @@ export const buildingColumns: ColumnDef<Building>[] = [
         try {
           const buildingDataWithId = { ...buildingData, Id: "string" }; // Include id with a placeholder value
           const action = {
-              type: "buildings",
-              method: "post",
-              data: buildingDataWithId,
+            type: "buildings",
+            method: "post",
+            data: buildingDataWithId,
           };
           // Call the useEntry function to add a new user
           console.log(buildingDataWithId);
@@ -136,13 +137,20 @@ export const buildingColumns: ColumnDef<Building>[] = [
       const { useEntry } = useContext(DataContext); // Get useEntry function from DataContext
 
       async function handleBuildingEdit(updatedBuildingData) {
+        console.log("here >> ", updatedBuildingData);
+        console.log("here2 >> ", building.id);
+        const newBuildingData = {
+          buildingCode: updatedBuildingData.buildingCode,
+          buildingName: updatedBuildingData.buildingName,
+          image: updatedBuildingData.image,
+        };
         try {
           const action = {
             type: "buildings",
             method: "put",
             data: {
-              id: building.id,
-              ...updatedBuildingData,
+              id: updatedBuildingData.id,
+              ...newBuildingData,
             },
           };
           // Call the useEntry function to update the user
@@ -150,7 +158,7 @@ export const buildingColumns: ColumnDef<Building>[] = [
           console.log(`Building with ID ${building.id} updated successfully`);
           editModal.current.close(); // Close the modal after successful update
         } catch (error) {
-          console.error('Error updating building:', error);
+          console.error("Error updating building:", error);
         }
       }
 
@@ -165,9 +173,11 @@ export const buildingColumns: ColumnDef<Building>[] = [
           };
           // Call the useEntry function to delete the building
           useEntry(action);
-          console.log(`Building with Name ${building.buildingName} deleted successfully`);
+          console.log(
+            `Building with Name ${building.buildingName} deleted successfully`
+          );
         } catch (error) {
-          console.error('Error deleting building:', error);
+          console.error("Error deleting building:", error);
         }
       }
 
