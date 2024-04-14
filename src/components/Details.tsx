@@ -7,9 +7,9 @@ export default function Details({ title, text, isLoad, list = false }) {
       {isLoad ? (
         <>
           <Skeleton className="h-6 w-[450px] mb-2 bg-neutral-200" />
-          <Skeleton className="h-6 w-[800px] mb-2 bg-neutral-200" />
-          <Skeleton className="h-6 w-[790px] mb-2 bg-neutral-200" />
-          <Skeleton className="h-6 w-[850px] mb-2 bg-neutral-200" />
+          <Skeleton className="h-6 w-[900px] mb-2 bg-neutral-200" />
+          <Skeleton className="h-6 w-[900px] mb-2 bg-neutral-200" />
+          <Skeleton className="h-6 w-[900px] mb-2 bg-neutral-200" />
         </>
       ) : (
         <code className={`${list && "grid grid-cols-2"} text-neutral-600 `}>
