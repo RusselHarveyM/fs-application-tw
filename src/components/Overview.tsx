@@ -2,6 +2,7 @@ import CircularProgress from "./CircularProgress";
 import { DataContext } from "@/data/data-context";
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import Card from "./Card";
 
 export default function Overview() {
   const { spaces, ratings } = useContext(DataContext);
@@ -53,18 +54,17 @@ export default function Overview() {
     console.log(spaceRatings);
   }, [params.id]);
 
+  {
+  }
+
   return (
-    <div className="flex flex-col p-6 w-[90rem] mx-auto">
-      <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
-        <h2 className="text-2xl text-neutral-500 font-bold">Overview</h2>
-        <div className="flex">
-          <CircularProgress
-            percent={averageScore}
-            average={true}
-            strokeColor="#1dd75b"
-            trailColor="#b8f5cd"
-          />
-        </div>
+    <div className="flex flex-col p-6 w-[97rem] mx-auto gap-4">
+      <h2 className="text-2xl text-neutral-700 font-bold mt-2">Overview</h2>
+      <div className="flex w-full justify-around mt-4 mx-auto">
+        <Card score={averageScore} title={"Overall"} />
+        <Card score={7.8} title={"Sort"} />
+        <Card score={2} title={"Set In Order"} />
+        <Card score={9} title={"Shine"} />
       </div>
     </div>
   );
