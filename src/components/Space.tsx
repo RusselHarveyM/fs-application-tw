@@ -345,7 +345,7 @@ export default function Space({ data }) {
           *This action is irreversible*
         </p> */}
       </Modal>
-      <div className="flex flex-col gap-4 p-6 w-[82rem] mx-auto">
+      <div className="flex flex-col gap-4 p-6 w-[90rem] mx-auto">
         <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
           <div className="flex justify-between">
             <h2 className="text-neutral-600 text-2xl">
