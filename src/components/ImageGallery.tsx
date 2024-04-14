@@ -22,7 +22,7 @@ export default function ImageGallery({
       )}
 
       {isLoad && (
-        <div className="absolute top-0 left-0 flex justify-center items-center  w-[25rem] h-[30rem] bg-neutral-50 opacity-90">
+        <div className="absolute top-0 left-0 flex justify-center items-center  w-[27rem] h-[30rem] bg-neutral-50 opacity-90">
           <h3 className="text-neutral-600 ">
             Please wait<p className="animate-bounce">...</p>
           </h3>
@@ -47,7 +47,7 @@ export default function ImageGallery({
             );
           })
         : !isLoad && (
-            <div className="absolute top-0 left-0 flex justify-center items-center text-neutral-600 w-[25rem] h-[30rem]">
+            <div className="absolute top-0 left-0 flex justify-center items-center text-neutral-600 w-[27rem] h-[30rem]">
               <p>No Images yet...</p>
             </div>
           )}
