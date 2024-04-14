@@ -3,6 +3,7 @@ import { DataContext } from "@/data/data-context";
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Card from "./Card";
+import { BarChartCustom } from "./BarChart";
 
 export default function Overview() {
   const { spaces, ratings } = useContext(DataContext);
@@ -59,12 +60,23 @@ export default function Overview() {
 
   return (
     <div className="flex flex-col p-6 w-[97rem] mx-auto gap-4">
-      <h2 className="text-2xl text-neutral-700 font-bold mt-2">Overview</h2>
+      <h2 className="text-2xl text-neutral-800 font-bold mt-2">Overview</h2>
       <div className="flex w-full justify-around mt-4 mx-auto">
         <Card score={averageScore} title={"Overall"} />
         <Card score={7.8} title={"Sort"} />
         <Card score={2} title={"Set In Order"} />
         <Card score={9} title={"Shine"} />
+      </div>
+      <div className="flex gap-4 w-full h-[35rem] mt-8">
+        <BarChartCustom />
+        <div className="w-1/3 h-full bg-white shadow rounded-2xl p-8">
+          <h2 className="text-lg text-neutral-700 font-semibold">
+            Recent Users
+          </h2>
+          <p className="text-neutral-400 text-sm">
+            0 users attended the room this year.
+          </p>
+        </div>
       </div>
     </div>
   );
