@@ -158,6 +158,28 @@ export default function DataContextProvider({ children }) {
     await axios.delete(`${endpoint}/api/buildings/${buildingName}`);
   }
 
+  //create room add and edit here
+  async function addRoom(roomData) {
+    try {
+      // Send a POST request to the API endpoint with the new room data
+      const response = await axios.post(`${endpoint}/api/rooms`, roomData);
+
+      // Return the newly created room object from the response
+      return response.data;
+    } catch (error) {
+      // Handle any errors that occur during the request
+      console.error("Error adding room:", error);
+      throw error; // Optional: rethrow the error to be handled elsewhere
+    }
+  }
+
+  async function updateRoom(roomId, updatedRoomData) {
+    return axios
+      .put(`${endpoint}/api/rooms/${roomId}`, updatedRoomData)
+      .then(() => console.log(`Room with ID ${roomId} updated successfully`))
+      .catch((error) => console.error("Error updating room:", error));
+  }
+
   async function deleteRoom(roomNumber, buildingId) {
     await axios.delete(
       `${endpoint}/api/rooms/${buildingId}?roomNumber=${roomNumber}`
@@ -361,15 +383,29 @@ export default function DataContextProvider({ children }) {
         // Perform the creation logic here, such as making a POST request to your backend API
         try {
           // Assuming your API endpoint for creating a room is `${endpoint}/api/rooms`
-          const response = await axios.post(`${endpoint}/api/rooms`, roomData);
+          await addRoom(roomData);
           // After successful creation, update the room data in state
           setData((prevData) => ({
             ...prevData,
-            rooms: [...prevData.rooms, response.data],
+            rooms: [...prevData.rooms, roomData],
           }));
           console.log("Room created successfully");
         } catch (error) {
           console.error("Error creating room:", error);
+        }
+      }
+      if (action.method === "put") {
+        const updatedRoomData = action.data; // Assuming action.data contains the updated Building data
+        const roomId = updatedRoomData.id;
+        // Perform the edit logic here, such as making a PUT request to your backend API
+        try {
+          // Assuming your API endpoint for updating a Building is `${endpoint}/api/user/${BuildingId}`
+          await updateRoom(roomId, updatedRoomData);
+          // After successful update, update the user data in state
+          console.log(roomId, updatedRoomData);
+          console.log(`Room with ID ${roomId} updated successfully`);
+        } catch (error) {
+          console.error("Error updating room:", error);
         }
       }
       if (action.method === "delete") {
