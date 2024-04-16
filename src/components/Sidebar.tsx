@@ -3,8 +3,6 @@ import Button from "./Button";
 
 import { NavLink } from "react-router-dom";
 
-import { Badge } from "./ui/badge";
-
 export default function Sidebar({
   onSelectTab,
   selectedTab,

@@ -1,5 +1,5 @@
 const COMMENT_FORMAT = {
-  summary: "Summary: The model found ",
+  summary: "Summary: The model found  ",
   thingsToImprove: "Things to improve: ",
 };
 
@@ -43,7 +43,11 @@ export default function commentFormatter(comment) {
     set: "",
     shine: "",
   };
-
+  let writeFlag = {
+    sort: 0,
+    set: 0,
+    shine: 0,
+  };
   for (const category in comment) {
     let commentFormat = { ...COMMENT_FORMAT };
     for (const property in comment[category]) {
@@ -56,6 +60,8 @@ export default function commentFormatter(comment) {
         ) {
           continue;
         }
+        writeFlag[category] = 1;
+
         if (property === "disorganizedRow") {
           commentFormat.summary += `${comment[category][property]} disorganized rows of tables/chairs, `;
           commentFormat.thingsToImprove += `* organization of chairs/desks\n`;
@@ -68,6 +74,26 @@ export default function commentFormatter(comment) {
           commentFormat.thingsToImprove += `* fix damages found on tables/chairs/walls \n`;
         }
         commentFormat.summary += `${comment[category][property]} ${property}, `;
+      }
+    }
+
+    console.log("writeFlag >> ", writeFlag);
+    console.log("category >> ", category);
+    if (writeFlag[category] === 0) {
+      if (category === "shine" && writeFlag["set"] === 0) {
+        comments.sort =
+          "Summary: Is this even an image of a room? Please try again. \n Things to improve:";
+        comments.set =
+          "Summary: Is this even an image of a room? Please try again. \n Things to improve:";
+        comments.shine =
+          "Summary: Is this even an image of a room? Please try again. \n Things to improve:";
+        continue;
+      } else {
+        if (category === "sort") {
+          commentFormat.summary = `Summary: The model found a well kept space  `;
+        } else if (category === "shine") {
+          commentFormat.summary = "Summary: The model found a shiny space  ";
+        }
       }
     }
     let summary = commentFormat.summary.slice(0, -2);
