@@ -4,6 +4,7 @@ export function getAuthToken() {
   const storedItem = JSON.parse(localStorage.getItem("isLoggedIn"));
   if (!storedItem || new Date().getTime() > storedItem.expiry) {
     localStorage.removeItem("isLoggedIn");
+    return null;
   }
   return storedItem;
 }
