@@ -150,7 +150,7 @@ export const userColumns: ColumnDef<User>[] = [
     id: "actions",
     cell: ({ row }) => {
       const user = row.original;
-      const editModal = useRef();
+      const editUserModal = useRef();
       const deleteModal = useRef();
       const { useEntry } = useContext(DataContext); // Get useEntry function from DataContext
 
@@ -167,7 +167,7 @@ export const userColumns: ColumnDef<User>[] = [
           // Call the useEntry function to update the user
           useEntry(action);
           // console.log(`User with ID ${user.id} updated successfully`);
-          editModal.current.close(); // Close the modal after successful update
+          editUserModal.current.close(); // Close the modal after successful update
         } catch (error) {
           console.error("Error updating user:", error);
         }
@@ -192,7 +192,7 @@ export const userColumns: ColumnDef<User>[] = [
 
       function handleDropdownSelect(selected) {
         if (selected === "edit") {
-          editModal.current.open();
+          editUserModal.current.open();
         } else if (selected === "delete") {
           deleteModal.current.open(user); // Open delete modal with user object
         }
@@ -203,7 +203,7 @@ export const userColumns: ColumnDef<User>[] = [
           <EditUserModal
             buttonCaption="Edit Entry"
             buttonVariant="blue"
-            ref={editModal}
+            ref={editUserModal}
             onSubmit={handleUserEdit} // Pass handleUserEdit as onSubmit handler
             initialValues={user} // Pass the selected user's data as initialValues
           />

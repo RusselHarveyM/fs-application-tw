@@ -132,7 +132,7 @@ export const buildingColumns: ColumnDef<Building>[] = [
     id: "actions",
     cell: ({ row }) => {
       const building = row.original;
-      const editModal = useRef();
+      const editBuildingModal = useRef();
       const deleteModal = useRef();
       const { useEntry } = useContext(DataContext); // Get useEntry function from DataContext
 
@@ -156,7 +156,7 @@ export const buildingColumns: ColumnDef<Building>[] = [
           // Call the useEntry function to update the user
           useEntry(action);
           console.log(`Building with ID ${building.id} updated successfully`);
-          editModal.current.close(); // Close the modal after successful update
+          editBuildingModal.current.close(); // Close the modal after successful update
         } catch (error) {
           console.error("Error updating building:", error);
         }
@@ -183,7 +183,7 @@ export const buildingColumns: ColumnDef<Building>[] = [
 
       function handleDropdownSelect(selected) {
         if (selected === "edit") {
-          editModal.current.open();
+          editBuildingModal.current.open();
         } else if (selected === "delete") {
           deleteModal.current.open(building);
         }
@@ -194,7 +194,7 @@ export const buildingColumns: ColumnDef<Building>[] = [
           <EditBuildingModal
             buttonCaption="Edit Entry"
             buttonVariant="blue"
-            ref={editModal}
+            ref={editBuildingModal}
             onSubmit={handleBuildingEdit}
             initialValues={building}
           />

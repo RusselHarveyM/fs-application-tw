@@ -13,12 +13,14 @@ import { useContext, useRef } from "react";
 import Modal from "@/components/Modal";
 import { DataContext } from "@/data/data-context";
 import AddRoomModal from "@/components/AddRoomModal";
+import EditRoomModal from "@/components/EditRoomModal";
 
 export type Room = {
   id: string;
   buildingId: string;
   roomNumber: string;
   image: string;
+  status: string;
 };
 
 export const roomColumns: ColumnDef<Room>[] = [
@@ -76,6 +78,20 @@ export const roomColumns: ColumnDef<Room>[] = [
     ),
   },
   {
+    accessorKey: "status",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          status
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
     header: ({ column }) => {
       const addRoomModal = useRef();
       const { useEntry } = useContext(DataContext);
@@ -120,9 +136,36 @@ export const roomColumns: ColumnDef<Room>[] = [
     id: "actions",
     cell: ({ row }) => {
       const room = row.original;
-      const editModal = useRef();
+      const editRoomModal = useRef();
       const deleteModal = useRef();
       const { useEntry } = useContext(DataContext); // Get useEntry function from DataContext
+
+      async function handleRoomEdit(updatedRoomData) {
+        console.log("here >> ", updatedRoomData);
+        console.log("here2 >> ", room.id);
+        const newRoomData = {
+          buildingId: updatedRoomData.buildingId,
+          roomNumber: updatedRoomData.roomNumber,
+          image: updatedRoomData.image,
+          status: updatedRoomData.status,
+        };
+        try {
+          const action = {
+            type: "rooms",
+            method: "put",
+            data: {
+              id: updatedRoomData.id,
+              ...newRoomData,
+            },
+          };
+          // Call the useEntry function to update the user
+          useEntry(action);
+          console.log(`Room with ID ${room.id} updated successfully`);
+          editRoomModal.current.close(); // Close the modal after successful update
+        } catch (error) {
+          console.error("Error updating building:", error);
+        }
+      }
 
       async function handleRoomDelete() {
         try {
@@ -144,7 +187,7 @@ export const roomColumns: ColumnDef<Room>[] = [
 
       function handleDropdownSelect(selected) {
         if (selected === "edit") {
-          editModal.current.open();
+          editRoomModal.current.open();
         } else if (selected === "delete") {
           deleteModal.current.open(room); 
         }
@@ -152,13 +195,14 @@ export const roomColumns: ColumnDef<Room>[] = [
 
       return (
         <>
-          <Modal
-            buttonCaption="Edit Entry"
-            buttonVariant="blue"
-            ref={editModal}
-          >
-            <p>Edit</p>
-          </Modal>
+          <EditRoomModal
+          buttonCaption="Edit Entry"
+          buttonVariant="blue"
+          buttonCaption="Save Changes"
+          onSubmit={handleRoomEdit}
+          ref={editRoomModal}
+          initialValues={room}
+          />
           <Modal
             buttonCaption="Delete Entry"
             buttonVariant="red"
@@ -176,7 +220,7 @@ export const roomColumns: ColumnDef<Room>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleDropdownSelect("edit")}>
+                <DropdownMenuItem onClick={() => handleDropdownSelect("edit")}>
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleDropdownSelect("delete")}>
