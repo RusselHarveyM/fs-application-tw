@@ -15,7 +15,7 @@ export default function Sidebar({
   return (
     <aside className="flex flex-col py-8 px-2 gap-4 items-center w-[19rem] h-screen bg-white shadow-md">
       <NavLink
-        to={`/${buildingData?.id}`}
+        to={`/home/${buildingData?.id}`}
         className={"justify-start w-[90%] flex gap-2 hover:text-red-500"}
       >
         <ArrowLeft />

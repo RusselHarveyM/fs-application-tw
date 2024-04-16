@@ -11,11 +11,11 @@ import { Toaster } from "./components/ui/toaster";
 function App() {
   const router = createBrowserRouter([
     {
-      path: "/login",
+      path: "/",
       element: <Login />,
     },
     {
-      path: "/",
+      path: "/home",
       element: <RootLayout />,
       children: [
         { index: true, element: <Home /> },
