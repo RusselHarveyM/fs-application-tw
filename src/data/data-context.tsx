@@ -379,16 +379,21 @@ export default function DataContextProvider({ children }) {
     if (action.type === "rooms") {
       if (action.method === "post") {
         const roomData = action.data;
+        const roomId = action.data.id;
         console.log(roomData);
         // Perform the creation logic here, such as making a POST request to your backend API
         try {
           // Assuming your API endpoint for creating a room is `${endpoint}/api/rooms`
           await addRoom(roomData);
-          // After successful creation, update the room data in state
-          setData((prevData) => ({
-            ...prevData,
-            rooms: [...prevData.rooms, roomData],
-          }));
+          // After successful creation, update the room data in state there is no prevdata tho, since its newly added how to render it
+
+          //update the room data in state there is no prevdata tho, since its newly added how to render it
+          setData((prevData) => {
+            return {
+              ...prevData,
+              rooms: [...prevData.rooms, roomData],
+            };
+          });
           console.log("Room created successfully");
         } catch (error) {
           console.error("Error creating room:", error);
@@ -401,7 +406,21 @@ export default function DataContextProvider({ children }) {
         try {
           // Assuming your API endpoint for updating a Building is `${endpoint}/api/user/${BuildingId}`
           await updateRoom(roomId, updatedRoomData);
-          // After successful update, update the user data in state
+          setData((prevData) => {
+            return {
+              ...prevData,
+              rooms: prevData.rooms.map((room) => {
+                if (room.id === roomId) {
+                  // Merge existing user data with the updated data, excluding username and password
+                  return {
+                    ...room,
+                    ...updatedRoomData,
+                  };
+                }
+                return room;
+              }),
+            };
+          });
           console.log(roomId, updatedRoomData);
           console.log(`Room with ID ${roomId} updated successfully`);
         } catch (error) {

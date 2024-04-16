@@ -198,7 +198,6 @@ export const roomColumns: ColumnDef<Room>[] = [
           <EditRoomModal
           buttonCaption="Edit Entry"
           buttonVariant="blue"
-          buttonCaption="Save Changes"
           onSubmit={handleRoomEdit}
           ref={editRoomModal}
           initialValues={room}
