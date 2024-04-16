@@ -3,7 +3,58 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import WildCats from "../../public/wildcats.png";
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 export function Login() {
+  const [errorHighlight, setErrorHighlight] = useState("");
+  const [usersData, setUsersData] = useState(undefined);
+  const emailRef = useRef();
+  const passwordRef = useRef();
+  const navigate = useNavigate();
+
+  async function handleLogin() {
+    const email = emailRef.current.value.trim();
+    const password = emailRef.current.value.trim();
+
+    if (email === "" || password === "") {
+      console.log("in");
+      setErrorHighlight("bg-red-100 border-2 border-red-200");
+      return;
+    }
+    emailRef.current.disabled = true;
+    passwordRef.current.disabled = true;
+    let response = usersData;
+    if (usersData === undefined) {
+      response = (
+        await axios.get(
+          `https://fs-backend-copy-production.up.railway.app/api/user`
+        )
+      ).data.map((user) => ({
+        ...user,
+        Name: `${user.firstName} ${user.lastName}`, // Calculate fullname
+      }));
+      setUsersData(response);
+    }
+    console.log(response);
+    const foundUser = response.filter((user) => {
+      if (user.username === email && user.password === password) {
+        return true;
+      }
+    });
+    console.log(foundUser);
+    if (foundUser.length > 0) {
+      const oneHourFromNow = new Date().getTime() + 3600000;
+
+      localStorage.setItem(
+        "isLoggedIn",
+        JSON.stringify({ value: "true", expiry: oneHourFromNow })
+      );
+      return navigate("/home");
+    }
+  }
+
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-screen">
       <div className="flex items-center justify-center py-12">
@@ -21,6 +72,8 @@ export function Login() {
                 id="email"
                 type="email"
                 placeholder="johndoe@cit.edu"
+                ref={emailRef}
+                className={errorHighlight}
                 required
               />
             </div>
@@ -34,15 +87,22 @@ export function Login() {
                   Forgot your password?
                 </NavLink>
               </div>
-              <Input id="password" type="password" required />
+              <Input
+                id="password"
+                type="password"
+                required
+                ref={passwordRef}
+                className={errorHighlight}
+              />
             </div>
             <Button
               type="submit"
               className="w-full bg-red-500 hover:bg-red-400"
+              onClick={handleLogin}
             >
               Login
             </Button>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" disabled>
               Login with Microsoft
             </Button>
           </div>
