@@ -237,6 +237,7 @@ export default function Space({ data }) {
     console.log("predictions >> ", raw5s.predictions);
 
     const commentResult = comment(raw5s.result);
+    console.log(" III commentResult III", commentResult);
     const { sort, set, shine } = commentResult;
     console.log(" III raw5s III", raw5s);
 
