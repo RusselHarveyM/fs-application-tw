@@ -39,7 +39,7 @@ export default function TopNavigation() {
           </ul>
         </li>
         <li className="w-1/3 flex items-center justify-end">
-          <NavLink to={"/settings"}>
+          <NavLink to={"settings"}>
             <img
               src={Settings}
               alt="settings-icon"
