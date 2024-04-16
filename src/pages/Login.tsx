@@ -16,7 +16,7 @@ export function Login() {
 
   async function handleLogin() {
     const email = emailRef.current.value.trim();
-    const password = emailRef.current.value.trim();
+    const password = passwordRef.current.value.trim();
 
     if (email === "" || password === "") {
       console.log("in");
@@ -39,6 +39,7 @@ export function Login() {
     }
     console.log(response);
     const foundUser = response.filter((user) => {
+      console.log(user);
       if (user.username === email && user.password === password) {
         return true;
       }
