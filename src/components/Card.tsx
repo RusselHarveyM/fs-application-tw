@@ -1,6 +1,6 @@
 import CircularProgress from "./CircularProgress";
 
-export default function Card({ title, score }) {
+export default function Card({ title, score, percent = "20.1%" }) {
   let textTheme = "";
   let circularCss = "";
   let trailCss = "";
@@ -22,7 +22,7 @@ export default function Card({ title, score }) {
     <div className="relative  flex flex-col shadow gap-1 bg-white rounded-2xl w-[22%] h-[10rem] px-6 py-8">
       <h2 className="text-lg text-neutral-600 font-semibold">{title}</h2>
       <p className={`font-bold text-2xl ${textTheme} `}>{score}/ 10</p>
-      <p className="text-neutral-400 ">+20.1% from last month</p>
+      <p className="text-neutral-400 ">+{percent} from last month</p>
       <div className="absolute -right-28 h-10">
         <CircularProgress
           percent={score}

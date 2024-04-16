@@ -15,6 +15,7 @@
 // ]),
 
 import { BarChart } from "@tremor/react";
+import { useEffect, useState } from "react";
 
 const chartdata = [
   {
@@ -61,7 +62,37 @@ const chartdata = [
   },
 ];
 
-export function BarChartCustom() {
+export function BarChartCustom({ filteredRatings }) {
+  const [chartData, setChartDate] = useState([]);
+
+  useEffect(() => {
+    if (filteredRatings.length > 0) {
+      // const latestRatings = [];
+      // filteredRatings.forEach((space) => {
+      //   const sortedRatings = space.ratings.sort(
+      //     (a, b) => new Date(b.dateModified) - new Date(a.dateModified)
+      //   );
+      //   const latestRating = sortedRatings[0];
+      //   const dateModified = new Date(
+      //     latestRating.dateModified
+      //   ).toLocaleDateString("en-US", {
+      //     month: "long",
+      //     day: "numeric",
+      //   });
+      //   latestRating.dateModified = dateModified;
+      //   const newData = {
+      //     date: dateModified,
+      //     Sort: latestRating.sort,
+      //     "Set In Order": latestRating.setInOrder,
+      //     Shine: latestRating.shine,
+      //   };
+      //   latestRatings.push(newData);
+      // });
+      // setChartDate(() => latestRatings);
+      // console.log(latestRatings);
+    }
+  }, [filteredRatings]);
+
   return (
     <>
       <BarChart
