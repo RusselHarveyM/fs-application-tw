@@ -9,6 +9,7 @@ import axios from "axios";
 
 export function Login() {
   const [errorHighlight, setErrorHighlight] = useState("");
+  const [isSubmit, setIsSubmit] = useState(false);
   const [usersData, setUsersData] = useState(undefined);
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -25,6 +26,7 @@ export function Login() {
     }
     emailRef.current.disabled = true;
     passwordRef.current.disabled = true;
+    setIsSubmit(true);
     let response = usersData;
     if (usersData === undefined) {
       response = (
@@ -50,8 +52,9 @@ export function Login() {
 
       localStorage.setItem(
         "isLoggedIn",
-        JSON.stringify({ value: "true", expiry: oneHourFromNow })
+        JSON.stringify({ value: foundUser[0].id, expiry: oneHourFromNow })
       );
+      setIsSubmit(false);
       return navigate("/home");
     }
   }
@@ -100,6 +103,7 @@ export function Login() {
               type="submit"
               className="w-full bg-red-500 hover:bg-red-400"
               onClick={handleLogin}
+              disabled={isSubmit}
             >
               Login
             </Button>

@@ -405,7 +405,10 @@ export default function Space({ data }) {
                   variant="blue"
                   onClick={() => showModal("upload")}
                   disabled={
-                    space.id === undefined || space.isUpload || space.isAssess
+                    space.id === undefined ||
+                    space.isUpload ||
+                    space.isAssess ||
+                    space.isLoad
                       ? true
                       : false
                   }
@@ -416,7 +419,10 @@ export default function Space({ data }) {
                   variant="blue"
                   onClick={handleAssessBtn}
                   disabled={
-                    space.id === undefined || space.isUpload || space.isAssess
+                    space.id === undefined ||
+                    space.isUpload ||
+                    space.isAssess ||
+                    space.isLoad
                       ? true
                       : false
                   }
