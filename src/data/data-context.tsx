@@ -186,6 +186,27 @@ export default function DataContextProvider({ children }) {
     );
   }
 
+  async function addSpace(spaceData) {
+    try {
+      // Send a POST request to the API endpoint with the new room data
+      const response = await axios.post(`${endpoint}/api/space`, spaceData);
+
+      // Return the newly created room object from the response
+      return response.data;
+    } catch (error) {
+      // Handle any errors that occur during the request
+      console.error("Error adding space:", error);
+      throw error; // Optional: rethrow the error to be handled elsewhere
+    }
+  }
+
+  async function updateSpace(spaceId, updatedSpaceData) {
+    return axios
+      .put(`${endpoint}/api/space/${spaceId}`, updatedSpaceData)
+      .then(() => console.log(`Space with ID ${spaceId} updated successfully`))
+      .catch((error) => console.error("Error updating space:", error));
+  }
+
   async function deleteSpace(spaceId) {
     await axios.delete(`${endpoint}/api/space/${spaceId}`);
   }
@@ -386,7 +407,7 @@ export default function DataContextProvider({ children }) {
           // Assuming your API endpoint for creating a room is `${endpoint}/api/rooms`
           await addRoom(roomData);
           // After successful creation, update the room data in state there is no prevdata tho, since its newly added how to render it
-
+          console.log("Newly created room ID:", roomId);
           //update the room data in state there is no prevdata tho, since its newly added how to render it
           setData((prevData) => {
             return {
@@ -450,6 +471,56 @@ export default function DataContextProvider({ children }) {
       }
     }
     if (action.type === "spaces") {
+      if (action.method === "post"){
+        const spaceData = action.data;
+        const spaceId = action.data.id;
+        console.log(spaceData);
+        // Perform the creation logic here, such as making a POST request to your backend API
+        try {
+          // Assuming your API endpoint for creating a room is `${endpoint}/api/rooms`
+          await addSpace(spaceData);
+          // After successful creation, update the room data in state there is no prevdata tho, since its newly added how to render it
+          console.log("Newly created space ID:", spaceId);
+          //update the room data in state there is no prevdata tho, since its newly added how to render it
+          setData((prevData) => {
+            return {
+              ...prevData,
+              spaces: [...prevData.spaces, spaceData],
+            };
+          });
+          console.log("Space created successfully");
+        } catch (error) {
+          console.error("Error creating space:", error);
+        } 
+      }
+      if (action.method === "put") {
+        const updatedSpaceData = action.data.data; // Assuming action.data contains the updated Building data
+        const spaceId = action.data.id;
+        // Perform the edit logic here, such as making a PUT request to your backend API
+        try {
+          // Assuming your API endpoint for updating a Building is `${endpoint}/api/user/${BuildingId}`
+          await updateSpace(spaceId, updatedSpaceData);
+          setData((prevData) => {
+            return {
+              ...prevData,
+              spaces: prevData.spaces.map((space) => {
+                if (space.id === spaceId) {
+                  // Merge existing user data with the updated data, excluding username and password
+                  return {
+                    ...space,
+                    ...updatedSpaceData,
+                  };
+                }
+                return space;
+              }),
+            };
+          });
+          console.log(spaceId, updatedSpaceData);
+          console.log(`Space with ID ${spaceId} updated successfully`);
+        } catch (error) {
+          console.error("Error updating space:", error);
+        }
+      }
       if (action.method === "delete") {
         const spaceId = action.data.id;
         console.log(spaceId);

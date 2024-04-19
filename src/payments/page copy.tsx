@@ -30,7 +30,7 @@ export default function Page({ tableContent }) {
   // Render the table with user data
   return (
     <div className="container mx-auto py-10">
-      {data && <DataTable columns={column} data={data} />}
+      {data && <DataTable columns={column} data={data} tableContent={tableContent}/>}
     </div>
   );
 }

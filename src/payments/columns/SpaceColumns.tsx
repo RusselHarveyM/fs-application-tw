@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,6 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import AddSpaceModal from "@/components/AddSpaceModal";
 import Modal from "@/components/Modal";
 import { useContext, useRef } from "react";
 import { DataContext } from "@/data/data-context";
@@ -73,6 +74,25 @@ export const spaceColumns: ColumnDef<Space>[] = [
       const editModal = useRef();
       const deleteModal = useRef();
       const { useEntry } = useContext(DataContext); // Get useEntry function from DataContext
+      
+      async function handleSpaceEdit(data) {
+        try {
+          const action = {
+            type: "spaces",
+            method: "put",
+            data: {
+              id: space.id,
+              data: { id: space.id, pictures: null, ...data },
+            },
+          };
+          // Call the useEntry function to update the user
+          useEntry(action);
+          // console.log(`User with ID ${user.id} updated successfully`);
+          editModal.current.close(); // Close the modal after successful update
+        } catch (error) {
+          console.error("Error updating user:", error);
+        }
+      }
 
       async function handleSpaceDelete() {
         try {
@@ -101,13 +121,14 @@ export const spaceColumns: ColumnDef<Space>[] = [
 
       return (
         <>
-          <Modal
+          <AddSpaceModal
             buttonCaption="Edit Entry"
             buttonVariant="blue"
             ref={editModal}
-          >
-            <p>Edit</p>
-          </Modal>
+            onSubmit={handleSpaceEdit}
+            isEditing={true} // Indicate that it's in edit mode
+            initialValues={space} // Pass the selected space's data as initialValues
+          />
           <Modal
             buttonCaption="Delete Entry"
             buttonVariant="red"

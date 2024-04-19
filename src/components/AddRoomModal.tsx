@@ -74,7 +74,10 @@ const AddRoomModal = forwardRef(function AddRoomModal(
       status: newRoom.status,
     };
 
-    onSubmit(requestBody); // Pass request to onSubmit handler
+    onSubmit(requestBody).then((response) => {
+      const { roomId } = response.data; // Assuming the response contains the generated roomId
+      setNewRoom((prevRoom) => ({ ...prevRoom, id: roomId }));
+    }); // Pass request to onSubmit handler
     dialog.current.close(); // Close the modal after submission
   };
 
