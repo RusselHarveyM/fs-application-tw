@@ -37,7 +37,6 @@ const AddUserButton = ({ buttonVariant }) => {
       <Button
         variant="ghost"
         className="flex items-center ml-2"
-        variant={buttonVariant}
         onClick={() => addUserModal.current.open()} // Open the AddUserModal when button is clicked
       >
         Add Entry

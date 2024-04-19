@@ -101,7 +101,7 @@ export function DataTable<TData, TValue>({
   const renderAddButton = () => {
     switch (tableContent) {
       case "users":
-        return <AddUserButton buttonVariant="red"/>;
+        return <AddUserButton />;
       case "buildings":
         return <AddBuildingButton />;
       case "rooms":
