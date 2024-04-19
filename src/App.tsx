@@ -7,26 +7,33 @@ import DataContextProvider from "./data/data-context";
 import Spaces from "./pages/Spaces";
 import { Login } from "./pages/Login";
 import { Toaster } from "./components/ui/toaster";
+import { checkAuthLoader } from "./helper/auth";
 
 function App() {
   const router = createBrowserRouter([
     {
-      path: "/login",
+      path: "/",
       element: <Login />,
+      // loader: checkAuthLoader,
     },
     {
-      path: "/",
+      path: "/home",
       element: <RootLayout />,
       children: [
-        { index: true, element: <Home /> },
-        { path: ":id", element: <Home /> },
-        { path: "manage", element: <ManageContent /> },
-        { path: "settings", element: <SettingsContent /> },
+        { index: true, element: <Home />, loader: checkAuthLoader },
+        { path: ":id", element: <Home />, loader: checkAuthLoader },
+        { path: "manage", element: <ManageContent />, loader: checkAuthLoader },
+        {
+          path: "settings",
+          element: <SettingsContent />,
+          loader: checkAuthLoader,
+        },
       ],
     },
     {
       path: "room/:id",
       element: <Spaces />,
+      loader: checkAuthLoader,
     },
   ]);
 

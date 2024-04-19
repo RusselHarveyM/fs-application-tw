@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_KEY = "zKSEIJWU9jceFvUIL8pz";
+const API_KEY = "OeSBdrSNcfGEme3a9fDf";
 
 const SORT = {
   wasteDisposal: 0,
@@ -41,7 +41,7 @@ async function countDesksChairs(image) {
   };
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-count-det/8",
+    url: "https://detect.roboflow.com/classroom-count-det/9",
     params: {
       api_key: API_KEY,
     },
@@ -68,7 +68,7 @@ async function organizationCheck(image, set) {
   let prediction;
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-order-seg/9",
+    url: "https://detect.roboflow.com/classroom-order-seg/11",
     params: {
       api_key: API_KEY,
     },
@@ -132,7 +132,7 @@ async function blueDetection(image, sort, set) {
 
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-blue-det/2",
+    url: "https://detect.roboflow.com/classroom-blue-det/3",
     params: {
       api_key: API_KEY,
     },
@@ -171,7 +171,7 @@ async function cleanlinessDetection(image, shine) {
   let prediction;
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-yellow-seg/7",
+    url: "https://detect.roboflow.com/classroom-yellow-seg/8",
     params: {
       api_key: API_KEY,
     },
@@ -316,13 +316,14 @@ export default async function evaluate(images) {
       if (prediction.class == "chair") set.chairs++;
     });
 
-    if (count.count >= 10) {
-      predictionsPoints.push(await organizationCheck(image, set));
-      // organizeScore += set.organization;
-      organizationCountImage++;
-    }
+    // if (count.count >= 10) {
+    predictionsPoints.push(await organizationCheck(image, set));
+    // organizeScore += set.organization;
+    // organizationCountImage++;
+    // }
     predictionsPoints.push(await blueDetection(image, sort, set));
     const pb_result_temp = await personalBelongingsCheck(image);
+    console.log("ttt 111 >> ", pb_result_temp);
     predictionsPoints.push(pb_result_temp.predictions);
     const pb_result = pb_result_temp.personalBelongings;
     const ic_result = isCluttered(predictions, pb_result);

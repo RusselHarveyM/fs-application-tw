@@ -92,7 +92,7 @@ export default function DashboardContent() {
       <div className="flex flex-col gap-8 items-center justify-center h-1/6 my-8 ">
         <menu className="flex bg-stone-100 rounded-full py-2 px-4">
           <NavLink
-            to="/"
+            to="/home"
             className={`flex justify-center flex-col items-center ${
               content.selectedTab === "buildings" ? "font-bold" : ""
             }`}

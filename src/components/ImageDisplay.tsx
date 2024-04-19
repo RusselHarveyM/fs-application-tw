@@ -44,6 +44,8 @@ export default function ImageDisplay({
                 let style =
                   innerPrediction.class === "chair"
                     ? "border-green-400 bg-green-300"
+                    : innerPrediction.class === "sofa"
+                    ? "border-pink-400 bg-pink-300"
                     : innerPrediction.class === "desk"
                     ? "border-red-600 bg-red-500"
                     : innerPrediction.class === "litter"
