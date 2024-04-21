@@ -41,7 +41,7 @@ export default function ImageGallery({
               imageObject.forType === "std"
                 ? "border-green-500 text-white bg-green-300"
                 : imageObject.forType === "ord"
-                ? "border-purple-500 text-white bg-purple-300"
+                ? "border-purple-400 text-white bg-purple-300"
                 : imageObject.forType === "cln"
                 ? "border-yellow-500 text-white bg-yellow-300"
                 : "border-orange-400 text-white bg-orange-300";
