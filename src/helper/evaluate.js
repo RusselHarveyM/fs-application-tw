@@ -202,36 +202,30 @@ function score(data) {
   );
 }
 
-const SORT = {
-  unwanted: [],
-  missing: [],
-  score: 0,
-};
-
-const SET = {
-  unorganized: 0,
-  airsystem: {
-    ventilation: 0,
-    aircon: 0,
-    exhaust: 0,
-  },
-  score: 0,
-};
-
-const SHINE = {
-  damage: 0,
-  litter: 0,
-  smudge: 0,
-  adhesive: 0,
-  score: 0,
-};
-
 export default async function evaluate(images, spacename) {
   let result = {
     scores: {
-      sort: { ...SORT },
-      set: { ...SET },
-      shine: { ...SHINE },
+      sort: {
+        unwanted: [],
+        missing: [],
+        score: 0,
+      },
+      set: {
+        unorganized: 0,
+        airsystem: {
+          ventilation: 0,
+          aircon: 0,
+          exhaust: 0,
+        },
+        score: 0,
+      },
+      shine: {
+        damage: 0,
+        litter: 0,
+        smudge: 0,
+        adhesive: 0,
+        score: 0,
+      },
     },
     count: {},
     airsystem: false,
@@ -246,7 +240,7 @@ export default async function evaluate(images, spacename) {
   let model4 = undefined;
   let model5 = undefined;
 
-  for await (const imageObject of images) {
+  for (const imageObject of images) {
     console.log(imageObject);
 
     let predictions = [];
@@ -436,16 +430,17 @@ export default async function evaluate(images, spacename) {
   const c_result = await c_evaluation(objects, spacename);
   console.log("c_result >>> ", c_result);
 
-  if (c_result.length > 0) {
-    for (const obj of c_result) {
-      if (obj.status === "missing" || obj.status === "c_missing") {
-        result.scores.sort.missing.push(obj);
-      }
-      if (obj.status === "extra" || obj.status === "c_extra") {
-        result.scores.sort.unwanted.push(obj);
-      }
-    }
-  }
+  result.scores.sort.missing.push(
+    ...c_result.filter(
+      (obj) => obj.status === "missing" || obj.status === "c_missing"
+    )
+  );
+  result.scores.sort.unwanted.push(
+    ...c_result.filter(
+      (obj) => obj.status === "extra" || obj.status === "c_extra"
+    )
+  );
+
   console.log("result >>> ", result);
   score(result);
 

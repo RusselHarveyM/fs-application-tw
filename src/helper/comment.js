@@ -87,10 +87,10 @@ export default function commentFormatter(data) {
       if (!missingFlag && !unwantedFlag) {
         comments[key] = "Summary: The space is well kept.";
       }
-      if (missingFlag) {
+      if (missingFlag === 1) {
         endComment += ` * make sure all items are in their correct positions.\n`;
       }
-      if (unwantedFlag) {
+      if (unwantedFlag === 1) {
         endComment += ` * remove unecessary items.\n`;
       }
 
@@ -121,7 +121,7 @@ export default function commentFormatter(data) {
         comments[key] += ` ${shine.smudge} smudge/s,`;
         endComment += ` * clean smudge/s.`;
       }
-      if (shine.adhesives > 0) {
+      if (shine.adhesive > 0) {
         comments[key] += ` ${shine.adhesive} adhesive/s,`;
         endComment += ` * clean adhesive/s.`;
       }
@@ -130,8 +130,3 @@ export default function commentFormatter(data) {
   }
   return comments;
 }
-
-const COMMENT_FORMAT = {
-  summary: "Summary: The model found  ",
-  thingsToImprove: "Things to improve: ",
-};
