@@ -34,9 +34,15 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  tableType: string;
+  tableContent: string;
 }
 
 import { Button } from "@/components/ui/button";
+import { AddUserButton } from "@/components/AddUserButton";
+import { AddBuildingButton } from "@/components/AddBuildingButton";
+import { AddRoomButton } from "@/components/AddRoomButton";
+import { AddSpaceButton } from "@/components/AddSpaceButton";
 
 import {
   DropdownMenu,
@@ -50,6 +56,7 @@ import { Input } from "@/components/ui/input";
 export function DataTable<TData, TValue>({
   columns,
   data,
+  tableContent,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -61,6 +68,8 @@ export function DataTable<TData, TValue>({
     React.useState<VisibilityState>({});
 
   const [rowSelection, setRowSelection] = React.useState({});
+
+  console.log('tableContent:', tableContent); 
 
   const table = useReactTable({
     data,
@@ -89,6 +98,21 @@ export function DataTable<TData, TValue>({
     table.setGlobalFilter(event.target.value);
   };
 
+  const renderAddButton = () => {
+    switch (tableContent) {
+      case "users":
+        return <AddUserButton />;
+      case "buildings":
+        return <AddBuildingButton />;
+      case "rooms":
+        return <AddRoomButton />;
+      case "spaces":
+        return <AddSpaceButton />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center py-4">
@@ -98,6 +122,7 @@ export function DataTable<TData, TValue>({
           onChange={handleGlobalSearchChange}
           className="max-w-sm"
         />
+        {renderAddButton()}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

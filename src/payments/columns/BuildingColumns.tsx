@@ -88,47 +88,6 @@ export const buildingColumns: ColumnDef<Building>[] = [
     ),
   },
   {
-    header: ({ column }) => {
-      const addBuildingModal = useRef();
-      const { useEntry } = useContext(DataContext);
-
-      async function handleAddBuilding(buildingData) {
-        try {
-          const buildingDataWithId = { ...buildingData, Id: "string" }; // Include id with a placeholder value
-          const action = {
-            type: "buildings",
-            method: "post",
-            data: buildingDataWithId,
-          };
-          // Call the useEntry function to add a new user
-          console.log(buildingDataWithId);
-          useEntry(action);
-          console.log(`Building added successfully`);
-          addBuildingModal.current.close(); // Close the modal after successful addition
-        } catch (error) {
-          console.error("Error adding building:", error);
-        }
-      }
-
-      return (
-        <>
-          <AddBuildingModal
-            ref={addBuildingModal}
-            onSubmit={handleAddBuilding}
-            buttonCaption="Add Entry"
-            buttonVariant="red"
-          />
-          <Button
-            variant="ghost"
-            className="flex items-center"
-            onClick={() => addBuildingModal.current.open()}
-          >
-            Add Entry
-            <Plus className="h-4 w-4" />
-          </Button>
-        </>
-      );
-    },
     id: "actions",
     cell: ({ row }) => {
       const building = row.original;
