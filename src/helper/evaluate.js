@@ -1,47 +1,13 @@
 import axios from "axios";
+import { c_evaluation } from "./checklist";
 
-const API_KEY = "OeSBdrSNcfGEme3a9fDf";
+const API_KEY = "7kfXkOSEwHiflj4IHiHI";
 
-const SORT = {
-  wasteDisposal: 0,
-  clutter: 0,
-  cabinet: 0,
-  danglings: 0,
-  drawer: 0,
-  shelf: 0,
-  score: 0,
-};
-
-const SET = {
-  chairs: 0,
-  desks: 0,
-  disorganizedRow: 0,
-  organizedRow: 0,
-  organization: 0,
-  ventilation: 0,
-  aircon: 0,
-  exhaust: 0,
-  score: 0,
-};
-
-const SHINE = {
-  adhesives: 0,
-  damage: 0,
-  dirt: 0,
-  dust: 0,
-  litter: 0,
-  smudge: 0,
-  stain: 0,
-  score: 0,
-};
-
-async function countDesksChairs(image) {
-  let response = {
-    predictions: [],
-  };
+async function countModel(image) {
+  let response;
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-count-det/9",
+    url: "https://detect.roboflow.com/classroom-count-det/10",
     params: {
       api_key: API_KEY,
     },
@@ -57,15 +23,11 @@ async function countDesksChairs(image) {
     .catch(function (error) {
       console.log(error.message);
     });
-  return {
-    count: response.predictions.length,
-    data: response,
-    predictions: response.predictions,
-  };
+  return response;
 }
 
-async function organizationCheck(image, set) {
-  let prediction;
+async function orderModel(image) {
+  let result;
   await axios({
     method: "POST",
     url: "https://detect.roboflow.com/classroom-order-seg/11",
@@ -78,26 +40,17 @@ async function organizationCheck(image, set) {
     },
   })
     .then(function (res) {
-      prediction = res.data.predictions;
+      result = res.data;
       console.log("organize check >>>", res.data);
-      res.data.predictions.map((prediction) => {
-        if (prediction.class === "disorganized") set.disorganizedRow++;
-        if (prediction.class === "organized") set.organizedRow++;
-      });
     })
     .catch(function (error) {
       console.log(error.message);
     });
-  let overall = set.organizedRow + set.disorganizedRow;
-  set.organization = (set.organizedRow / overall) * 10;
-  return prediction;
+  return result;
 }
 
-async function personalBelongingsCheck(image) {
-  let response = {
-    predictions: [],
-  };
-  let predictions;
+async function pbModel(image) {
+  let response;
   await axios({
     method: "POST",
     url: "https://detect.roboflow.com/classroom-3igmn/11",
@@ -111,24 +64,17 @@ async function personalBelongingsCheck(image) {
   })
     .then(function (res) {
       response = res.data;
-      predictions = res.data.predictions;
       console.log("personalBelongings check >>> ", res.data);
     })
     .catch(function (error) {
       console.log(error.message);
     });
 
-  let personalBelongings = response.predictions.filter(
-    (pred) => pred.class === "personal belongings"
-  );
-  return { personalBelongings, predictions };
+  return response;
 }
 
-async function blueDetection(image, sort, set) {
-  let response = {
-    predictions: [],
-  };
-  let predictions;
+async function blueModel(image) {
+  let response;
 
   await axios({
     method: "POST",
@@ -145,30 +91,17 @@ async function blueDetection(image, sort, set) {
       // Log the response data for each request
       console.log("blue >>>", res.data);
       response = res.data;
-      predictions = res.data.predictions;
     })
     .catch(function (error) {
       console.log(error.message);
     });
-  response.predictions.forEach((prediction) => {
-    console.log("blue prediction foreach", prediction);
-    if (prediction.class == "trashcan") sort.wasteDisposal++;
-    if (prediction.class == "cabinet") sort.cabinet++;
-    if (prediction.class == "dangling wire/cable") sort.danginglings++;
-    if (prediction.class == "drawer") sort.drawer++;
-    if (prediction.class == "shelf") sort.shelf++;
-    if (prediction.class == "aircon") set.aircon++;
-    if (prediction.class == "exhaust fan") set.exhaust++;
-    if (prediction.class == "ventilation") set.ventilation++;
-  });
-  return predictions;
+
+  return response;
 }
 
-async function cleanlinessDetection(image, shine) {
-  let response = {
-    predictions: [],
-  };
-  let prediction;
+async function yellowModel(image) {
+  let response;
+
   await axios({
     method: "POST",
     url: "https://detect.roboflow.com/classroom-yellow-seg/8",
@@ -181,185 +114,340 @@ async function cleanlinessDetection(image, shine) {
     },
   })
     .then(function (res) {
-      prediction = res.data.predictions;
       console.log("cleanliness detection >>> ", res.data);
       response = res.data;
     })
     .catch(function (error) {
       console.log(error.message);
     });
-  response.predictions.forEach((prediction) => {
-    console.log("clean prediction foreach", prediction);
-    if (prediction.class == "adhesive") shine.adhesives++;
-    if (prediction.class == "damage") shine.damage++;
-    if (prediction.class == "litter") shine.litter++;
-  });
-
-  return prediction;
+  return response;
 }
 
-function isCluttered(dcObjects, pbObjects) {
-  let clutteredStatus = [];
+function calculateOverlap(prediction1, prediction2) {
+  // Calculate the area of each prediction
+  let area1 = prediction1.width * prediction1.height;
+  let area2 = prediction2.width * prediction2.height;
 
-  const PBObjects = pbObjects;
-  if (PBObjects.length === 0 || dcObjects.length === 0) return clutteredStatus;
-
-  console.log(" PBObjects>>>> ??? ", PBObjects);
-  console.log(" dcObjects>>>> ??? ", dcObjects);
-
-  PBObjects.forEach((pbObject) => {
-    dcObjects.forEach((dcObject) => {
-      if (
-        pbObject.x < dcObject.x + dcObject.width &&
-        pbObject.x + pbObject.width > dcObject.x &&
-        pbObject.y < dcObject.y + dcObject.height &&
-        pbObject.y + pbObject.height > dcObject.y
-      ) {
-        clutteredStatus.push(dcObject);
-      }
-    });
-  });
-
-  return clutteredStatus;
-}
-
-async function computeScores(s3, isClutterResults) {
-  const trashCanRecommendedNo = 3;
-  const cabinetRecommendedNo = 1;
-  const danglings = 0;
-
-  const idealOrganization = 10;
-  const idealAEV = 1;
-
-  let clutterNo = isClutterResults.length;
-  s3.sort.clutter = clutterNo;
-
-  console.log("clutter numbers >>>>> ", clutterNo);
-
-  let sort = s3.sort;
-  let set = s3.set;
-  let shine = s3.shine;
-
-  //sort score
-  const cabinetScore = Math.min(sort.cabinet, cabinetRecommendedNo) * 1;
-  const clutterScore = (sort.clutter === 0 ? 1 : 0) * 2;
-  const danglingsScore = (sort.danglings === danglings ? 1 : 0) * 6;
-  const wasteDisposalScore =
-    Math.min(sort.wasteDisposal, trashCanRecommendedNo) * 1;
-
-  const sortScore =
-    ((cabinetScore + clutterScore + danglingsScore + wasteDisposalScore) / 10) *
-    10;
-
-  //set score
-  // const organizationScore = (set.organization / idealOrganization) * 8;
-  const atLeastOneHVACScore =
-    (set.aircon + set.exhaust + set.ventilation >= idealAEV ? 1 : 0) * 2;
-
-  const setScore = Math.max(
-    ((set.organization + atLeastOneHVACScore) / 10) * 10,
-    1
+  // Calculate the x and y coordinates of the intersection rectangle
+  let x_overlap = Math.max(
+    0,
+    Math.min(
+      prediction1.x + prediction1.width,
+      prediction2.x + prediction2.width
+    ) - Math.max(prediction1.x, prediction2.x)
+  );
+  let y_overlap = Math.max(
+    0,
+    Math.min(
+      prediction1.y + prediction1.height,
+      prediction2.y + prediction2.height
+    ) - Math.max(prediction1.y, prediction2.y)
   );
 
-  // shine score
-  // const totalCount = Object.values(shine).reduce((total, c) => total + c, 0);
-  // const maxCount = Math.max(...Object.values(shine));
+  // Calculate the area of intersection
+  let overlapArea = x_overlap * y_overlap;
 
-  // Calculate the score based on the distance from zero
-  const shineScore = Object.values(shine).reduce((total, c) => total + c, 0);
-  const maxScore = Object.keys(shine).length;
-  const normalizedShineScore = maxScore - shineScore;
-  const scaledShineScore = (normalizedShineScore / maxScore) * 10;
-  // Normalize the score to be between 0 and 1
+  // Determine which prediction is bigger
+  let bigger = area1 > area2 ? "first" : "second";
 
-  // Scale the score to be between 1 and 10
+  // Check if the smaller prediction is at least 40% inside the bigger one's box
+  let smallerArea = area1 < area2 ? area1 : area2;
+  let overlap = overlapArea >= smallerArea * 0.2;
 
-  s3.sort.score = sortScore;
-  s3.set.score = setScore;
-  s3.shine.score = scaledShineScore >= 0 ? scaledShineScore : 0;
-
-  return s3;
+  return {
+    overlap,
+    overlapArea,
+    bigger,
+  };
 }
 
-export default async function evaluate(images) {
-  const s3Results = [];
-
-  let overalls3 = {
-    sort: { ...SORT },
-    set: { ...SET },
-    shine: { ...SHINE },
-  };
-
-  let allPredictions = [];
-
-  let organizationCountImage = 0;
-  let length = images[0].length;
-
-  // let organizeScore = 0;
-
-  // Loop through the images array
-  for (let index = 0; index < length; index++) {
-    let sort = { ...SORT };
-    let set = { ...SET };
-    let shine = { ...SHINE };
-    let predictionsPoints = [];
-
-    const image = images[0][index];
-
-    const count = await countDesksChairs(image);
-    predictionsPoints.push(count.predictions);
-    const predictions = count.data.predictions;
-    console.log("count {}{}{}{}{}{}", count);
-    predictions.map((prediction) => {
-      console.log("prediction.class >>>> ", prediction.class);
-      if (prediction.class == "desk") set.desks++;
-      if (prediction.class == "chair") set.chairs++;
-    });
-
-    // if (count.count >= 10) {
-    predictionsPoints.push(await organizationCheck(image, set));
-    // organizeScore += set.organization;
-    // organizationCountImage++;
-    // }
-    predictionsPoints.push(await blueDetection(image, sort, set));
-    const pb_result_temp = await personalBelongingsCheck(image);
-    console.log("ttt 111 >> ", pb_result_temp);
-    predictionsPoints.push(pb_result_temp.predictions);
-    const pb_result = pb_result_temp.personalBelongings;
-    const ic_result = isCluttered(predictions, pb_result);
-    predictionsPoints.push(await cleanlinessDetection(image, shine));
-    let s3 = {
-      sort: sort,
-      set: set,
-      shine: shine,
+function score(data) {
+  /**
+    let result = {
+      scores: {
+        sort: { ...SORT },
+        set: { ...SET },
+        shine: { ...SHINE },
+      },
+      predictions: [],
     };
+   */
+  const sort = data.scores.sort;
+  const set = data.scores.set;
+  const shine = data.scores.shine;
 
-    const s3Result = await computeScores(s3, ic_result);
-    s3Results.push(s3Result);
-    // Calculate overall scores and add them to overalls3
-    for (let prop in sort) {
-      overalls3.sort[prop] += sort[prop];
-    }
-    for (let prop in set) {
-      overalls3.set[prop] += set[prop];
-    }
-    for (let prop in shine) {
-      overalls3.shine[prop] += shine[prop];
-    }
-    allPredictions.push(predictionsPoints);
-  }
-  overalls3.sort.score /= length;
-  overalls3.sort.clutter /= length;
+  sort.score = Math.min(
+    10,
+    Math.max(10 - (sort.unwanted.length + sort.missing.length) / 2, 0)
+  );
+  // Calculate the average air system
+  const totalAS =
+    set.airsystem.ventilation + set.airsystem.aircon + set.airsystem.exhaust;
+  const airSystemScore = totalAS === 1 ? 1 : totalAS >= 2 ? 0 : 5; // Default value if no air systems
 
-  overalls3.set.score /= length;
-  overalls3.set.organization /=
-    organizationCountImage !== 0 ? organizationCountImage : 0;
+  // Calculate the final score
+  set.score = Math.min(
+    10,
+    // Math.max(0, 10 - (airSystemScore + set.unorganized) / 2)
+    Math.max(0, 10 - set.unorganized)
+  );
 
-  overalls3.shine.score /= length;
+  shine.score = Math.min(
+    10,
+    Math.max(
+      10 -
+        (shine.damage * 2 + shine.litter + shine.smudge + shine.adhesive) / 4,
+      0
+    )
+  );
+}
 
-  console.log("srResultsssss >>>>> ", s3Results);
-  return {
-    result: overalls3,
-    predictions: allPredictions,
+const SORT = {
+  unwanted: [],
+  missing: [],
+  score: 0,
+};
+
+const SET = {
+  unorganized: 0,
+  airsystem: {
+    ventilation: 0,
+    aircon: 0,
+    exhaust: 0,
+  },
+  score: 0,
+};
+
+const SHINE = {
+  damage: 0,
+  litter: 0,
+  smudge: 0,
+  adhesive: 0,
+  score: 0,
+};
+
+export default async function evaluate(images, spacename) {
+  let result = {
+    scores: {
+      sort: { ...SORT },
+      set: { ...SET },
+      shine: { ...SHINE },
+    },
+    count: {},
+    airsystem: false,
+    predictions: [],
   };
+
+  let objects = [];
+  let objects_temp = [];
+  let model1 = undefined;
+  let model2 = undefined;
+  let model3 = undefined;
+  let model4 = undefined;
+  let model5 = undefined;
+
+  for await (const imageObject of images) {
+    console.log(imageObject);
+
+    let predictions = [];
+
+    model1 = await countModel(imageObject.image);
+
+    for (const pred of model1.predictions) {
+      if (pred.confidence >= 0.5) {
+        if (!Object.hasOwn(result.count, pred.class)) {
+          result.count[pred.class] = {
+            qty: 1,
+            class: pred.class,
+          };
+        } else {
+          result.count[pred.class].qty++;
+        }
+      }
+    }
+
+    if (imageObject.forType === "std" || imageObject.forType === "all") {
+      // model1 = await countModel(imageObject.image);
+      model3 = await pbModel(imageObject.image);
+      // structure
+      if (model1 !== undefined && model3 !== undefined) {
+        // list objects and predictions
+        // model1.predictions.forEach((prediction, index) => {
+        const modelConcat = model1.predictions.concat(model3.predictions);
+        for (const [index, prediction] of modelConcat.entries()) {
+          if (prediction.confidence >= 0.5) {
+            const class_name = prediction.class;
+            objects_temp.push({
+              id: index,
+              class: class_name,
+              indexFrom: 0,
+              prediction: {
+                height: prediction.height,
+                width: prediction.width,
+                x: prediction.x,
+                y: prediction.y,
+              },
+              children: [],
+            });
+          }
+        }
+        // structure object hierarchy
+        // objects_temp.forEach((first_object, outerIndex) =>
+        for (const [outerIndex, first_object] of objects_temp.entries()) {
+          objects_temp.forEach((second_object, innerIndex) => {
+            const first_key = first_object.class;
+            const second_key = second_object.class;
+            const notObjects = ["chair", "sofa"];
+            if (
+              first_key === second_key ||
+              notObjects.includes(first_key) ||
+              notObjects.includes(second_key)
+            )
+              return;
+            if (first_object && second_object) {
+              const result = calculateOverlap(
+                first_object.prediction, // outer
+                second_object.prediction // inner
+              );
+
+              if (result.overlap) {
+                if (result.bigger === "first") {
+                  if (second_object.indexFrom === 0) {
+                    second_object.indexFrom = outerIndex;
+                    const object = { ...second_object, result };
+                    first_object.children.push(object);
+                  } else {
+                    let childObject_raw = second_object;
+                    const index = childObject_raw.indexFrom;
+                    let ParentObject = objects_temp[index];
+                    let foundIndex = ParentObject.children.findIndex(
+                      (ch) => ch.id === childObject_raw.id
+                    );
+                    let childObject_result = ParentObject.children[foundIndex];
+                    if (
+                      result.overlapArea > childObject_result.result.overlapArea
+                    ) {
+                      second_object.indexFrom = outerIndex;
+                      let object = { ...second_object, result };
+                      first_object.children.push(object);
+                      ParentObject.children.splice(foundIndex, 1);
+                    }
+                  }
+                  if (first_object.indexFrom !== 0) {
+                    let childObject_raw = first_object;
+                    const index = childObject_raw.indexFrom;
+                    let ParentObject = objects_temp[index];
+                    let foundIndex = ParentObject.children.findIndex(
+                      (ch) => ch.id === childObject_raw.id
+                    );
+                    ParentObject.splice(foundIndex, 1, childObject_raw);
+                  }
+                }
+                if (result.bigger === "second") {
+                  if (first_object.indexFrom === 0) {
+                    objects_temp[outerIndex].indexFrom = innerIndex;
+                    const object = { ...first_object, result };
+                    second_object.children.push(object);
+                  } else {
+                    let childObject_raw = first_object;
+                    const index = childObject_raw.indexFrom;
+                    let ParentObject = objects_temp[index];
+                    let foundIndex = ParentObject.children.findIndex(
+                      (ch) => ch.id === childObject_raw.id
+                    );
+                    let childObject_result = ParentObject.children[foundIndex];
+                    if (
+                      result.overlapArea > childObject_result.result.overlapArea
+                    ) {
+                      first_object.indexFrom = innerIndex;
+                      let object = { ...second_object, result };
+                      second_object.children.push(object);
+                      ParentObject.children.splice(foundIndex, 1);
+                    }
+                  }
+                  if (second_object.indexFrom !== 0) {
+                    let childObject_raw = second_object;
+                    const index = childObject_raw.indexFrom;
+                    let ParentObject = objects_temp[index];
+                    let foundIndex = ParentObject.children.findIndex(
+                      (ch) => ch.id === childObject_raw.id
+                    );
+                    ParentObject.splice(foundIndex, 1, childObject_raw);
+                  }
+                }
+              }
+            }
+          });
+        }
+        // remove the items with indexFrom
+        // objects_temp.forEach((object, index) => {
+        for (const [index, object] of objects_temp.entries()) {
+          if (object.indexFrom !== 0) {
+            objects_temp.splice(index, 1);
+          }
+        }
+
+        objects = objects_temp;
+        console.log(objects_temp);
+      }
+    }
+
+    if (imageObject.forType === "ord" || imageObject.forType === "all") {
+      model2 = await orderModel(imageObject.image);
+      model4 = await blueModel(imageObject.image);
+      if (model2 !== undefined && model4 !== undefined) {
+        const filteredOrder = model2.predictions.filter(
+          (obj) => obj.class === "disorganized"
+        );
+        if (filteredOrder.length > 0)
+          result.scores.set.unorganized += filteredOrder.length;
+        for (const obj of model4.predictions) {
+          const airwaysSystems = ["ventilation", "aircon", "exhaust"];
+          if (obj.class in airwaysSystems) {
+            result.scores.set.airsystem[obj.class]++;
+            result.airsystem = true;
+          }
+        }
+      }
+    }
+
+    if (imageObject.forType === "cln" || imageObject.forType === "all") {
+      model5 = await yellowModel(imageObject.image);
+      if (model5 !== undefined) {
+        // const yellowClasses = ["damage", "litter", "smudge", "adhesives"];
+        for (const obj of model5.predictions) {
+          if (obj.class === "score") continue;
+          result.scores.shine[obj.class]++;
+        }
+      }
+    }
+
+    // end of image
+    predictions.push(
+      model1?.predictions.filter((obj) => obj.confidence >= 0.5)
+    );
+    predictions.push(model2?.predictions);
+    predictions.push(model3?.predictions);
+    predictions.push(model4?.predictions);
+    predictions.push(model5?.predictions);
+    result.predictions.push(predictions);
+  }
+
+  const c_result = await c_evaluation(objects, spacename);
+  console.log("c_result >>> ", c_result);
+
+  if (c_result.length > 0) {
+    for (const obj of c_result) {
+      if (obj.status === "missing" || obj.status === "c_missing") {
+        result.scores.sort.missing.push(obj);
+      }
+      if (obj.status === "extra" || obj.status === "c_extra") {
+        result.scores.sort.unwanted.push(obj);
+      }
+    }
+  }
+  console.log("result >>> ", result);
+  score(result);
+
+  return result;
 }

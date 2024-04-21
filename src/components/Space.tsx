@@ -46,6 +46,9 @@ export default function Space({ data }) {
   const [space, setSpace] = useState(SPACE_DEFINITION);
   const [model, setModel] = useState(undefined);
   const uploadModal = useRef();
+  const forSTDRef = useRef();
+  const forORDRef = useRef();
+  const forCLNRef = useRef();
   const selectedUploadImages = useRef();
   const deleteModal = useRef();
   const timer = useRef<NodeJS.Timeout | undefined>();
@@ -98,8 +101,12 @@ export default function Space({ data }) {
         ...prev,
         pictures:
           prev.id !== undefined && !prev.isAssess
-            ? spaceImages.map((spi) => {
-                return { image: spi, prediction: undefined };
+            ? spaceImages?.map((spi) => {
+                return {
+                  image: spi,
+                  prediction: undefined,
+                  forType: spi.forType,
+                };
               })
             : prev.pictures,
         rating: prev.id !== undefined && latestRating,
@@ -167,12 +174,26 @@ export default function Space({ data }) {
 
   function handleImageSubmit(event) {
     event.preventDefault();
+    console.log("test", forSTDRef.current.checked);
+    let type = forSTDRef.current.checked
+      ? forSTDRef.current.value
+      : forORDRef.current.checked
+      ? forORDRef.current.value
+      : forCLNRef.current.checked
+      ? forCLNRef.current.value
+      : "all";
+
+    forSTDRef.current.checked = false;
+    forORDRef.current.checked = false;
+    forCLNRef.current.checked = false;
+
     uploadModal.current.close();
     let action = {
       type: "spaceimages",
       method: "post",
       data: {
-        id: space.id,
+        spaceId: space.id,
+        forType: type,
         file: selectedUploadImages.current,
       },
     };
@@ -218,9 +239,12 @@ export default function Space({ data }) {
 
   async function handleAssessBtn() {
     const images = [
-      space.pictures.map(
-        (imageObject) => "data:image/png;base64," + imageObject.image.image
-      ),
+      ...space.pictures.map((imageObject) => {
+        return {
+          image: "data:image/png;base64," + imageObject.image.image,
+          forType: imageObject.image.forType,
+        };
+      }),
     ];
     setSpace((prev) => {
       return {
@@ -233,18 +257,18 @@ export default function Space({ data }) {
     timer.current = setInterval(() => {
       duration.current += 1;
     }, 1000);
-    const raw5s = await evaluate(images);
+    const raw5s = await evaluate(images, space?.name);
     console.log("predictions >> ", raw5s.predictions);
 
-    const commentResult = comment(raw5s.result);
+    const commentResult = comment(raw5s);
     console.log(" III commentResult III", commentResult);
     const { sort, set, shine } = commentResult;
     console.log(" III raw5s III", raw5s);
 
     // const { sort, set, shine } = raw5s.comment;
-    const { score: sortScore } = raw5s.result.sort;
-    const { score: setScore } = raw5s.result.set;
-    const { score: shineScore } = raw5s.result.shine;
+    const { score: sortScore } = raw5s.scores.sort;
+    const { score: setScore } = raw5s.scores.set;
+    const { score: shineScore } = raw5s.scores.shine;
 
     const sortScoreFixed = parseFloat(sortScore.toFixed(1));
     const setScoreFixed = parseFloat(setScore.toFixed(1));
@@ -287,6 +311,7 @@ export default function Space({ data }) {
         newPictures.push({
           image: prev?.pictures[i].image,
           prediction: raw5s.predictions[i],
+          forType: prev?.pictures[i].forType,
         });
       }
       console.log("newPictures >> ", newPictures);
@@ -325,6 +350,44 @@ export default function Space({ data }) {
               onChange={handleImageUpload}
               multiple
             />
+            <fieldset className="flex width-full justify-around">
+              <div className="flex gap-2 justify-center items-center">
+                <input
+                  ref={forSTDRef}
+                  type="radio"
+                  id="std"
+                  name="choice"
+                  value="std"
+                />
+                <label htmlFor="std" className="text-xs text-neutral-600">
+                  STD
+                </label>
+              </div>
+              <div className="flex gap-2 justify-center items-center">
+                <input
+                  ref={forORDRef}
+                  type="radio"
+                  id="order"
+                  name="choice"
+                  value="ord"
+                />
+                <label htmlFor="order" className="text-xs text-neutral-600">
+                  ORD
+                </label>
+              </div>
+              <div className="flex gap-2 justify-center items-center">
+                <input
+                  ref={forCLNRef}
+                  type="radio"
+                  id="cln"
+                  name="choice"
+                  value="cln"
+                />
+                <label htmlFor="cln" className="text-xs text-neutral-600">
+                  CLN
+                </label>
+              </div>
+            </fieldset>
             <img id="preview" className="h-24 w-full object-contain" />
           </>
         }

@@ -7,7 +7,7 @@ import { BarChartCustom } from "./BarChart";
 export default function Overview() {
   const { spaces, ratings } = useContext(DataContext);
   const [scores, setScores] = useState({
-    averate: 0,
+    average: 0,
     sort: 0,
     set: 0,
     shine: 0,
@@ -39,30 +39,32 @@ export default function Overview() {
       let avgScore = { sort: 0, set: 0, shine: 0 };
       spaceRatings.map((spaceRating) => {
         const ratings = spaceRating.ratings[0];
-        avgScore.sort += ratings.sort;
-        avgScore.set += ratings.setInOrder;
-        avgScore.shine += ratings.shine;
+        avgScore.sort += ratings?.sort;
+        avgScore.set += ratings?.setInOrder;
+        avgScore.shine += ratings?.shine;
       });
+      const total = avgScore.sort + avgScore.set + avgScore.shine;
+      if (total > 0) {
+        setScores(() => {
+          const totalScores = total;
+          const average = totalScores / spacesByRoomId.length;
+          const percScore = average / 30;
+          const score = percScore * 10;
+          const finalScore = Math.min(Math.max(score, 1), 10);
 
-      setScores(() => {
-        const totalScores = avgScore.sort + avgScore.set + avgScore.shine;
-        const average = totalScores / spacesByRoomId.length;
-        const percScore = average / 30;
-        const score = percScore * 10;
-        const finalScore = Math.min(Math.max(score, 1), 10);
+          const sort = avgScore.sort / spacesByRoomId.length;
+          const set = avgScore.set / spacesByRoomId.length;
+          const shine = avgScore.shine / spacesByRoomId.length;
 
-        const sort = avgScore.sort / spacesByRoomId.length;
-        const set = avgScore.set / spacesByRoomId.length;
-        const shine = avgScore.shine / spacesByRoomId.length;
-
-        return {
-          average: finalScore.toFixed(1),
-          sort: sort.toFixed(1),
-          set: set.toFixed(1),
-          shine: shine.toFixed(1),
-        };
-      });
-      setFilteredRatings(() => spaceRatings);
+          return {
+            average: finalScore.toFixed(1),
+            sort: sort.toFixed(1),
+            set: set.toFixed(1),
+            shine: shine.toFixed(1),
+          };
+        });
+        setFilteredRatings(() => spaceRatings);
+      }
     }
   }, [params.id]);
 
@@ -70,10 +72,10 @@ export default function Overview() {
     <div className="flex flex-col p-6 w-[97rem] mx-auto gap-4">
       <h2 className="text-2xl text-neutral-700 font-bold mt-2">Overview</h2>
       <div className="flex w-full justify-around mt-4 mx-auto">
-        <Card score={scores.average} title={"Overall"} percent="8%" />
-        <Card score={scores.sort} title={"Sort"} />
-        <Card score={scores.set} title={"Set In Order"} percent="14%" />
-        <Card score={scores.shine} title={"Shine"} />
+        <Card score={scores?.average ?? 0} title={"Overall"} percent="8%" />
+        <Card score={scores?.sort ?? 0} title={"Sort"} />
+        <Card score={scores?.set ?? 0} title={"Set In Order"} percent="14%" />
+        <Card score={scores?.shine ?? 0} title={"Shine"} />
       </div>
       <div className="flex gap-4 w-full h-[35rem] mt-8">
         <BarChartCustom filteredRatings={filteredRatings} />

@@ -13,7 +13,8 @@ export const DataContext = createContext({
   useEntry: () => {},
 });
 
-const endpoint = "https://fs-backend-copy-production.up.railway.app";
+// const endpoint = "https://fs-backend-copy-production.up.railway.app";
+const endpoint = "https://localhost:7124";
 
 export default function DataContextProvider({ children }) {
   const [data, setData] = useState({
@@ -77,9 +78,11 @@ export default function DataContextProvider({ children }) {
     }
   }
 
-  async function addSpaceImage(image, id) {
+  async function addSpaceImage(data, id) {
     const formData = new FormData();
-    formData.append("file", image);
+    formData.append("file", data.image);
+    formData.append("forType", data.forType);
+
     await axios.post(`${endpoint}/api/spaceImage/upload/${id}`, formData);
   }
 
@@ -91,7 +94,7 @@ export default function DataContextProvider({ children }) {
     try {
       // Make the POST request to add a new user
       const response = await axios.post(`${endpoint}/api/user`, userData);
-      
+
       // Extract the ID of the newly created user from the response
       const userId = response.data.id;
 
@@ -99,10 +102,9 @@ export default function DataContextProvider({ children }) {
       console.log("User added successfully. User ID:", userId);
 
       // Optionally, you can perform further actions with the user ID here
-      
-  } catch (error) {
+    } catch (error) {
       console.error("Error adding new user:", error);
-  }
+    }
   }
 
   async function updateUser(userId, updatedUserData) {
@@ -119,7 +121,10 @@ export default function DataContextProvider({ children }) {
   async function addBuilding(buildingData) {
     try {
       // Send a POST request to the API endpoint with the new building data
-      const response = await axios.post(`${endpoint}/api/buildings`, buildingData);
+      const response = await axios.post(
+        `${endpoint}/api/buildings`,
+        buildingData
+      );
 
       // Return the newly created building object from the response
       return response.data;
@@ -133,7 +138,9 @@ export default function DataContextProvider({ children }) {
   async function updateBuilding(buildingId, updatedBuildingData) {
     return axios
       .put(`${endpoint}/api/buildings/${buildingId}`, updatedBuildingData)
-      .then(() => console.log(`Building with ID ${buildingId} updated successfully`))
+      .then(() =>
+        console.log(`Building with ID ${buildingId} updated successfully`)
+      )
       .catch((error) => console.error("Error updating building:", error));
   }
 
@@ -208,8 +215,13 @@ export default function DataContextProvider({ children }) {
       }
       if (action.method === "post") {
         const image = action.data.file;
-        await addSpaceImage(image, action.data.id);
-        await getSpaceImagesBySpaceId(action.data.id);
+        const newData = {
+          spaceId: action.data.spaceId,
+          forType: action.data.forType,
+          image,
+        };
+        await addSpaceImage(newData, action.data.spaceId);
+        await getSpaceImagesBySpaceId(action.data.spaceId);
       }
       if (action.method === "delete") {
         await deleteSpaceImage(action.data.imageId);
@@ -330,11 +342,11 @@ export default function DataContextProvider({ children }) {
       if (action.method === "post") {
         const newBuildingData = action.data; // Assuming action.data contains the new Building data
         console.log(newBuildingData);
-        
+
         try {
           // Assuming your API endpoint for adding a Building is `${endpoint}/api/buildings`
           await addBuilding(newBuildingData);
-          
+
           console.log("Building added successfully");
         } catch (error) {
           console.error("Error adding building:", error);

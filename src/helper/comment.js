@@ -1,112 +1,137 @@
+export default function commentFormatter(data) {
+  let comments = {
+    sort: "Summary: The model found ",
+    set: "Summary: The model found ",
+    shine: "Summary: The model found ",
+  };
+  const count = data.count;
+  const scores = data.scores;
+  console.log(data);
+  for (let key in scores) {
+    const obj = scores[key];
+    let objectsFound = {};
+    for (let prop in obj) {
+      if (prop === "score") continue;
+      if (Array.isArray(obj[prop])) {
+        obj[prop].forEach((obj) => {
+          if (Object.hasOwn(objectsFound, obj.class)) {
+            objectsFound[obj.class].qty++;
+          } else {
+            objectsFound[obj.class] = {
+              qty: 1,
+              class: obj.class,
+              type: prop,
+            };
+          }
+        });
+      } else if (typeof obj[prop] === "object") {
+        const innerObj = obj[prop];
+        for (let innerProp in innerObj) {
+          if (!Object.hasOwn(objectsFound, innerProp)) {
+            objectsFound[innerProp] = {
+              qty: obj[innerProp],
+              class: innerProp,
+              type: innerProp,
+            };
+          }
+        }
+      } else {
+        if (!Object.hasOwn(objectsFound, prop)) {
+          objectsFound[prop] = {
+            qty: obj[prop],
+            class: prop,
+            type: prop,
+          };
+        }
+      }
+    }
+
+    console.log(objectsFound);
+    if (key === "set") {
+      let endComment = ". Things to improve: ";
+      for (const [countKey, value] of Object.entries(count)) {
+        comments[key] += ` ${count[countKey].qty} ${count[countKey].class},`;
+      }
+      if (scores.set.unorganized > 0) {
+        comments[key] += ` ${scores.set.unorganized} unorganized area,`;
+        endComment += ` * arrange areas according to standard.\n`;
+      } else {
+        comments[key] = "Summary: The space is in order.";
+      }
+      // if(!data.airsystem){
+      //   comments[key] += ` no air system found`;
+      //   endComment += ` * make sure there are proper air systems installed.\n`;
+      // }
+      comments[key] += endComment;
+    }
+    if (key === "sort") {
+      let endComment = ". Things to improve: ";
+      let missingFlag = -1;
+      let unwantedFlag = -1;
+      for (const [prop, value] of Object.entries(objectsFound)) {
+        if (
+          objectsFound[prop].type === "unwanted" ||
+          objectsFound[prop].type === "missing"
+        ) {
+          comments[
+            key
+          ] += ` ${objectsFound[prop].qty} ${objectsFound[prop].type} ${objectsFound[prop].class}/s,`;
+          if (objectsFound[prop].type === "unwanted") {
+            unwantedFlag = 1;
+          }
+          if (objectsFound[prop].type === "missing") {
+            missingFlag = 1;
+          }
+        }
+      }
+      if (!missingFlag && !unwantedFlag) {
+        comments[key] = "Summary: The space is well kept.";
+      }
+      if (missingFlag) {
+        endComment += ` * make sure all items are in their correct positions.\n`;
+      }
+      if (unwantedFlag) {
+        endComment += ` * remove unecessary items.\n`;
+      }
+
+      comments[key] += endComment;
+    }
+    if (key === "shine") {
+      let endComment = ". Things to improve: ";
+      const shine = scores.shine;
+      if (
+        shine.damage === 0 &&
+        shine.litter === 0 &&
+        shine.smudge === 0 &&
+        shine.adhesive === 0
+      ) {
+        comments[key] = "Summary: The space is clean.";
+        comments[key] += endComment;
+        continue;
+      }
+      if (shine.damage > 0) {
+        comments[key] += ` ${shine.damage} damage/s,`;
+        endComment += ` * fix damage/s.`;
+      }
+      if (shine.litter > 0) {
+        comments[key] += ` ${shine.litter} litter/s,`;
+        endComment += ` * remove litter/s.`;
+      }
+      if (shine.smudge > 0) {
+        comments[key] += ` ${shine.smudge} smudge/s,`;
+        endComment += ` * clean smudge/s.`;
+      }
+      if (shine.adhesives > 0) {
+        comments[key] += ` ${shine.adhesive} adhesive/s,`;
+        endComment += ` * clean adhesive/s.`;
+      }
+      comments[key] += endComment;
+    }
+  }
+  return comments;
+}
+
 const COMMENT_FORMAT = {
   summary: "Summary: The model found  ",
   thingsToImprove: "Things to improve: ",
 };
-
-//EXAMPLE
-//   {
-//     set: {
-//       aircon: 0;
-//       chairs: 38;
-//       desks: 43;
-//       disorganizedRow: 5;
-//       exhaust: 0;
-//       organization: 3.75;
-//       organizedRow: 3;
-//       score: 2.375;
-//       ventilation: 0;
-//     }
-//     shine: {
-//       adhesives: 0;
-//       damage: 1;
-//       dirt: 0;
-//       dust: 0;
-//       litter: 1;
-//       score: 9.375;
-//       smudge: 0;
-//       stain: 0;
-//     }
-//     sort: {
-//       cabinet: 0;
-//       clutter: 10.5;
-//       danglings: 0;
-//       drawer: 0;
-//       score: 7;
-//       shelf: 0;
-//       wasteDisposal: 0;
-//     }
-//   }
-
-export default function commentFormatter(comment) {
-  let comments = {
-    sort: "",
-    set: "",
-    shine: "",
-  };
-  let writeFlag = {
-    sort: 0,
-    set: 0,
-    shine: 0,
-  };
-  for (const category in comment) {
-    let commentFormat = { ...COMMENT_FORMAT };
-    for (const property in comment[category]) {
-      if (comment[category][property] > 0) {
-        if (
-          property === "clutter" ||
-          property === "organizedRow" ||
-          property === "score" ||
-          property === "organization"
-        ) {
-          continue;
-        }
-        writeFlag[category] = 1;
-
-        if (property === "disorganizedRow") {
-          commentFormat.summary += `${comment[category][property]} disorganized rows of tables/chairs, `;
-          commentFormat.thingsToImprove += `* organization of chairs/desks\n`;
-          continue;
-        }
-        if (property === "litter") {
-          commentFormat.thingsToImprove += `* remove litters \n`;
-        }
-        if (property === "damage") {
-          commentFormat.thingsToImprove += `* fix damages found on tables/chairs/walls \n`;
-        }
-        commentFormat.summary += `${comment[category][property]} ${property}, `;
-      }
-    }
-
-    console.log("writeFlag >> ", writeFlag);
-    console.log("category >> ", category);
-    if (writeFlag[category] === 0) {
-      if (category === "shine" && writeFlag["set"] === 0) {
-        comments.sort =
-          "Summary: Is this even an image of a room? Please try again. \n Things to improve:";
-        comments.set =
-          "Summary: Is this even an image of a room? Please try again. \n Things to improve:";
-        comments.shine =
-          "Summary: Is this even an image of a room? Please try again. \n Things to improve:";
-        continue;
-      } else {
-        if (category === "sort") {
-          commentFormat.summary = `Summary: The model found a well kept space  `;
-        } else if (category === "shine") {
-          commentFormat.summary = "Summary: The model found a shiny space  ";
-        }
-      }
-    }
-    let summary = commentFormat.summary.slice(0, -2);
-    summary += ".";
-
-    commentFormat.summary = summary;
-    comments[category] =
-      commentFormat.summary + " \n " + commentFormat.thingsToImprove;
-  }
-
-  console.log("comments >>> ", comments);
-
-  // Remove the trailing comma and space
-
-  return comments;
-}

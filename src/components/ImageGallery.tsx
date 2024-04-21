@@ -31,19 +31,40 @@ export default function ImageGallery({
 
       {images && images?.length > 0
         ? images.map((imageObject: any) => {
+            console.log(imageObject);
             const imageData = {
               id: imageObject.image.id,
               image: imageObject.image.image,
               prediction: imageObject.prediction,
             };
+            const css =
+              imageObject.forType === "std"
+                ? "border-green-500 text-white bg-green-300"
+                : imageObject.forType === "ord"
+                ? "border-purple-500 text-white bg-purple-300"
+                : imageObject.forType === "cln"
+                ? "border-yellow-500 text-white bg-yellow-300"
+                : "border-orange-400 text-white bg-orange-300";
             return (
-              <img
+              <div
                 key={imageObject.image.id}
-                src={`data:image/jpeg;base64,${imageObject.image.image}`}
-                alt="gallery-image"
-                onClick={() => onSelectImage(imageData)}
-                className={`h-full w-full object-fit  hover:scale-105 hover:cursor-pointer`}
-              />
+                className="relative  hover:scale-105 hover:cursor-pointer"
+              >
+                <img
+                  src={`data:image/jpeg;base64,${imageObject.image.image}`}
+                  alt="gallery-image"
+                  onClick={() => onSelectImage(imageData)}
+                  className={`h-full w-full object-fit `}
+                />
+                <sup
+                  className={
+                    "absolute top-16 right-1  h-6 w-fit py-1 px-1 flex justify-center items-center rounded-lg border-4   uppercase font-bold text-md " +
+                    css
+                  }
+                >
+                  {imageObject.forType}
+                </sup>
+              </div>
             );
           })
         : !isLoad && (
