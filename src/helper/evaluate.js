@@ -239,29 +239,35 @@ export default async function evaluate(images, spacename) {
   let model3 = undefined;
   let model4 = undefined;
   let model5 = undefined;
+  let prevModel1 = model1;
+  let prevModel2 = model2;
+  let prevModel3 = model3;
+  let prevModel4 = model4;
+  let prevModel5 = model5;
 
   for (const imageObject of images) {
     console.log(imageObject);
 
     let predictions = [];
 
-    model1 = await countModel(imageObject.image);
-
-    for (const pred of model1.predictions) {
-      if (pred.confidence >= 0.5) {
-        if (!Object.hasOwn(result.count, pred.class)) {
-          result.count[pred.class] = {
-            qty: 1,
-            class: pred.class,
-          };
-        } else {
-          result.count[pred.class].qty++;
-        }
-      }
-    }
+    // model1 = await countModel(imageObject.image);
+    // model3 = await pbModel(imageObject.image);
 
     if (imageObject.forType === "std" || imageObject.forType === "all") {
-      // model1 = await countModel(imageObject.image);
+      model1 = await countModel(imageObject.image);
+      for (const pred of model1.predictions) {
+        if (pred.confidence >= 0.5) {
+          if (!Object.hasOwn(result.count, pred.class)) {
+            result.count[pred.class] = {
+              qty: 1,
+              class: pred.class,
+            };
+          } else {
+            result.count[pred.class].qty++;
+          }
+        }
+      }
+
       model3 = await pbModel(imageObject.image);
       // structure
       if (model1 !== undefined && model3 !== undefined) {
@@ -418,13 +424,20 @@ export default async function evaluate(images, spacename) {
 
     // end of image
     predictions.push(
-      model1?.predictions.filter((obj) => obj.confidence >= 0.5)
+      prevModel1 !== model1
+        ? model1?.predictions.filter((obj) => obj.confidence >= 0.5)
+        : []
     );
-    predictions.push(model2?.predictions);
-    predictions.push(model3?.predictions);
-    predictions.push(model4?.predictions);
-    predictions.push(model5?.predictions);
+    predictions.push(prevModel2 !== model2 ? model2?.predictions : []);
+    predictions.push(prevModel3 !== model3 ? model3?.predictions : []);
+    predictions.push(prevModel4 !== model4 ? model4?.predictions : []);
+    predictions.push(prevModel5 !== model5 ? model5?.predictions : []);
     result.predictions.push(predictions);
+    prevModel1 = model1;
+    prevModel2 = model2;
+    prevModel3 = model3;
+    prevModel4 = model4;
+    prevModel5 = model5;
   }
 
   const c_result = await c_evaluation(objects, spacename);
