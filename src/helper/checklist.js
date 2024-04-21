@@ -47,14 +47,11 @@ const WIL_CHECKLIST = {
 };
 
 export async function c_evaluation(data, spacename) {
-  let space = [
-    ...WIL_CHECKLIST[spacename].filter((obj) => {
-      return {
-        ...obj,
-        children: [...obj.children],
-      };
-    }),
-  ];
+  let space = WIL_CHECKLIST[spacename].map((obj) => ({
+    ...obj,
+    children: [...obj.children],
+  }));
+
   let missing_objects = [];
   // let found_objects = [];
   console.log("space", space);
