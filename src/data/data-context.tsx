@@ -44,7 +44,8 @@ export default function DataContextProvider({ children }) {
       })
     );
     try {
-      newData.buildings = (await axios.get(`${endpoint}/api/buildings`)).data;
+      const data = (await axios.get(`${endpoint}/api/buildings`)).data;
+      newData.buildings = data === "" ? [] : data;
     } catch (error) {
       newData.buildings = [];
     }
