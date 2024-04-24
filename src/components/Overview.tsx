@@ -122,7 +122,7 @@ export default function Overview() {
             return (
               <UserItem
                 key={index}
-                name={`${user.firstName} ${user.lastName}`}
+                name={`${user?.firstName} ${user?.lastName}`}
               />
             );
           })}
