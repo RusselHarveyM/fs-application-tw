@@ -31,10 +31,12 @@ export default function ImageDisplay({
   return (
     <div className="relative grid grid-cols-1 grid-rows-1 bg-neutral-100 h-[26rem]">
       {selectedImage && (
-        <Trash
-          className="relative z-10 m-4 w-5 h-5 hover:cursor-pointer hover:text-red-500"
-          onClick={onDelete}
-        />
+        <div className="z-10 m-4 w-5 h-5 relative p-4 rounded-full bg-neutral-200 bg-opacity-30 ">
+          <Trash
+            className=" absolute w-5 h-5 top-[6px] left-[6px] hover:cursor-pointer hover:text-red-500"
+            onClick={onDelete}
+          />
+        </div>
       )}
       {prediction && (
         <TargetBox>

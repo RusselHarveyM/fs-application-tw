@@ -1,23 +1,7 @@
-// NOTE: The tailwind.config.js has to be extended if you use custom HEX color
-// ...['[#f0652f]'].flatMap((customColor) => [
-//   `bg-${customColor}`,
-//   `border-${customColor}`,
-//   `hover:bg-${customColor}`,
-//   `hover:border-${customColor}`,
-//   `hover:text-${customColor}`,
-//   `fill-${customColor}`,
-//   `ring-${customColor}`,
-//   `stroke-${customColor}`,
-//   `text-${customColor}`,
-//   `ui-selected:bg-${customColor}]`,
-//   `ui-selected:border-${customColor}]`,
-//   `ui-selected:text-${customColor}`,
-// ]),
-
 import { BarChart } from "@tremor/react";
 import { useEffect, useState } from "react";
 
-const chartdata = [
+const DUMMY_DATA = [
   {
     date: "Jan 23",
     Sort: 6,
@@ -63,47 +47,99 @@ const chartdata = [
 ];
 
 export function BarChartCustom({ filteredRatings }) {
-  const [chartData, setChartDate] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     if (filteredRatings.length > 0) {
-      // const latestRatings = [];
-      // filteredRatings.forEach((space) => {
-      //   const sortedRatings = space.ratings.sort(
-      //     (a, b) => new Date(b.dateModified) - new Date(a.dateModified)
-      //   );
-      //   const latestRating = sortedRatings[0];
-      //   const dateModified = new Date(
-      //     latestRating.dateModified
-      //   ).toLocaleDateString("en-US", {
-      //     month: "long",
-      //     day: "numeric",
-      //   });
-      //   latestRating.dateModified = dateModified;
-      //   const newData = {
-      //     date: dateModified,
-      //     Sort: latestRating.sort,
-      //     "Set In Order": latestRating.setInOrder,
-      //     Shine: latestRating.shine,
-      //   };
-      //   latestRatings.push(newData);
-      // });
-      // setChartDate(() => latestRatings);
-      // console.log(latestRatings);
+      console.log(filteredRatings);
+
+      const monthlyAverages = {};
+
+      // Calculate monthly averages for the selected year
+      filteredRatings.forEach((space) => {
+        space.ratings.forEach((rating) => {
+          const date = new Date(rating.dateModified);
+          if (date.getFullYear() === selectedYear) {
+            const month = `${date.toLocaleDateString("en-US", {
+              month: "short",
+            })} ${date.getFullYear()}`;
+            if (!monthlyAverages[month]) {
+              monthlyAverages[month] = {
+                date: month,
+                Sort: 0,
+                "Set In Order": 0,
+                Shine: 0,
+                count: 0,
+              };
+            }
+            monthlyAverages[month].Sort += rating.sort;
+            monthlyAverages[month]["Set In Order"] += rating.setInOrder;
+            monthlyAverages[month].Shine += rating.shine;
+            monthlyAverages[month].count++;
+          }
+        });
+      });
+
+      // Calculate average scores
+      const averageScores = Object.values(monthlyAverages).map((average) => ({
+        date: average.date,
+        Sort: (average.Sort / average.count).toFixed(1),
+        "Set In Order": (average["Set In Order"] / average.count).toFixed(1),
+        Shine: (average.Shine / average.count).toFixed(1),
+      }));
+
+      // Sort the data by date
+      averageScores.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      setChartData(averageScores);
     }
-  }, [filteredRatings]);
+  }, [filteredRatings, selectedYear]);
+
+  // Extract available years from filteredRatings
+  const availableYears = [
+    ...new Set(
+      filteredRatings.flatMap((space) =>
+        space.ratings.map((rating) =>
+          new Date(rating.dateModified).getFullYear()
+        )
+      )
+    ),
+  ].sort((a, b) => b - a);
+
+  const handleYearChange = (e) => {
+    setSelectedYear(parseInt(e.target.value));
+  };
 
   return (
-    <>
+    <div className="relative w-3/4">
+      <div className="flex absolute top-4 left-8 justify-center items-center mb-4">
+        <label htmlFor="year" className="mr-2 text-neutral-500">
+          Select Year:
+        </label>
+        <select
+          id="year"
+          className="border border-gray-300 rounded text-neutral-500"
+          value={selectedYear}
+          onChange={handleYearChange}
+        >
+          {availableYears.map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+      </div>
       <BarChart
-        className="rounded-2xl shadow w-2/3 bg-white p-8 h-full"
-        data={chartdata}
+        className="rounded-2xl shadow w-full bg-white p-8 h-full"
+        // data={DUMMY_DATA}
+        data={chartData}
         index="date"
         categories={["Sort", "Set In Order", "Shine"]}
         colors={["red-800", "red-700", "red-600"]}
         yAxisWidth={20}
         maxValue={10}
       />
-    </>
+    </div>
   );
 }

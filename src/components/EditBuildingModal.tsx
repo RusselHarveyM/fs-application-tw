@@ -41,7 +41,7 @@ const EditBuildingModal = forwardRef(function EditBuildingModal(
     // const { id } = formData;
     // updatedBuildingData.id = id;
 
-    console.log("before here>>> ", updatedBuildingData);
+    // console.log("before here>>> ", updatedBuildingData);
     try {
       // Call the onSubmit handler to submit the form data
       await onSubmit(updatedBuildingData);

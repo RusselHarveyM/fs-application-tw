@@ -46,20 +46,16 @@ const WIL_CHECKLIST = {
   // end
 };
 
-export async function c_evaluation(data, spacename) {
+export async function c_evaluation(data, spacename, standard) {
   let space = WIL_CHECKLIST[spacename].map((obj) => ({
     ...obj,
     children: [...obj.children],
   }));
-
+  const SPACE_STANDARD = JSON.parse(standard);
   let missing_objects = [];
-  // let found_objects = [];
-  console.log("space", space);
-  console.log("data", data);
   const objects = [...data];
-  console.log("objects", objects);
 
-  for (const wilObj of space) {
+  for (const wilObj of SPACE_STANDARD) {
     let filteredObjects = objects.filter((obj) => obj.class === wilObj.class);
     if (filteredObjects.length === 0) {
       wilObj.status = "missing";

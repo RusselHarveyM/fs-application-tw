@@ -9,6 +9,7 @@ import ImageGallery from "./ImageGallery";
 import Button from "./Button";
 import ScoreCard from "./ScoreCard";
 import { useState, useContext, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 
 import { DataContext } from "@/data/data-context";
 import Modal from "./Modal";
@@ -29,6 +30,7 @@ const SPACE_DEFINITION = {
   pictures: undefined,
   roomId: undefined,
   selectedImage: "",
+  standard: "",
   selectedScore: "",
   rating: {
     sort: undefined,
@@ -42,17 +44,17 @@ const SPACE_DEFINITION = {
 };
 
 export default function Space({ data }) {
-  const { spaceImages, ratings, useEntry } = useContext(DataContext);
+  const { rooms, spaceImages, ratings, useEntry } = useContext(DataContext);
   const [space, setSpace] = useState(SPACE_DEFINITION);
   const [model, setModel] = useState(undefined);
   const uploadModal = useRef();
   const forSTDRef = useRef();
-  const forORDRef = useRef();
-  const forCLNRef = useRef();
+  const forALLRef = useRef();
   const selectedUploadImages = useRef();
   const deleteModal = useRef();
   const timer = useRef<NodeJS.Timeout | undefined>();
   const duration = useRef();
+  const params = useParams();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -86,10 +88,10 @@ export default function Space({ data }) {
     setSpace((prev) => {
       let latestRating = [];
       if (space.id !== undefined) {
-        const matchedRatings = ratings.filter(
+        const matchedRatings = ratings?.filter(
           (rating) => rating.spaceId === space.id
         );
-        latestRating = matchedRatings.sort(
+        latestRating = matchedRatings?.sort(
           (a, b) =>
             new Date(b.dateModified).getTime() -
             new Date(a.dateModified).getTime()
@@ -174,18 +176,14 @@ export default function Space({ data }) {
 
   function handleImageSubmit(event) {
     event.preventDefault();
-    console.log("test", forSTDRef.current.checked);
     let type = forSTDRef.current.checked
       ? forSTDRef.current.value
-      : forORDRef.current.checked
-      ? forORDRef.current.value
-      : forCLNRef.current.checked
-      ? forCLNRef.current.value
-      : "all";
+      : // : forALLRef.current.checked
+        // ? forALLRef.current.value
+        "all";
 
     forSTDRef.current.checked = false;
-    forORDRef.current.checked = false;
-    forCLNRef.current.checked = false;
+    // forALLRef.current.checked = false;
 
     uploadModal.current.close();
     let action = {
@@ -257,69 +255,119 @@ export default function Space({ data }) {
     timer.current = setInterval(() => {
       duration.current += 1;
     }, 1000);
-    const raw5s = await evaluate(images, space?.name);
-    console.log("predictions >> ", raw5s.predictions);
+    const raw5s = await evaluate(images, space?.name, space?.standard);
+    if (raw5s.standard === "") {
+      // if not calibrating
+      console.log("predictions >> ", raw5s.predictions);
 
-    const commentResult = comment(raw5s);
-    console.log(" III commentResult III", commentResult);
-    const { sort, set, shine } = commentResult;
-    console.log(" III raw5s III", raw5s);
+      const commentResult = comment(raw5s);
+      console.log(" III commentResult III", commentResult);
+      const { sort, set, shine } = commentResult;
+      console.log(" III raw5s III", raw5s);
 
-    // const { sort, set, shine } = raw5s.comment;
-    const { score: sortScore } = raw5s.scores.sort;
-    const { score: setScore } = raw5s.scores.set;
-    const { score: shineScore } = raw5s.scores.shine;
+      // const { sort, set, shine } = raw5s.comment;
+      const { score: sortScore } = raw5s.scores.sort;
+      const { score: setScore } = raw5s.scores.set;
+      const { score: shineScore } = raw5s.scores.shine;
 
-    const sortScoreFixed = parseFloat(sortScore.toFixed(1));
-    const setScoreFixed = parseFloat(setScore.toFixed(1));
-    const shineScoreFixed = parseFloat(shineScore.toFixed(1));
+      const sortScoreFixed = parseFloat(sortScore.toFixed(1));
+      const setScoreFixed = parseFloat(setScore.toFixed(1));
+      const shineScoreFixed = parseFloat(shineScore.toFixed(1));
 
-    console.log(" III data III", data);
+      console.log(" III data III", data);
 
-    const totalScore = data.scores?.reduce(
-      (acc, score) => acc + (score.sort + score.setInOrder + score.shine) / 3,
-      0
-    );
+      const totalScore = data.scores?.reduce(
+        (acc, score) => acc + (score.sort + score.setInOrder + score.shine) / 3,
+        0
+      );
 
-    let averageScore = totalScore / data.scores?.length;
-    averageScore = Math.min(Math.max(averageScore, 1), 10);
+      let averageScore = totalScore / data.scores?.length;
+      averageScore = Math.min(Math.max(averageScore, 1), 10);
 
-    let scores = {
-      spaceId: space.id,
-      sort: sortScoreFixed,
-      setInOrder: setScoreFixed,
-      shine: shineScoreFixed,
-      comment: {
-        sort: sort,
-        setInOrder: set,
-        shine: shine,
-      },
-    };
-
-    let action = {
-      type: "ratings",
-      method: "post",
-      data: {
-        scores,
-      },
-    };
-
-    useEntry(action);
-    setSpace((prev) => {
-      let newPictures = [];
-      for (let i = 0; i < prev?.pictures.length; i++) {
-        newPictures.push({
-          image: prev?.pictures[i].image,
-          prediction: raw5s.predictions[i],
-          forType: prev?.pictures[i].forType,
-        });
-      }
-      console.log("newPictures >> ", newPictures);
-      return {
-        ...prev,
-        pictures: newPictures,
+      let scores = {
+        spaceId: space.id,
+        sort: sortScoreFixed,
+        setInOrder: setScoreFixed,
+        shine: shineScoreFixed,
+        comment: {
+          sort: sort,
+          setInOrder: set,
+          shine: shine,
+        },
       };
-    });
+
+      let action = {
+        type: "ratings",
+        method: "post",
+        data: {
+          scores,
+        },
+      };
+
+      useEntry(action);
+      setSpace((prev) => {
+        let newPictures = [];
+        for (let i = 0; i < prev?.pictures.length; i++) {
+          newPictures.push({
+            image: prev?.pictures[i].image,
+            prediction: raw5s.predictions[i],
+            forType: prev?.pictures[i].forType,
+          });
+        }
+
+        return {
+          ...prev,
+          pictures: newPictures,
+        };
+      });
+
+      // edit room for user attended
+
+      const roomId = params.id;
+      const foundRoom = rooms.find((obj) => obj.id === roomId);
+      const loginData = JSON.parse(localStorage.getItem("isLoggedIn"));
+
+      console.log("loginData >> ", loginData);
+      console.log("foundROOm >> ", foundRoom);
+      let newAction = {
+        type: "rooms",
+        method: "put",
+        data: {
+          id: roomId,
+          buildingId: foundRoom.buildingId,
+          roomNumber: foundRoom.roomNumber,
+          image: foundRoom.image,
+          status: foundRoom.status,
+          modifiedBy: [loginData.value, ...foundRoom.modifiedBy],
+        },
+      };
+      useEntry(newAction);
+    } else {
+      // if calibrating
+      console.log("raw5s >>> ", raw5s);
+      console.log("calibrating");
+      const roomId = params.id;
+      const currentSpace = data.find((curr) => curr.name === space.name);
+      let action = {
+        type: "spaces",
+        method: "put",
+        data: {
+          id: currentSpace.id,
+          name: currentSpace.name,
+          roomId: roomId,
+          pictures: currentSpace.pictures,
+          standard: raw5s.standard,
+        },
+      };
+      useEntry(action);
+      setSpace((prev) => {
+        return {
+          ...prev,
+          standard: raw5s.standard,
+          isAssess: false,
+        };
+      });
+    }
   }
 
   function handleScoreClick(type) {
@@ -329,6 +377,11 @@ export default function Space({ data }) {
         selectedScore: type,
       };
     });
+  }
+
+  function handleImageClose() {
+    forSTDRef.current.checked = false;
+    // forALLRef.current.checked = false;
   }
 
   return (
@@ -363,36 +416,13 @@ export default function Space({ data }) {
                   STD
                 </label>
               </div>
-              <div className="flex gap-2 justify-center items-center">
-                <input
-                  ref={forORDRef}
-                  type="radio"
-                  id="order"
-                  name="choice"
-                  value="ord"
-                />
-                <label htmlFor="order" className="text-xs text-neutral-600">
-                  ORD
-                </label>
-              </div>
-              <div className="flex gap-2 justify-center items-center">
-                <input
-                  ref={forCLNRef}
-                  type="radio"
-                  id="cln"
-                  name="choice"
-                  value="cln"
-                />
-                <label htmlFor="cln" className="text-xs text-neutral-600">
-                  CLN
-                </label>
-              </div>
             </fieldset>
             <img id="preview" className="h-24 w-full object-contain" />
           </>
         }
         ref={uploadModal}
         onSubmit={handleImageSubmit}
+        onClose={handleImageClose}
       >
         <h2 className="text-neutral-500 text-xl mb-4">Upload an Image</h2>
       </Modal>
@@ -412,9 +442,20 @@ export default function Space({ data }) {
       <div className="flex flex-col gap-4 p-6 w-[90rem] mx-auto">
         <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
           <div className="flex justify-between">
-            <h2 className="text-neutral-600 text-2xl">
-              {space.name ? space.name : "Space"}
-            </h2>
+            <div className="flex items-center gap-4 text-neutral-600 text-2xl">
+              <h2 className="uppercase">{space.name ? space.name : "Space"}</h2>
+              {space.name ? (
+                <p
+                  className={`text-xs ${
+                    space.standard !== "" ? "bg-green-400" : "bg-neutral-400"
+                  } py-2 px-4 rounded-2xl text-white font-semibold opacity-60`}
+                >
+                  {space.standard !== "" ? "Calibrated" : "Not Calibrated"}
+                </p>
+              ) : (
+                ""
+              )}
+            </div>
             <Select
               onValueChange={(selectedName) => handleSpaceSelect(selectedName)}
               disabled={space.isLoad || space.isAssess}
@@ -483,6 +524,8 @@ export default function Space({ data }) {
                   onClick={handleAssessBtn}
                   disabled={
                     space.id === undefined ||
+                    space.pictures === undefined ||
+                    space.pictures?.length === 0 ||
                     space.isUpload ||
                     space.isAssess ||
                     space.isLoad
@@ -490,7 +533,7 @@ export default function Space({ data }) {
                       : false
                   }
                 >
-                  Assess
+                  {space?.standard === "" ? "Calibrate" : "Assess"}
                 </Button>
               </menu>
             </div>

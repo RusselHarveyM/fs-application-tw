@@ -28,31 +28,47 @@ export default function DataContextProvider({ children }) {
   });
 
   async function fetchAllData() {
+    // try {
+    const newData = {
+      users: [],
+      buildings: [],
+      rooms: [],
+      spaces: [],
+      // ratings: [],
+      // comments: [],
+    };
+    newData.users = (await axios.get(`${endpoint}/api/user`)).data.map(
+      (user) => ({
+        ...user,
+        Name: `${user.firstName} ${user.lastName}`, // Calculate fullname
+      })
+    );
     try {
-      const newData = {
-        users: [],
-        buildings: [],
-        rooms: [],
-        spaces: [],
-        ratings: [],
-        comments: [],
-      };
-      newData.users = (await axios.get(`${endpoint}/api/user`)).data.map(
-        (user) => ({
-          ...user,
-          Name: `${user.firstName} ${user.lastName}`, // Calculate fullname
-        })
-      );
       newData.buildings = (await axios.get(`${endpoint}/api/buildings`)).data;
-      newData.rooms = (await axios.get(`${endpoint}/api/rooms`)).data;
-      newData.spaces = (await axios.get(`${endpoint}/api/space`)).data;
-      newData.ratings = (await axios.get(`${endpoint}/api/ratings`)).data;
-      newData.comments = (await axios.get(`${endpoint}/api/comment`)).data;
-      console.log(newData);
-      setData(newData);
     } catch (error) {
-      console.log(error);
+      newData.buildings = [];
     }
+
+    try {
+      newData.rooms = (await axios.get(`${endpoint}/api/rooms`)).data;
+    } catch (error) {
+      newData.rooms = [];
+    }
+
+    try {
+      newData.spaces = (await axios.get(`${endpoint}/api/space`)).data;
+    } catch (error) {
+      newData.spaces = [];
+    }
+
+    // newData.ratings = (await axios.get(`${endpoint}/api/ratings`)).data || [];
+    // newData.comments =
+    //   (await axios.get(`${endpoint}/api/comment`)).data || [];
+    console.log(newData);
+    setData(newData);
+    // } catch (error) {
+    // console.log(error);
+    // }
   }
 
   async function getSpaceImagesBySpaceId(id) {
@@ -144,23 +160,6 @@ export default function DataContextProvider({ children }) {
       .catch((error) => console.error("Error updating building:", error));
   }
 
-  // async function updateBuilding(buildingId, updatedBuildingData) {
-  //   try {
-  //     console.log(buildingId);
-  //     console.log(updatedBuildingData);
-  //     // Send a PUT request to the API endpoint with the updated data
-  //     const response = await axios.put(`${endpoint}/api/buildings/${buildingId}`,updatedBuildingData);
-
-  //     // Return the updated building object from the response
-  //     console.log(updatedBuildingData);
-  //     return response.data;
-  //   } catch (error) {
-  //     // Handle any errors that occur during the request
-  //     console.error("Error updating building:", error);
-  //     throw error; // Optional: rethrow the error to be handled elsewhere
-  //   }
-  // }
-
   async function deleteBuilding(buildingName) {
     await axios.delete(`${endpoint}/api/buildings/${buildingName}`);
   }
@@ -218,6 +217,37 @@ export default function DataContextProvider({ children }) {
     await axios.delete(`${endpoint}/api/space/${spaceId}`);
   }
 
+  async function getSpaces() {
+    const spaces = (await axios.get(`${endpoint}/api/space`)).data;
+
+    setData((prev) => {
+      return {
+        ...prev,
+        spaces,
+      };
+    });
+  }
+
+  async function getRooms() {
+    const rooms = (await axios.get(`${endpoint}/api/rooms`)).data;
+
+    setData((prev) => {
+      return {
+        ...prev,
+        rooms,
+      };
+    });
+  }
+
+  async function getBuildings() {
+    const buildings = (await axios.get(`${endpoint}/api/buildings`)).data;
+    setData((prev) => {
+      return {
+        ...prev,
+        buildings,
+      };
+    });
+  }
   /*
   ------------------------
   function handleUseEntry
@@ -305,6 +335,19 @@ export default function DataContextProvider({ children }) {
         });
       }
     }
+    if (action.type === "comments") {
+      if (action.method === "get") {
+        const comments = (await axios.get(`${endpoint}/api/comment`)).data;
+        console.log(comments);
+
+        setData((prev) => {
+          return {
+            ...prev,
+            comments,
+          };
+        });
+      }
+    }
     if (action.type === "users") {
       if (action.method === "post") {
         console.log(action.data);
@@ -367,7 +410,7 @@ export default function DataContextProvider({ children }) {
         try {
           // Assuming your API endpoint for adding a Building is `${endpoint}/api/buildings`
           await addBuilding(newBuildingData);
-
+          await getBuildings();
           console.log("Building added successfully");
         } catch (error) {
           console.error("Error adding building:", error);
@@ -380,6 +423,7 @@ export default function DataContextProvider({ children }) {
         try {
           // Assuming your API endpoint for updating a Building is `${endpoint}/api/user/${BuildingId}`
           await updateBuilding(buildingId, updatedBuildingData);
+          await getBuildings();
           // After successful update, update the user data in state
           console.log(buildingId, updatedBuildingData);
           console.log(`Building with ID ${buildingId} updated successfully`);
@@ -411,7 +455,8 @@ export default function DataContextProvider({ children }) {
     }
     if (action.type === "rooms") {
       if (action.method === "post") {
-        const roomData = action.data;
+        let roomData = action.data;
+        roomData.modifiedBy = [];
         const roomId = action.data.id;
         console.log(roomData);
         // Perform the creation logic here, such as making a POST request to your backend API
@@ -421,12 +466,13 @@ export default function DataContextProvider({ children }) {
           // After successful creation, update the room data in state there is no prevdata tho, since its newly added how to render it
           console.log("Newly created room ID:", roomId);
           //update the room data in state there is no prevdata tho, since its newly added how to render it
-          setData((prevData) => {
-            return {
-              ...prevData,
-              rooms: [...prevData.rooms, roomData],
-            };
-          });
+          // setData((prevData) => {
+          //   return {
+          //     ...prevData,
+          //     rooms: [...prevData.rooms, roomData],
+          //   };
+          // });
+          await getRooms();
           console.log("Room created successfully");
         } catch (error) {
           console.error("Error creating room:", error);
@@ -439,21 +485,7 @@ export default function DataContextProvider({ children }) {
         try {
           // Assuming your API endpoint for updating a Building is `${endpoint}/api/user/${BuildingId}`
           await updateRoom(roomId, updatedRoomData);
-          setData((prevData) => {
-            return {
-              ...prevData,
-              rooms: prevData.rooms.map((room) => {
-                if (room.id === roomId) {
-                  // Merge existing user data with the updated data, excluding username and password
-                  return {
-                    ...room,
-                    ...updatedRoomData,
-                  };
-                }
-                return room;
-              }),
-            };
-          });
+          await getRooms();
           console.log(roomId, updatedRoomData);
           console.log(`Room with ID ${roomId} updated successfully`);
         } catch (error) {
@@ -481,9 +513,13 @@ export default function DataContextProvider({ children }) {
           console.error("Error deleting room:", error);
         }
       }
+      if (action.method === "get") {
+        await getRooms();
+        console.log("get used");
+      }
     }
     if (action.type === "spaces") {
-      if (action.method === "post"){
+      if (action.method === "post") {
         const spaceData = action.data;
         const spaceId = action.data.id;
         console.log(spaceData);
@@ -494,41 +530,19 @@ export default function DataContextProvider({ children }) {
           // After successful creation, update the room data in state there is no prevdata tho, since its newly added how to render it
           console.log("Newly created space ID:", spaceId);
           //update the room data in state there is no prevdata tho, since its newly added how to render it
-          setData((prevData) => {
-            return {
-              ...prevData,
-              spaces: [...prevData.spaces, spaceData],
-            };
-          });
+          await getSpaces();
           console.log("Space created successfully");
         } catch (error) {
           console.error("Error creating space:", error);
-        } 
+        }
       }
       if (action.method === "put") {
-        const updatedSpaceData = action.data.data; // Assuming action.data contains the updated Building data
+        const updatedSpaceData = action.data;
         const spaceId = action.data.id;
-        // Perform the edit logic here, such as making a PUT request to your backend API
         try {
-          // Assuming your API endpoint for updating a Building is `${endpoint}/api/user/${BuildingId}`
           await updateSpace(spaceId, updatedSpaceData);
-          setData((prevData) => {
-            return {
-              ...prevData,
-              spaces: prevData.spaces.map((space) => {
-                if (space.id === spaceId) {
-                  // Merge existing user data with the updated data, excluding username and password
-                  return {
-                    ...space,
-                    ...updatedSpaceData,
-                  };
-                }
-                return space;
-              }),
-            };
-          });
-          console.log(spaceId, updatedSpaceData);
-          console.log(`Space with ID ${spaceId} updated successfully`);
+          await getSpaces();
+          console.log("success");
         } catch (error) {
           console.error("Error updating space:", error);
         }

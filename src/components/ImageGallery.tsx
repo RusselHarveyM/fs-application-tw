@@ -7,6 +7,8 @@ export default function ImageGallery({
   duration,
 }) {
   let cssLoad = " animate-pulse";
+  let allFlag = 0;
+
   return (
     <div
       className={`grid grid-cols-4 grid-rows-5 w-1/3 h-[30rem] bg-neutral-100 ${
@@ -32,18 +34,22 @@ export default function ImageGallery({
       {images && images?.length > 0
         ? images.map((imageObject: any) => {
             console.log(imageObject);
+            let tag = "all";
+            if (imageObject.forType === "all" && allFlag === 0) {
+              allFlag = 1;
+            } else if (imageObject.forType !== "std") {
+              tag = "sub";
+            } else {
+              tag = imageObject.forType;
+            }
             const imageData = {
               id: imageObject.image.id,
               image: imageObject.image.image,
               prediction: imageObject.prediction,
             };
             const css =
-              imageObject.forType === "std"
-                ? "border-green-500 text-white bg-green-300"
-                : imageObject.forType === "ord"
+              tag !== "all"
                 ? "border-purple-400 text-white bg-purple-300"
-                : imageObject.forType === "cln"
-                ? "border-yellow-500 text-white bg-yellow-300"
                 : "border-orange-400 text-white bg-orange-300";
             return (
               <div
@@ -62,7 +68,7 @@ export default function ImageGallery({
                     css
                   }
                 >
-                  {imageObject.forType}
+                  {tag}
                 </sup>
               </div>
             );

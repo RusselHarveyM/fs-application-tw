@@ -23,7 +23,7 @@ export default function Sidebar({
       </NavLink>
       <div className="flex gap-4 items-center w-[90%] h-24 mb-4 mt-4 ">
         <img
-          src={`data:image/jpeg;base64,${roomData.image}`}
+          src={`data:image/jpeg;base64,${roomData?.image}`}
           alt="room-image"
           className="w-20 h-20 object-fill rounded-md bg-stone-100"
         />

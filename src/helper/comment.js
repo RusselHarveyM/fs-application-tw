@@ -89,6 +89,7 @@ export default function commentFormatter(data) {
       }
       if (missingFlag === 1) {
         endComment += ` * make sure all items are in their correct positions.\n`;
+        endComment += ` * make sure all necessary areas are captured.\n`;
       }
       if (unwantedFlag === 1) {
         endComment += ` * remove unecessary items.\n`;

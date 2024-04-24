@@ -1,4 +1,10 @@
-import { forwardRef, useImperativeHandle, useRef, useState, useContext } from "react";
+import {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+  useContext,
+} from "react";
 import { createPortal } from "react-dom";
 import Button from "./Button";
 import { Label } from "@radix-ui/react-dropdown-menu";
@@ -45,8 +51,8 @@ const AddSpaceModal = forwardRef(function AddSpaceModal(
       ...prevSpace,
       [field]: event.target.value,
     }));
-  };  
-  
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault(); // Prevent default form submission
 
@@ -55,6 +61,7 @@ const AddSpaceModal = forwardRef(function AddSpaceModal(
       name: newSpace.name,
       roomId: newSpace.roomId,
       pictures: newSpace.pictures,
+      standard: "",
     };
 
     onSubmit(requestBody).then((response) => {

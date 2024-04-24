@@ -150,9 +150,8 @@ function calculateOverlap(prediction1, prediction2) {
   // Determine which prediction is bigger
   let bigger = area1 > area2 ? "first" : "second";
 
-  // Check if the smaller prediction is at least 40% inside the bigger one's box
   let smallerArea = area1 < area2 ? area1 : area2;
-  let overlap = overlapArea >= smallerArea * 0.2;
+  let overlap = overlapArea >= smallerArea * 0.1;
 
   return {
     overlap,
@@ -202,7 +201,7 @@ function score(data) {
   );
 }
 
-export default async function evaluate(images, spacename) {
+export default async function evaluate(images, spacename, standard) {
   let result = {
     scores: {
       sort: {
@@ -230,10 +229,10 @@ export default async function evaluate(images, spacename) {
     count: {},
     airsystem: false,
     predictions: [],
+    standard: "",
   };
 
   let objects = [];
-  let objects_temp = [];
   let model1 = undefined;
   let model2 = undefined;
   let model3 = undefined;
@@ -244,16 +243,18 @@ export default async function evaluate(images, spacename) {
   let prevModel3 = model3;
   let prevModel4 = model4;
   let prevModel5 = model5;
+  let allFlag = 0;
+  let objectId = 0;
 
   for (const imageObject of images) {
+    // start
     console.log(imageObject);
 
     let predictions = [];
+    let objects_temp = [];
 
-    // model1 = await countModel(imageObject.image);
-    // model3 = await pbModel(imageObject.image);
-
-    if (imageObject.forType === "std" || imageObject.forType === "all") {
+    // sort and set
+    if (imageObject.forType === "std" || allFlag === 0) {
       model1 = await countModel(imageObject.image);
       for (const pred of model1.predictions) {
         if (pred.confidence >= 0.5) {
@@ -267,20 +268,24 @@ export default async function evaluate(images, spacename) {
           }
         }
       }
-
       model3 = await pbModel(imageObject.image);
+
       // structure
       if (model1 !== undefined && model3 !== undefined) {
-        // list objects and predictions
-        // model1.predictions.forEach((prediction, index) => {
-        const modelConcat = model1.predictions.concat(model3.predictions);
-        for (const [index, prediction] of modelConcat.entries()) {
+        let models = model1.predictions;
+        if (standard !== "") {
+          model3.predictions = model3.predictions.filter(
+            (pred) => pred.confidence >= 0.5
+          );
+          models = model1.predictions.concat(model3.predictions);
+        }
+        for (const [index, prediction] of models.entries()) {
           if (prediction.confidence >= 0.5) {
             const class_name = prediction.class;
             objects_temp.push({
-              id: index,
+              id: objectId,
               class: class_name,
-              indexFrom: 0,
+              indexFrom: undefined,
               prediction: {
                 height: prediction.height,
                 width: prediction.width,
@@ -289,6 +294,7 @@ export default async function evaluate(images, spacename) {
               },
               children: [],
             });
+            objectId++;
           }
         }
         // structure object hierarchy
@@ -297,7 +303,7 @@ export default async function evaluate(images, spacename) {
           objects_temp.forEach((second_object, innerIndex) => {
             const first_key = first_object.class;
             const second_key = second_object.class;
-            const notObjects = ["chair", "sofa"];
+            const notObjects = ["chair", "sofa", "pot"];
             if (
               first_key === second_key ||
               notObjects.includes(first_key) ||
@@ -312,7 +318,7 @@ export default async function evaluate(images, spacename) {
 
               if (result.overlap) {
                 if (result.bigger === "first") {
-                  if (second_object.indexFrom === 0) {
+                  if (second_object.indexFrom === undefined) {
                     second_object.indexFrom = outerIndex;
                     const object = { ...second_object, result };
                     first_object.children.push(object);
@@ -333,18 +339,22 @@ export default async function evaluate(images, spacename) {
                       ParentObject.children.splice(foundIndex, 1);
                     }
                   }
-                  if (first_object.indexFrom !== 0) {
+                  if (first_object.indexFrom !== undefined) {
                     let childObject_raw = first_object;
                     const index = childObject_raw.indexFrom;
                     let ParentObject = objects_temp[index];
                     let foundIndex = ParentObject.children.findIndex(
                       (ch) => ch.id === childObject_raw.id
                     );
-                    ParentObject.splice(foundIndex, 1, childObject_raw);
+                    ParentObject.children.splice(
+                      foundIndex,
+                      1,
+                      childObject_raw
+                    );
                   }
                 }
                 if (result.bigger === "second") {
-                  if (first_object.indexFrom === 0) {
+                  if (first_object.indexFrom === undefined) {
                     objects_temp[outerIndex].indexFrom = innerIndex;
                     const object = { ...first_object, result };
                     second_object.children.push(object);
@@ -365,7 +375,7 @@ export default async function evaluate(images, spacename) {
                       ParentObject.children.splice(foundIndex, 1);
                     }
                   }
-                  if (second_object.indexFrom !== 0) {
+                  if (second_object.indexFrom !== undefined) {
                     let childObject_raw = second_object;
                     const index = childObject_raw.indexFrom;
                     let ParentObject = objects_temp[index];
@@ -382,36 +392,36 @@ export default async function evaluate(images, spacename) {
         // remove the items with indexFrom
         // objects_temp.forEach((object, index) => {
         for (const [index, object] of objects_temp.entries()) {
-          if (object.indexFrom !== 0) {
+          if (object.indexFrom !== undefined) {
             objects_temp.splice(index, 1);
           }
         }
-
-        objects = objects_temp;
-        console.log(objects_temp);
       }
-    }
+      const newObject = [...objects, ...objects_temp];
+      objects = newObject;
 
-    if (imageObject.forType === "ord" || imageObject.forType === "all") {
+      console.log(objects);
+      // order/organization
       model2 = await orderModel(imageObject.image);
-      model4 = await blueModel(imageObject.image);
-      if (model2 !== undefined && model4 !== undefined) {
+      // model4 = await blueModel(imageObject.image);
+      if (model2 !== undefined) {
         const filteredOrder = model2.predictions.filter(
           (obj) => obj.class === "disorganized"
         );
         if (filteredOrder.length > 0)
           result.scores.set.unorganized += filteredOrder.length;
-        for (const obj of model4.predictions) {
-          const airwaysSystems = ["ventilation", "aircon", "exhaust"];
-          if (obj.class in airwaysSystems) {
-            result.scores.set.airsystem[obj.class]++;
-            result.airsystem = true;
-          }
-        }
+        // for (const obj of model4.predictions) {
+        //   const airwaysSystems = ["ventilation", "aircon", "exhaust"];
+        //   if (obj.class in airwaysSystems) {
+        //     result.scores.set.airsystem[obj.class]++;
+        //     result.airsystem = true;
+        //   }
+        // }
       }
     }
 
-    if (imageObject.forType === "cln" || imageObject.forType === "all") {
+    // shine
+    if (imageObject.forType === "all" || imageObject.forType === "std") {
       model5 = await yellowModel(imageObject.image);
       if (model5 !== undefined) {
         // const yellowClasses = ["damage", "litter", "smudge", "adhesives"];
@@ -422,12 +432,12 @@ export default async function evaluate(images, spacename) {
       }
     }
 
-    // end of image
     predictions.push(
       prevModel1 !== model1
         ? model1?.predictions.filter((obj) => obj.confidence >= 0.5)
         : []
     );
+
     predictions.push(prevModel2 !== model2 ? model2?.predictions : []);
     predictions.push(prevModel3 !== model3 ? model3?.predictions : []);
     predictions.push(prevModel4 !== model4 ? model4?.predictions : []);
@@ -438,24 +448,32 @@ export default async function evaluate(images, spacename) {
     prevModel3 = model3;
     prevModel4 = model4;
     prevModel5 = model5;
+
+    if (imageObject.forType === "all" && allFlag === 0) allFlag = 1;
+    // end
   }
+  console.log("before", objects);
 
-  const c_result = await c_evaluation(objects, spacename);
-  console.log("c_result >>> ", c_result);
+  if (standard !== "") {
+    const c_result = await c_evaluation(objects, spacename, standard);
+    console.log("c_result >>> ", c_result);
 
-  result.scores.sort.missing.push(
-    ...c_result.filter(
-      (obj) => obj.status === "missing" || obj.status === "c_missing"
-    )
-  );
-  result.scores.sort.unwanted.push(
-    ...c_result.filter(
-      (obj) => obj.status === "extra" || obj.status === "c_extra"
-    )
-  );
+    result.scores.sort.missing.push(
+      ...c_result.filter(
+        (obj) => obj.status === "missing" || obj.status === "c_missing"
+      )
+    );
+    result.scores.sort.unwanted.push(
+      ...c_result.filter(
+        (obj) => obj.status === "extra" || obj.status === "c_extra"
+      )
+    );
 
-  console.log("result >>> ", result);
-  score(result);
+    console.log("result >>> ", result);
+    score(result);
+  } else {
+    result.standard = JSON.stringify(objects);
+  }
 
   return result;
 }

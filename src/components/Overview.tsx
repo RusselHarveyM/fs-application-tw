@@ -3,9 +3,10 @@ import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Card from "./Card";
 import { BarChartCustom } from "./BarChart";
+import UserItem from "./UserItem";
 
 export default function Overview() {
-  const { spaces, ratings } = useContext(DataContext);
+  const { users, rooms, spaces, ratings, useEntry } = useContext(DataContext);
   const [scores, setScores] = useState({
     average: 0,
     sort: 0,
@@ -13,15 +14,47 @@ export default function Overview() {
     shine: 0,
   });
   const [filteredRatings, setFilteredRatings] = useState([]);
+  const [recentUsers, setRecentUsers] = useState({
+    totalLength: 0,
+    users: [],
+  });
 
   const params = useParams();
 
   useEffect(() => {
+    let action = {
+      type: "ratings",
+      method: "get",
+    };
+    useEntry(action);
+    action.type = "comments";
+    useEntry(action);
     const id = params.id;
-    if (spaces) {
+    const room = rooms?.find((obj) => obj.id === id);
+    let usersList = [];
+    console.log("room overview >> ", room);
+    if (room?.modifiedBy?.length > 0) {
+      for (const userId of room?.modifiedBy) {
+        const foundUser = users.find((obj) => obj.id === userId);
+        usersList.push(foundUser);
+      }
+      setRecentUsers(() => {
+        return {
+          totalLength: usersList.length,
+          users: usersList.slice(0, 5),
+        };
+      });
+    }
+    console.log("usersList overview >> ", usersList);
+  }, [params.id, rooms]);
+
+  useEffect(() => {
+    const id = params.id;
+    if (spaces && ratings) {
       let spaceRatings = [];
+      let avgScore = { sort: 0, set: 0, shine: 0 };
       const spacesByRoomId = [...spaces.filter((space) => space.roomId === id)];
-      spacesByRoomId.forEach((space) => {
+      for (const space of spacesByRoomId) {
         let ratingsBySpaceId = [
           ...ratings.filter((rating) => rating.spaceId === space.id),
         ];
@@ -34,15 +67,14 @@ export default function Overview() {
           space,
           ratings: latestRating,
         };
+        const rating = latestRating[0];
+        avgScore.sort += rating?.sort;
+        avgScore.set += rating?.setInOrder;
+        avgScore.shine += rating?.shine;
         spaceRatings.push(spaceRating);
-      });
-      let avgScore = { sort: 0, set: 0, shine: 0 };
-      spaceRatings.map((spaceRating) => {
-        const ratings = spaceRating.ratings[0];
-        avgScore.sort += ratings?.sort;
-        avgScore.set += ratings?.setInOrder;
-        avgScore.shine += ratings?.shine;
-      });
+      }
+      console.log(spaceRatings);
+
       const total = avgScore.sort + avgScore.set + avgScore.shine;
       if (total > 0) {
         setScores(() => {
@@ -66,7 +98,7 @@ export default function Overview() {
         setFilteredRatings(() => spaceRatings);
       }
     }
-  }, [params.id]);
+  }, [params.id, ratings, spaces]);
 
   return (
     <div className="flex flex-col p-6 w-[97rem] mx-auto gap-4">
@@ -79,13 +111,21 @@ export default function Overview() {
       </div>
       <div className="flex gap-4 w-full h-[35rem] mt-8">
         <BarChartCustom filteredRatings={filteredRatings} />
-        <div className="w-1/3 h-full bg-white shadow rounded-2xl p-8">
+        <div className="w-1/4 h-full bg-white shadow rounded-2xl p-8">
           <h2 className="text-lg text-neutral-700 font-semibold">
             Recent Users
           </h2>
           <p className="text-neutral-400 text-sm">
-            0 users attended to this room this year.
+            {recentUsers.totalLength} users attended to this room this year.
           </p>
+          {recentUsers.users.map((user, index) => {
+            return (
+              <UserItem
+                key={index}
+                name={`${user.firstName} ${user.lastName}`}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

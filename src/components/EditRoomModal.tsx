@@ -1,4 +1,10 @@
-import { forwardRef, useImperativeHandle, useRef, useState, useContext } from "react";
+import {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+  useContext,
+} from "react";
 import { createPortal } from "react-dom";
 import Button from "./Button";
 import { Label } from "@radix-ui/react-dropdown-menu";
@@ -60,7 +66,9 @@ const EditRoomModal = forwardRef(function EditRoomModal(
     e.preventDefault(); // Prevent default form submission
 
     // Find the building ID based on the selected building name
-    const selectedBuilding = buildings.find((building) => building.buildingName === editedRoom.buildingId);
+    const selectedBuilding = buildings.find(
+      (building) => building.buildingName === editedRoom.buildingId
+    );
     const buildingId = selectedBuilding ? selectedBuilding.id : "";
 
     const requestBody = {
@@ -141,16 +149,14 @@ const EditRoomModal = forwardRef(function EditRoomModal(
                 Upload Image:
               </Label>
               <div className="relative w-64">
-                <Input 
-                  id="image" 
+                <Input
+                  id="image"
                   type="file"
-                  onChange={handleImageUpload} 
-                  className="opacity-0 absolute left-0 top-0 w-full h-full cursor-pointer" 
+                  onChange={handleImageUpload}
+                  className="opacity-0 absolute left-0 top-0 w-full h-full cursor-pointer"
                 />
                 <div className="bg-white border border-gray-300 rounded-md py-2 px-5">
-                  <span className="block truncate">
-                    Choose image file
-                  </span>
+                  <span className="block truncate">Choose image file</span>
                 </div>
               </div>
             </div>
