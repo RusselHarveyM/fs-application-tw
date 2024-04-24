@@ -111,14 +111,6 @@ export default function DataContextProvider({ children }) {
     try {
       // Make the POST request to add a new user
       const response = await axios.post(`${endpoint}/api/user`, userData);
-
-      // Extract the ID of the newly created user from the response
-      const userId = response.data.id;
-
-      // Log the success message along with the user ID
-      console.log("User added successfully. User ID:", userId);
-
-      // Optionally, you can perform further actions with the user ID here
     } catch (error) {
       console.error("Error adding new user:", error);
     }
@@ -351,8 +343,26 @@ export default function DataContextProvider({ children }) {
     }
     if (action.type === "users") {
       if (action.method === "post") {
-        console.log(action.data);
-        await addNewUser(action.data);
+        try {
+          // Call the addNewUser function to add the new user to the backend
+          await addNewUser(action.data);
+      
+          // Fetch the updated list of users from the backend
+          const updatedUsers = (await axios.get(`${endpoint}/api/user`)).data;
+      
+          // Update the state with the new list of users
+          setData((prevData) => ({
+            ...prevData,
+            users: updatedUsers.map(user => ({
+              ...user,
+              Name: `${user.firstName} ${user.lastName}`
+            })),
+          }));
+      
+          console.log("Newly added users:", updatedUsers);
+        } catch (error) {
+          console.error("Error adding new user:", error);
+        }
       }
       if (action.method === "put") {
         const updatedUserData = action.data.data; // Assuming action.data contains the updated user data
@@ -375,6 +385,7 @@ export default function DataContextProvider({ children }) {
                   return {
                     ...user,
                     ...updatedUserData,
+                    Name: `${updatedUserData.firstName} ${updatedUserData.lastName}`,
                   };
                 }
                 return user;
