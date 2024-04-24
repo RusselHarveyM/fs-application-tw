@@ -50,7 +50,11 @@ export function Login() {
 
       localStorage.setItem(
         "isLoggedIn",
-        JSON.stringify({ value: foundUser[0].id, expiry: oneHourFromNow })
+        JSON.stringify({
+          id: foundUser[0].id,
+          role: foundUser[0].role,
+          expiry: oneHourFromNow,
+        })
       );
       setIsSubmit(false);
       return navigate("/home");

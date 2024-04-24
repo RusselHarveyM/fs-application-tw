@@ -12,7 +12,10 @@ export default function Spaces() {
   const { rooms, spaces, buildings } = useContext(DataContext);
   const param = useParams();
   const [content, setContent] = useState({
-    selectedTab: "overview",
+    selectedTab:
+      JSON.parse(localStorage.getItem("isLoggedIn")).role === "admin"
+        ? "overview"
+        : "spaces",
     selectedSpaceId: undefined,
     data: {
       room: [],

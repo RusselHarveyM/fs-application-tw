@@ -554,41 +554,44 @@ export default function Space({ data }) {
             <p className="text-neutral-600 animate-bounce">Please wait...</p>
           </div>
         )}
-        <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
-          <div className="flex flex-col gap-4 justify-center">
-            <ScoreCard
-              isLoad={space.isAssess}
-              score={space.isLoad || space.isAssess ? 0 : space.rating?.sort}
-              onClick={() => {
-                if (space.selectedScore !== "sort") handleScoreClick("sort");
-              }}
-            />
-            <ScoreCard
-              isLoad={space.isAssess}
-              type="set"
-              score={
-                space.isLoad || space.isAssess ? 0 : space.rating?.setInOrder
-              }
-              onClick={() => {
-                if (space.selectedScore !== "set in order")
-                  handleScoreClick("set in order");
-              }}
-            />
-            <ScoreCard
-              isLoad={space.isAssess}
-              type="shine"
-              score={space.isLoad || space.isAssess ? 0 : space.rating?.shine}
-              onClick={() => {
-                if (space.selectedScore !== "shine") handleScoreClick("shine");
-              }}
+        {JSON.parse(localStorage.getItem("isLoggedIn")).role === "admin" && (
+          <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
+            <div className="flex flex-col gap-4 justify-center">
+              <ScoreCard
+                isLoad={space.isAssess}
+                score={space.isLoad || space.isAssess ? 0 : space.rating?.sort}
+                onClick={() => {
+                  if (space.selectedScore !== "sort") handleScoreClick("sort");
+                }}
+              />
+              <ScoreCard
+                isLoad={space.isAssess}
+                type="set"
+                score={
+                  space.isLoad || space.isAssess ? 0 : space.rating?.setInOrder
+                }
+                onClick={() => {
+                  if (space.selectedScore !== "set in order")
+                    handleScoreClick("set in order");
+                }}
+              />
+              <ScoreCard
+                isLoad={space.isAssess}
+                type="shine"
+                score={space.isLoad || space.isAssess ? 0 : space.rating?.shine}
+                onClick={() => {
+                  if (space.selectedScore !== "shine")
+                    handleScoreClick("shine");
+                }}
+              />
+            </div>
+            <Comment
+              isLoad={space.isAssess || space.isLoad}
+              selected={space.selectedScore}
+              ratingId={space.rating?.id}
             />
           </div>
-          <Comment
-            isLoad={space.isAssess || space.isLoad}
-            selected={space.selectedScore}
-            ratingId={space.rating?.id}
-          />
-        </div>
+        )}
       </div>
     </>
   );
