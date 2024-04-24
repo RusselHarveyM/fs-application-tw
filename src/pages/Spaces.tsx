@@ -37,7 +37,7 @@ export default function Spaces() {
         },
       };
     });
-  }, [param.id]);
+  }, [param.id, spaces]);
 
   function handleSelectTab(selected) {
     setContent((prev) => {

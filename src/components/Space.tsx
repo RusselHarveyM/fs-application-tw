@@ -50,6 +50,7 @@ export default function Space({ data }) {
   const uploadModal = useRef();
   const forSTDRef = useRef();
   const forALLRef = useRef();
+  const cameraInputRef = useRef(null);
   const selectedUploadImages = useRef();
   const deleteModal = useRef();
   const timer = useRef<NodeJS.Timeout | undefined>();
@@ -338,7 +339,7 @@ export default function Space({ data }) {
           roomNumber: foundRoom.roomNumber,
           image: foundRoom.image,
           status: foundRoom.status,
-          modifiedBy: [loginData.value, ...foundRoom.modifiedBy],
+          modifiedBy: [loginData.id, ...foundRoom.modifiedBy],
         },
       };
       useEntry(newAction);
@@ -384,6 +385,10 @@ export default function Space({ data }) {
     // forALLRef.current.checked = false;
   }
 
+  const handleCameraClick = () => {
+    cameraInputRef.current.click();
+  };
+
   return (
     <>
       {space.isLoad && (
@@ -401,7 +406,8 @@ export default function Space({ data }) {
               type="file"
               accept="image/png, image/jpeg"
               onChange={handleImageUpload}
-              multiple
+              ref={cameraInputRef}
+              capture="environment"
             />
             <fieldset className="flex width-full justify-around">
               <div className="flex gap-2 justify-center items-center">
@@ -435,9 +441,6 @@ export default function Space({ data }) {
         <h2 className="text-neutral-500 text-xl mb-4">
           Are you sure you want to delete this image?
         </h2>
-        {/* <p className="text-red-300 text-md mb-6">
-          *This action is irreversible*
-        </p> */}
       </Modal>
       <div className="flex flex-col gap-4 p-6 w-[90rem] mx-auto">
         <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
@@ -505,36 +508,42 @@ export default function Space({ data }) {
                 </SelectContent>
               </Select>
               <menu className="flex gap-4 justify-end">
-                <Button
-                  variant="blue"
-                  onClick={() => showModal("upload")}
-                  disabled={
-                    space.id === undefined ||
-                    space.isUpload ||
-                    space.isAssess ||
-                    space.isLoad
-                      ? true
-                      : false
-                  }
-                >
-                  Upload
-                </Button>
-                <Button
-                  variant="blue"
-                  onClick={handleAssessBtn}
-                  disabled={
-                    space.id === undefined ||
-                    space.pictures === undefined ||
-                    space.pictures?.length === 0 ||
-                    space.isUpload ||
-                    space.isAssess ||
-                    space.isLoad
-                      ? true
-                      : false
-                  }
-                >
-                  {space?.standard === "" ? "Calibrate" : "Assess"}
-                </Button>
+                {JSON.parse(localStorage.getItem("isLoggedIn")).role !==
+                  "admin" && (
+                  <>
+                    {" "}
+                    <Button
+                      variant="blue"
+                      onClick={() => showModal("upload")}
+                      disabled={
+                        space.id === undefined ||
+                        space.isUpload ||
+                        space.isAssess ||
+                        space.isLoad
+                          ? true
+                          : false
+                      }
+                    >
+                      Upload
+                    </Button>
+                    <Button
+                      variant="blue"
+                      onClick={handleAssessBtn}
+                      disabled={
+                        space.id === undefined ||
+                        space.pictures === undefined ||
+                        space.pictures?.length === 0 ||
+                        space.isUpload ||
+                        space.isAssess ||
+                        space.isLoad
+                          ? true
+                          : false
+                      }
+                    >
+                      {space?.standard === "" ? "Calibrate" : "Assess"}
+                    </Button>
+                  </>
+                )}
               </menu>
             </div>
           </div>
@@ -549,48 +558,59 @@ export default function Space({ data }) {
             onSelectImage={handleImageSelect}
           />
         </div>
-        {space.isAssess && (
-          <div className=" w-32 h-fit text-center m-auto pt-2 mt-2">
-            <p className="text-neutral-600 animate-bounce">Please wait...</p>
-          </div>
-        )}
         {JSON.parse(localStorage.getItem("isLoggedIn")).role === "admin" && (
-          <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
-            <div className="flex flex-col gap-4 justify-center">
-              <ScoreCard
-                isLoad={space.isAssess}
-                score={space.isLoad || space.isAssess ? 0 : space.rating?.sort}
-                onClick={() => {
-                  if (space.selectedScore !== "sort") handleScoreClick("sort");
-                }}
-              />
-              <ScoreCard
-                isLoad={space.isAssess}
-                type="set"
-                score={
-                  space.isLoad || space.isAssess ? 0 : space.rating?.setInOrder
-                }
-                onClick={() => {
-                  if (space.selectedScore !== "set in order")
-                    handleScoreClick("set in order");
-                }}
-              />
-              <ScoreCard
-                isLoad={space.isAssess}
-                type="shine"
-                score={space.isLoad || space.isAssess ? 0 : space.rating?.shine}
-                onClick={() => {
-                  if (space.selectedScore !== "shine")
-                    handleScoreClick("shine");
-                }}
+          <>
+            {space.isAssess && (
+              <div className=" w-32 h-fit text-center m-auto pt-2 mt-2">
+                <p className="text-neutral-600 animate-bounce">
+                  Please wait...
+                </p>
+              </div>
+            )}
+            <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
+              <div className="flex flex-col gap-4 justify-center">
+                <ScoreCard
+                  isLoad={space.isAssess}
+                  score={
+                    space.isLoad || space.isAssess ? 0 : space.rating?.sort
+                  }
+                  onClick={() => {
+                    if (space.selectedScore !== "sort")
+                      handleScoreClick("sort");
+                  }}
+                />
+                <ScoreCard
+                  isLoad={space.isAssess}
+                  type="set"
+                  score={
+                    space.isLoad || space.isAssess
+                      ? 0
+                      : space.rating?.setInOrder
+                  }
+                  onClick={() => {
+                    if (space.selectedScore !== "set in order")
+                      handleScoreClick("set in order");
+                  }}
+                />
+                <ScoreCard
+                  isLoad={space.isAssess}
+                  type="shine"
+                  score={
+                    space.isLoad || space.isAssess ? 0 : space.rating?.shine
+                  }
+                  onClick={() => {
+                    if (space.selectedScore !== "shine")
+                      handleScoreClick("shine");
+                  }}
+                />
+              </div>
+              <Comment
+                isLoad={space.isAssess || space.isLoad}
+                selected={space.selectedScore}
+                ratingId={space.rating?.id}
               />
             </div>
-            <Comment
-              isLoad={space.isAssess || space.isLoad}
-              selected={space.selectedScore}
-              ratingId={space.rating?.id}
-            />
-          </div>
+          </>
         )}
       </div>
     </>
