@@ -457,9 +457,7 @@ export default function DataContextProvider({ children }) {
               (building) => building.buildingName !== buildingName
             ),
           }));
-          console.log(
-            `Building with Name ${buildingName} deleted successfully`
-          );
+          console.log(`Building with Name ${buildingName} deleted successfully`);
         } catch (error) {
           console.error("Error deleting Building:", error);
         }
@@ -475,8 +473,7 @@ export default function DataContextProvider({ children }) {
         try {
           // Assuming your API endpoint for creating a room is `${endpoint}/api/rooms`
           await addRoom(roomData);
-          // After successful creation, update the room data in state there is no prevdata tho, since its newly added how to render it
-          console.log("Newly created room ID:", roomId);
+          // After successful creation, update the room data in state there is no prevdata tho, since its newly added how to render it\
           //update the room data in state there is no prevdata tho, since its newly added how to render it
           // setData((prevData) => {
           //   return {
@@ -533,14 +530,11 @@ export default function DataContextProvider({ children }) {
     if (action.type === "spaces") {
       if (action.method === "post") {
         const spaceData = action.data;
-        const spaceId = action.data.id;
         console.log(spaceData);
         // Perform the creation logic here, such as making a POST request to your backend API
         try {
           // Assuming your API endpoint for creating a room is `${endpoint}/api/rooms`
           await addSpace(spaceData);
-          // After successful creation, update the room data in state there is no prevdata tho, since its newly added how to render it
-          console.log("Newly created space ID:", spaceId);
           //update the room data in state there is no prevdata tho, since its newly added how to render it
           await getSpaces();
           console.log("Space created successfully");
