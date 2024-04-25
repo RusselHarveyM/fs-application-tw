@@ -13,11 +13,6 @@ const EditUserModal = forwardRef(function EditUserModal(
 ) {
   const dialog = useRef();
   const [formData, setFormData] = useState(initialValues);
-  const roleRef = useRef();
-  const firstnameRef = useRef();
-  const lastnameRef = useRef();
-  const usernameRef = useRef();
-  const passwordRef = useRef();
 
   useImperativeHandle(ref, () => ({
     open() {
@@ -32,18 +27,26 @@ const EditUserModal = forwardRef(function EditUserModal(
     },
   }));
 
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent default form submission
-    const data = {
-      role: roleRef.current.value,
-      firstName: firstnameRef.current.value,
-      lastName: lastnameRef.current.value,
-      username: usernameRef.current.value,
-      password: passwordRef.current.value,
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
-    onSubmit(data); // Pass current form data to onSubmit handler
-    dialog.current.close(); // Close the modal after submission
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+    const updatedUserData = { ...formData };
+
+    try {
+      // Call the onSubmit handler to submit the form data
+      await onSubmit(updatedUserData);
+      // Close the modal after successful submission
+      dialog.current.close();
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
   };
 
   return createPortal(
@@ -62,7 +65,8 @@ const EditUserModal = forwardRef(function EditUserModal(
           <select
             id="role"
             name="role"
-            ref={roleRef}
+            value={formData.role}
+            onChange={handleChange}
             className="input rounded-md"
           >
             <option value="admin">Admin</option>
@@ -77,7 +81,8 @@ const EditUserModal = forwardRef(function EditUserModal(
             type="text"
             id="firstName"
             name="firstName"
-            ref={firstnameRef}
+            value={formData.firstName}
+            onChange={handleChange}
             className="input rounded-md"
           />
         </div>
@@ -89,7 +94,8 @@ const EditUserModal = forwardRef(function EditUserModal(
             type="text"
             id="lastName"
             name="lastName"
-            ref={lastnameRef}
+            value={formData.lastName}
+            onChange={handleChange}
             className="input rounded-md"
           />
         </div>
@@ -101,7 +107,8 @@ const EditUserModal = forwardRef(function EditUserModal(
             type="text"
             id="username"
             name="username"
-            ref={usernameRef}
+            value={formData.username}
+            onChange={handleChange}
             className="input rounded-md"
           />
         </div>
@@ -113,7 +120,8 @@ const EditUserModal = forwardRef(function EditUserModal(
             type="password"
             id="password"
             name="password"
-            ref={passwordRef}
+            value={formData.password}
+            onChange={handleChange}
             className="input rounded-md"
           />
         </div>
