@@ -13,7 +13,7 @@ interface ImageDisplayProps {
 export default function ImageDisplay({
   onDelete,
   selectedImage,
-  model,
+  model = undefined,
 }: ImageDisplayProps) {
   const imageRef = useRef<HTMLImageElement>(null);
 

@@ -32,11 +32,7 @@ const SPACE_DEFINITION = {
   selectedImage: "",
   standard: "",
   selectedScore: "",
-  rating: {
-    sort: undefined,
-    setInOrder: undefined,
-    shine: undefined,
-  },
+  rating: [],
   assessmentDuration: 0,
   isLoad: false,
   isUpload: false,
@@ -46,7 +42,8 @@ const SPACE_DEFINITION = {
 export default function Space({ data }) {
   const { rooms, spaceImages, ratings, useEntry } = useContext(DataContext);
   const [space, setSpace] = useState(SPACE_DEFINITION);
-  const [model, setModel] = useState(undefined);
+  const [selectedRating, setSelectedRating] = useState(undefined);
+  // const [model, setModel] = useState(undefined);
   const uploadModal = useRef();
   const forSTDRef = useRef();
   const forALLRef = useRef();
@@ -96,10 +93,10 @@ export default function Space({ data }) {
           (a, b) =>
             new Date(b.dateModified).getTime() -
             new Date(a.dateModified).getTime()
-        )[0];
+        );
+        console.log("latestRating >>> ", latestRating);
+        setSelectedRating(latestRating ? latestRating[0] : []);
       }
-
-      console.log("latestRating >>> ", latestRating);
       return {
         ...prev,
         pictures:
@@ -107,12 +104,12 @@ export default function Space({ data }) {
             ? spaceImages?.map((spi) => {
                 return {
                   image: spi,
-                  prediction: undefined,
+                  prediction: JSON.parse(spi.prediction),
                   forType: spi.forType,
                 };
               })
             : prev.pictures,
-        rating: prev.id !== undefined && latestRating,
+        rating: prev.id !== undefined ? latestRating : [],
         isLoad: prev.pictures !== undefined && false,
         isUpload: false,
         isAssess: false,
@@ -193,6 +190,7 @@ export default function Space({ data }) {
       data: {
         spaceId: space.id,
         forType: type,
+        prediction: "",
         file: selectedUploadImages.current,
       },
     };
@@ -314,6 +312,19 @@ export default function Space({ data }) {
             prediction: raw5s.predictions[i],
             forType: prev?.pictures[i].forType,
           });
+          console.log("pic >> ", prev?.pictures[i]);
+          let action = {
+            type: "spaceimages",
+            method: "put",
+            data: {
+              id: prev?.pictures[i].image.id,
+              spaceId: prev?.pictures[i].image.spaceId,
+              image: prev?.pictures[i].image.image,
+              forType: prev?.pictures[i].image.forType,
+              prediction: JSON.stringify(raw5s.predictions[i]),
+            },
+          };
+          useEntry(action);
         }
 
         return {
@@ -342,6 +353,7 @@ export default function Space({ data }) {
           modifiedBy: [loginData.id, ...foundRoom.modifiedBy],
         },
       };
+
       useEntry(newAction);
     } else {
       // if calibrating
@@ -388,6 +400,15 @@ export default function Space({ data }) {
   const handleCameraClick = () => {
     cameraInputRef.current.click();
   };
+
+  function handleResultSelect(selectedDate) {
+    setSelectedRating(() => {
+      const foundRating = space?.rating.find(
+        (r) => r.dateModified === selectedDate
+      );
+      return foundRating;
+    });
+  }
 
   return (
     <>
@@ -485,28 +506,11 @@ export default function Space({ data }) {
         <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
           <div className="flex flex-col justify-between w-2/3">
             <ImageDisplay
-              model={model}
+              // model={model}
               onDelete={() => showModal("delete")}
               selectedImage={space.selectedImage}
             />
             <div className="flex justify-between">
-              <Select
-                onValueChange={(selected) => {
-                  setModel(selected);
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by Model" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="model1">Model 1</SelectItem>
-                  <SelectItem value="model2">Model 2</SelectItem>
-                  <SelectItem value="model3">Model 3</SelectItem>
-                  <SelectItem value="model4">Model 4</SelectItem>
-                  <SelectItem value="model5">Model 5</SelectItem>
-                </SelectContent>
-              </Select>
               <menu className="flex gap-4 justify-end">
                 {JSON.parse(localStorage.getItem("isLoggedIn")).role !==
                   "admin" && (
@@ -567,12 +571,46 @@ export default function Space({ data }) {
                 </p>
               </div>
             )}
-            <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
+            <div className="relative flex bg-white w-full gap-8 shadow-sm p-8 pt-20  rounded-lg">
+              <div className="flex  w-full absolute top-5  ">
+                <Select
+                  onValueChange={(selectedDate) =>
+                    handleResultSelect(selectedDate)
+                  }
+                  disabled={space.isLoad || space.isAssess}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Most Recent" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {space?.rating?.map((r) => {
+                      const date = new Date(r.dateModified);
+                      const formattedDate = date.toLocaleDateString("en-US", {
+                        day: "numeric",
+                        month: "short",
+                        hour: "numeric",
+                        minute: "numeric",
+                        hour12: true,
+                      });
+                      return (
+                        <SelectItem
+                          key={r.id}
+                          value={r.dateModified}
+                          className="hover:cursor-pointer"
+                        >
+                          {formattedDate}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="flex flex-col gap-4 justify-center">
                 <ScoreCard
                   isLoad={space.isAssess}
                   score={
-                    space.isLoad || space.isAssess ? 0 : space.rating?.sort
+                    space.isLoad || space.isAssess ? 0 : selectedRating?.sort
                   }
                   onClick={() => {
                     if (space.selectedScore !== "sort")
@@ -585,7 +623,7 @@ export default function Space({ data }) {
                   score={
                     space.isLoad || space.isAssess
                       ? 0
-                      : space.rating?.setInOrder
+                      : selectedRating?.setInOrder
                   }
                   onClick={() => {
                     if (space.selectedScore !== "set in order")
@@ -596,7 +634,7 @@ export default function Space({ data }) {
                   isLoad={space.isAssess}
                   type="shine"
                   score={
-                    space.isLoad || space.isAssess ? 0 : space.rating?.shine
+                    space.isLoad || space.isAssess ? 0 : selectedRating?.shine
                   }
                   onClick={() => {
                     if (space.selectedScore !== "shine")
@@ -607,7 +645,7 @@ export default function Space({ data }) {
               <Comment
                 isLoad={space.isAssess || space.isLoad}
                 selected={space.selectedScore}
-                ratingId={space.rating?.id}
+                ratingId={selectedRating?.id}
               />
             </div>
           </>

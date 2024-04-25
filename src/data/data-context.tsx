@@ -249,6 +249,15 @@ export default function DataContextProvider({ children }) {
       };
     });
   }
+
+  async function updateSpaceImages(data) {
+    return axios
+      .put(`${endpoint}/api/spaceimage/${data.id}`, data)
+      .then(() =>
+        console.log(`SpaceImage with ID ${data.id} updated successfully`)
+      )
+      .catch((error) => console.error("Error updating space:", error));
+  }
   /*
   ------------------------
   function handleUseEntry
@@ -270,9 +279,21 @@ export default function DataContextProvider({ children }) {
         const newData = {
           spaceId: action.data.spaceId,
           forType: action.data.forType,
+          prediction: action.data.prediction,
           image,
         };
         await addSpaceImage(newData, action.data.spaceId);
+        await getSpaceImagesBySpaceId(action.data.spaceId);
+      }
+      if (action.method === "put") {
+        const newData = {
+          id: action.data.id,
+          spaceId: action.data.spaceId,
+          forType: action.data.forType,
+          prediction: action.data.prediction,
+          image: action.data.image,
+        };
+        await updateSpaceImages(newData);
         await getSpaceImagesBySpaceId(action.data.spaceId);
       }
       if (action.method === "delete") {
