@@ -58,27 +58,28 @@ export function BarChartCustom({ filteredRatings }) {
 
       // Calculate monthly averages for the selected year
       filteredRatings.forEach((space) => {
-        space.ratings.forEach((rating) => {
-          const date = new Date(rating.dateModified);
-          if (date.getFullYear() === selectedYear) {
-            const month = `${date.toLocaleDateString("en-US", {
-              month: "short",
-            })} ${date.getFullYear()}`;
-            if (!monthlyAverages[month]) {
-              monthlyAverages[month] = {
-                date: month,
-                Sort: 0,
-                "Set In Order": 0,
-                Shine: 0,
-                count: 0,
-              };
-            }
-            monthlyAverages[month].Sort += rating.sort;
-            monthlyAverages[month]["Set In Order"] += rating.setInOrder;
-            monthlyAverages[month].Shine += rating.shine;
-            monthlyAverages[month].count++;
+        // space.ratings.forEach((rating) => {
+        const rating = space.ratings[0];
+        const date = new Date(rating.dateModified);
+        if (date.getFullYear() === selectedYear) {
+          const month = `${date.toLocaleDateString("en-US", {
+            month: "short",
+          })} ${date.getFullYear()}`;
+          if (!monthlyAverages[month]) {
+            monthlyAverages[month] = {
+              date: month,
+              Sort: 0,
+              "Set In Order": 0,
+              Shine: 0,
+              count: 0,
+            };
           }
-        });
+          monthlyAverages[month].Sort += rating.sort;
+          monthlyAverages[month]["Set In Order"] += rating.setInOrder;
+          monthlyAverages[month].Shine += rating.shine;
+          monthlyAverages[month].count++;
+        }
+        // });
       });
 
       // Calculate average scores
