@@ -3,13 +3,14 @@ import { useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Overview from "../components/Overview";
 import Space from "../components/Space";
+import SpacesTable from "../components/SpacesTable";
 import RedTag from "../components/RegTag";
 import NoSpace from "../components/NoSpace";
 
 import { DataContext } from "@/data/data-context";
 
 export default function Spaces() {
-  const { rooms, spaces, buildings } = useContext(DataContext);
+  const { rooms, spaces, ratings, buildings } = useContext(DataContext);
   const param = useParams();
   const [content, setContent] = useState({
     selectedTab:
@@ -27,13 +28,28 @@ export default function Spaces() {
     setContent((prev) => {
       const roomsCopy = [...rooms];
       const room = roomsCopy.find((r) => r.id === param.id);
-      const spacesCopy = spaces?.filter((space) => space.roomId === param.id);
+      // const spacesCopy = spaces?.filter((space) => space.roomId === param.id);
+      const spacesByRoomId = [
+        ...spaces.filter((space) => space.roomId === param.id),
+      ];
+      let spaceRatings = [];
+      for (const space of spacesByRoomId) {
+        let ratingsBySpaceId = [
+          ...ratings.filter((rating) => rating.spaceId === space.id),
+        ];
+        const latestRating = ratingsBySpaceId.sort(
+          (a, b) =>
+            new Date(b.dateModified).getTime() -
+            new Date(a.dateModified).getTime()
+        );
+        spaceRatings.push({ space, rating: latestRating });
+      }
       return {
         ...prev,
-        selectedSpaceId: spacesCopy[0],
+        selectedSpaceId: spacesByRoomId[0],
         data: {
           room,
-          spaces: spacesCopy,
+          spaces: spaceRatings,
         },
       };
     });
@@ -53,7 +69,7 @@ export default function Spaces() {
     if (content.selectedSpaceId === undefined) {
       display = <NoSpace />;
     } else {
-      display = <Space data={content.data.spaces} />;
+      display = <SpacesTable data={content.data.spaces} />;
     }
   } else if (content.selectedTab === "redtags") {
     display = <RedTag />;
