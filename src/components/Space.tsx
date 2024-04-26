@@ -37,6 +37,7 @@ const SPACE_DEFINITION = {
   isLoad: false,
   isUpload: false,
   isAssess: false,
+  selectedRating: undefined,
 };
 
 export default function Space({ data }) {
@@ -51,7 +52,7 @@ export default function Space({ data }) {
   const timer = useRef<NodeJS.Timeout | undefined>();
   const duration = useRef();
   const [space, setSpace] = useState(SPACE_DEFINITION);
-  const [selectedRating, setSelectedRating] = useState(undefined);
+  // const [selectedRating, setSelectedRating] = useState(undefined);
 
   console.log(data);
 
@@ -117,14 +118,15 @@ export default function Space({ data }) {
       //       new Date(b.dateModified).getTime() -
       //       new Date(a.dateModified).getTime()
       //   );
-      setSelectedRating(data?.rating ? data?.rating[0] : []);
+      // setSelectedRating(data?.rating ? data?.rating[0] : []);
       // }
       console.log(data?.rating);
       return {
         ...prev,
-        pictures: data?.space.pictures,
+        pictures: data?.space.pictures ?? [],
         rating: data?.rating,
         isLoad: prev.pictures !== undefined && false,
+        selectedRating: data?.rating[0],
         isUpload: false,
         isAssess: false,
         selectedImage: "",
@@ -132,7 +134,7 @@ export default function Space({ data }) {
         assessmentDuration: prevTimer ? duration.current : 0,
       };
     });
-  }, [spaceImages, ratings]);
+  }, [data]);
 
   const handleImageSelect = useCallback((image) => {
     setSpace((prev) => ({
@@ -367,17 +369,17 @@ export default function Space({ data }) {
     cameraInputRef.current.click();
   }, []);
 
-  const handleResultSelect = useCallback(
-    (selectedDate) => {
-      setSelectedRating(() => {
-        const foundRating = space?.rating.find(
-          (r) => r.dateModified === selectedDate
-        );
-        return foundRating;
-      });
-    },
-    [space?.rating]
-  );
+  function handleResultSelect(selectedDate) {
+    setSpace((prev) => {
+      const foundRating = space?.rating.find(
+        (r) => r.dateModified === selectedDate
+      );
+      return {
+        ...prev,
+        selectedRating: foundRating,
+      };
+    });
+  }
 
   const renderImageUploadModal = space.id && (
     <Modal
@@ -469,7 +471,9 @@ export default function Space({ data }) {
       <div className="flex flex-col gap-4 justify-center">
         <ScoreCard
           isLoad={space.isAssess}
-          score={space.isLoad || space.isAssess ? 0 : selectedRating?.sort}
+          score={
+            space.isLoad || space.isAssess ? 0 : space.selectedRating?.sort
+          }
           onClick={() => {
             if (space.selectedScore !== "sort") handleScoreClick("sort");
           }}
@@ -478,7 +482,9 @@ export default function Space({ data }) {
           isLoad={space.isAssess}
           type="set"
           score={
-            space.isLoad || space.isAssess ? 0 : selectedRating?.setInOrder
+            space.isLoad || space.isAssess
+              ? 0
+              : space.selectedRating?.setInOrder
           }
           onClick={() => {
             if (space.selectedScore !== "set in order")
@@ -488,7 +494,9 @@ export default function Space({ data }) {
         <ScoreCard
           isLoad={space.isAssess}
           type="shine"
-          score={space.isLoad || space.isAssess ? 0 : selectedRating?.shine}
+          score={
+            space.isLoad || space.isAssess ? 0 : space.selectedRating?.shine
+          }
           onClick={() => {
             if (space.selectedScore !== "shine") handleScoreClick("shine");
           }}
@@ -497,7 +505,7 @@ export default function Space({ data }) {
       <Comment
         isLoad={space.isAssess || space.isLoad}
         selected={space.selectedScore}
-        ratingId={selectedRating?.id}
+        ratingId={space.selectedRating?.id}
       />
     </div>
   );
