@@ -367,19 +367,19 @@ export default function DataContextProvider({ children }) {
         try {
           // Call the addNewUser function to add the new user to the backend
           await addNewUser(action.data);
-      
+
           // Fetch the updated list of users from the backend
           const updatedUsers = (await axios.get(`${endpoint}/api/user`)).data;
-      
+
           // Update the state with the new list of users
           setData((prevData) => ({
             ...prevData,
-            users: updatedUsers.map(user => ({
+            users: updatedUsers.map((user) => ({
               ...user,
-              Name: `${user.firstName} ${user.lastName}`
+              Name: `${user.firstName} ${user.lastName}`,
             })),
           }));
-      
+
           console.log("Newly added users:", updatedUsers);
         } catch (error) {
           console.error("Error adding new user:", error);
@@ -478,7 +478,9 @@ export default function DataContextProvider({ children }) {
               (building) => building.buildingName !== buildingName
             ),
           }));
-          console.log(`Building with Name ${buildingName} deleted successfully`);
+          console.log(
+            `Building with Name ${buildingName} deleted successfully`
+          );
         } catch (error) {
           console.error("Error deleting Building:", error);
         }

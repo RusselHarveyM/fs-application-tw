@@ -9,6 +9,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import Space from "./Space";
+import { useState, useContext } from "react";
+import { DataContext } from "@/data/data-context";
+
 const invoices = [
   {
     spaceName: "INV001",
@@ -83,17 +87,39 @@ const invoices = [
 
 export default function SpacesTable({ data }) {
   console.log(data);
+  const [spaceData, setSpaceData] = useState(undefined);
+  const { useEntry } = useContext(DataContext);
+
+  function handleClickSpace(data) {
+    if (data.space.id !== spaceData?.space.id) {
+      let action = {
+        type: "spaceimages",
+        method: "get",
+        data: {
+          id: data.space.id,
+        },
+      };
+      useEntry(action);
+      console.log("data >> ", data);
+      setSpaceData(() => data);
+    }
+  }
 
   return (
-    <div className="w-[90rem] mx-auto bg-white rounded-lg mt-10 flex items-center justify-center p-6">
+    <div className="w-[90rem] mx-auto bg-white rounded-lg mt-10 flex flex-col items-center justify-center p-6">
       <Table>
         <TableCaption>A list of your recent spaces.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[150px]">Name</TableHead>
-            <TableHead className="text-center">Sort</TableHead>
-            <TableHead className="text-center">Set In Order</TableHead>
-            <TableHead className="text-center">Shine</TableHead>
+            {JSON.parse(localStorage.getItem("isLoggedIn")).role ===
+              "admin" && (
+              <>
+                <TableHead className="text-center">Sort</TableHead>
+                <TableHead className="text-center">Set In Order</TableHead>
+                <TableHead className="text-center">Shine</TableHead>
+              </>
+            )}
             <TableHead className="text-center">Status</TableHead>
             <TableHead className="text-right">Last Checked</TableHead>
             <TableHead className="text-right">Last Assessed</TableHead>
@@ -111,17 +137,27 @@ export default function SpacesTable({ data }) {
             }
 
             return (
-              <TableRow key={data.space.id} className="hover:cursor-pointer">
+              <TableRow
+                key={data.space.id}
+                onClick={() => handleClickSpace(data)}
+                className="hover:cursor-pointer"
+              >
                 <TableCell className="font-medium">{data.space.name}</TableCell>
-                <TableCell className="text-center">
-                  {data.rating[0].sort}
-                </TableCell>
-                <TableCell className="text-center ">
-                  {data.rating[0].setInOrder}
-                </TableCell>
-                <TableCell className="text-center">
-                  {data.rating[0].shine}
-                </TableCell>
+                {JSON.parse(localStorage.getItem("isLoggedIn")).role ===
+                  "admin" && (
+                  <>
+                    <TableCell className="text-center">
+                      {data.rating[0] ? data.rating[0]?.sort : 0}
+                    </TableCell>
+                    <TableCell className="text-center ">
+                      {data.rating[0] ? data.rating[0]?.setInOrder : 0}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {data.rating[0] ? data.rating[0]?.shine : 0}
+                    </TableCell>
+                  </>
+                )}
+
                 <TableCell className="text-center flex items-center justify-center">
                   <p className={`${statusCss}`}>{statusCaption}</p>
                 </TableCell>
@@ -142,6 +178,7 @@ export default function SpacesTable({ data }) {
           </TableRow>
         </TableFooter> */}
       </Table>
+      {spaceData && <Space data={spaceData} />}
     </div>
   );
 }

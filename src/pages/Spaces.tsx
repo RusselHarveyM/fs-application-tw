@@ -10,7 +10,8 @@ import NoSpace from "../components/NoSpace";
 import { DataContext } from "@/data/data-context";
 
 export default function Spaces() {
-  const { rooms, spaces, ratings, buildings } = useContext(DataContext);
+  const { rooms, spaces, ratings, buildings, useEntry } =
+    useContext(DataContext);
   const param = useParams();
   const [content, setContent] = useState({
     selectedTab:
@@ -25,6 +26,16 @@ export default function Spaces() {
   });
 
   useEffect(() => {
+    let action = {
+      type: "ratings",
+      method: "get",
+    };
+    useEntry(action);
+    action.type = "comments";
+    useEntry(action);
+  }, []);
+
+  useEffect(() => {
     setContent((prev) => {
       const roomsCopy = [...rooms];
       const room = roomsCopy.find((r) => r.id === param.id);
@@ -33,17 +44,20 @@ export default function Spaces() {
         ...spaces.filter((space) => space.roomId === param.id),
       ];
       let spaceRatings = [];
-      for (const space of spacesByRoomId) {
-        let ratingsBySpaceId = [
-          ...ratings.filter((rating) => rating.spaceId === space.id),
-        ];
-        const latestRating = ratingsBySpaceId.sort(
-          (a, b) =>
-            new Date(b.dateModified).getTime() -
-            new Date(a.dateModified).getTime()
-        );
-        spaceRatings.push({ space, rating: latestRating });
+      if (ratings) {
+        for (const space of spacesByRoomId) {
+          let ratingsBySpaceId = [
+            ...ratings?.filter((rating) => rating.spaceId === space.id),
+          ];
+          const latestRating = ratingsBySpaceId.sort(
+            (a, b) =>
+              new Date(b.dateModified).getTime() -
+              new Date(a.dateModified).getTime()
+          );
+          spaceRatings.push({ space, rating: latestRating });
+        }
       }
+
       return {
         ...prev,
         selectedSpaceId: spacesByRoomId[0],
@@ -53,7 +67,7 @@ export default function Spaces() {
         },
       };
     });
-  }, [param.id, spaces]);
+  }, [param.id, spaces, ratings]);
 
   function handleSelectTab(selected) {
     setContent((prev) => {
@@ -64,7 +78,7 @@ export default function Spaces() {
     });
   }
 
-  let display = <Overview />;
+  let display = <Overview data={content.data} />;
   if (content.selectedTab === "spaces") {
     if (content.selectedSpaceId === undefined) {
       display = <NoSpace />;
