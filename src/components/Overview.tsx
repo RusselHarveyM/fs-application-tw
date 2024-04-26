@@ -6,7 +6,7 @@ import { BarChartCustom } from "./BarChart";
 import UserItem from "./UserItem";
 
 export default function Overview({ data }) {
-  const { users, rooms, spaces, ratings, useEntry } = useContext(DataContext);
+  const { users } = useContext(DataContext);
   const [scores, setScores] = useState({
     average: 0,
     sort: 0,
@@ -38,7 +38,7 @@ export default function Overview({ data }) {
       });
     }
     console.log("usersList overview >> ", usersList);
-  }, [params.id, data]);
+  }, [data]);
 
   useEffect(() => {
     if (data) {
@@ -94,7 +94,7 @@ export default function Overview({ data }) {
         // setFilteredRatings(() => spaceRatings);
       }
     }
-  }, [params.id, data]);
+  }, [data]);
 
   return (
     <div className="flex flex-col p-6 w-[97rem] mx-auto gap-4">

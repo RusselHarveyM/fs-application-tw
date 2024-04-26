@@ -24,6 +24,7 @@ export default function Spaces() {
       spaces: [],
     },
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     let action = {
@@ -38,7 +39,10 @@ export default function Spaces() {
   }, []);
 
   useEffect(() => {
-    if (rooms && ratings && spaceImages) {
+    if (!isLoading) {
+      setIsLoading(true);
+    }
+    if (ratings && spaceImages) {
       setContent((prev) => {
         // const roomsCopy = [...rooms];
         console.log("rooms >>> ", rooms);
@@ -70,7 +74,7 @@ export default function Spaces() {
             // spaceRatings.push({ space, rating: latestRating });
           }
         }
-
+        setIsLoading(false);
         return {
           ...prev,
           selectedSpaceId: spacesByRoomId[0],
@@ -81,7 +85,7 @@ export default function Spaces() {
         };
       });
     }
-  }, [param.id, spaces, ratings, rooms, spaceImages]);
+  }, [spaces, ratings, rooms, spaceImages]);
 
   function handleSelectTab(selected) {
     setContent((prev) => {
@@ -114,6 +118,7 @@ export default function Spaces() {
               )
             : []
         }
+        isLoad={isLoading}
         onSelectTab={handleSelectTab}
         selectedTab={content.selectedTab}
       />
