@@ -2,7 +2,6 @@ import { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Overview from "../components/Overview";
-import Space from "../components/Space";
 import SpacesTable from "../components/SpacesTable";
 import RedTag from "../components/RegTag";
 import NoSpace from "../components/NoSpace";
@@ -44,12 +43,9 @@ export default function Spaces() {
     }
     if (ratings && spaceImages) {
       setContent((prev) => {
-        // const roomsCopy = [...rooms];
         console.log("rooms >>> ", rooms);
         const room = rooms.find((r) => r.id === param.id);
         console.log("room >>> ", room);
-
-        // const spacesCopy = spaces?.filter((space) => space.roomId === param.id);
         const spacesByRoomId = [
           ...spaces.filter((space) => space.roomId === param.id),
         ];
@@ -71,7 +67,6 @@ export default function Spaces() {
               space: { ...space, pictures: picturesFound },
               rating: latestRating,
             });
-            // spaceRatings.push({ space, rating: latestRating });
           }
         }
         setIsLoading(false);
@@ -122,7 +117,14 @@ export default function Spaces() {
         onSelectTab={handleSelectTab}
         selectedTab={content.selectedTab}
       />
-      <div className="w-full overflow-y-auto h-screen">{display}</div>
+      <div className="w-full overflow-y-auto h-screen">
+        {isLoading && (
+          <div className=" w-32 h-fit text-center m-auto pt-2 mt-12">
+            <p className="text-neutral-600 animate-bounce">Please wait...</p>
+          </div>
+        )}
+        {display}
+      </div>
     </div>
   );
 }

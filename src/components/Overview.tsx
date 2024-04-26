@@ -1,6 +1,5 @@
 import { DataContext } from "@/data/data-context";
 import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import Card from "./Card";
 import { BarChartCustom } from "./BarChart";
 import UserItem from "./UserItem";
@@ -14,13 +13,10 @@ export default function Overview({ data }) {
     shine: 0,
     count: 0,
   });
-  // const [filteredRatings, setFilteredRatings] = useState([]);
   const [recentUsers, setRecentUsers] = useState({
     totalLength: 0,
     users: [],
   });
-
-  const params = useParams();
 
   useEffect(() => {
     let usersList = [];
@@ -42,22 +38,9 @@ export default function Overview({ data }) {
 
   useEffect(() => {
     if (data) {
-      // let spaceRatings = [];
       let avgScore = { sort: 0, set: 0, shine: 0, count: 0 };
 
       for (const space of data.spaces) {
-        // let ratingsBySpaceId = [
-        //   ...ratings.filter((rating) => rating.spaceId === space.id),
-        // ];
-        // const latestRating = ratingsBySpaceId.sort(
-        //   (a, b) =>
-        //     new Date(b.dateModified).getTime() -
-        //     new Date(a.dateModified).getTime()
-        // );
-        // const spaceRating = {
-        //   space,
-        //   ratings: latestRating,
-        // };
         const rating = space.rating[0];
         console.log(space);
         if (rating) {
@@ -66,10 +49,7 @@ export default function Overview({ data }) {
           avgScore.shine += rating?.shine;
           avgScore.count++;
         }
-
-        // spaceRatings.push(spaceRating);
       }
-      // console.log(spaceRatings);
 
       const total = avgScore.sort + avgScore.set + avgScore.shine;
       if (total > 0) {
@@ -91,7 +71,6 @@ export default function Overview({ data }) {
             shine: shine.toFixed(1),
           };
         });
-        // setFilteredRatings(() => spaceRatings);
       }
     }
   }, [data]);

@@ -390,7 +390,7 @@ export default function Space({ data }) {
           <Input
             id="picture"
             type="file"
-            accept="image/png, image/jpeg"
+            accept="image/*"
             onChange={handleImageUpload}
             ref={cameraInputRef}
             capture="environment"
