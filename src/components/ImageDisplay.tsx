@@ -19,7 +19,7 @@ export default function ImageDisplay({
 
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
 
-  const prediction = selectedImage?.prediction;
+  const prediction = selectedImage && JSON.parse(selectedImage?.prediction);
 
   const handleImageLoad = (event) => {
     setImageSize({

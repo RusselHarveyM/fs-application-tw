@@ -10,7 +10,7 @@ import NoSpace from "../components/NoSpace";
 import { DataContext } from "@/data/data-context";
 
 export default function Spaces() {
-  const { rooms, spaces, ratings, buildings, useEntry } =
+  const { rooms, spaces, spaceImages, ratings, buildings, useEntry } =
     useContext(DataContext);
   const param = useParams();
   const [content, setContent] = useState({
@@ -33,41 +33,55 @@ export default function Spaces() {
     useEntry(action);
     action.type = "comments";
     useEntry(action);
+    action.type = "spaceimages";
+    useEntry(action);
   }, []);
 
   useEffect(() => {
-    setContent((prev) => {
-      const roomsCopy = [...rooms];
-      const room = roomsCopy.find((r) => r.id === param.id);
-      // const spacesCopy = spaces?.filter((space) => space.roomId === param.id);
-      const spacesByRoomId = [
-        ...spaces.filter((space) => space.roomId === param.id),
-      ];
-      let spaceRatings = [];
-      if (ratings) {
-        for (const space of spacesByRoomId) {
-          let ratingsBySpaceId = [
-            ...ratings?.filter((rating) => rating.spaceId === space.id),
-          ];
-          const latestRating = ratingsBySpaceId.sort(
-            (a, b) =>
-              new Date(b.dateModified).getTime() -
-              new Date(a.dateModified).getTime()
-          );
-          spaceRatings.push({ space, rating: latestRating });
-        }
-      }
+    if (rooms && ratings && spaceImages) {
+      setContent((prev) => {
+        // const roomsCopy = [...rooms];
+        console.log("rooms >>> ", rooms);
+        const room = rooms.find((r) => r.id === param.id);
+        console.log("room >>> ", room);
 
-      return {
-        ...prev,
-        selectedSpaceId: spacesByRoomId[0],
-        data: {
-          room,
-          spaces: spaceRatings,
-        },
-      };
-    });
-  }, [param.id, spaces, ratings]);
+        // const spacesCopy = spaces?.filter((space) => space.roomId === param.id);
+        const spacesByRoomId = [
+          ...spaces.filter((space) => space.roomId === param.id),
+        ];
+        let spaceRatings = [];
+        if (ratings) {
+          for (const space of spacesByRoomId) {
+            let ratingsBySpaceId = [
+              ...ratings?.filter((rating) => rating.spaceId === space.id),
+            ];
+            let picturesFound = [
+              ...spaceImages?.filter((spi) => spi.spaceId === space.id),
+            ];
+            const latestRating = ratingsBySpaceId.sort(
+              (a, b) =>
+                new Date(b.dateModified).getTime() -
+                new Date(a.dateModified).getTime()
+            );
+            spaceRatings.push({
+              space: { ...space, pictures: picturesFound },
+              rating: latestRating,
+            });
+            // spaceRatings.push({ space, rating: latestRating });
+          }
+        }
+
+        return {
+          ...prev,
+          selectedSpaceId: spacesByRoomId[0],
+          data: {
+            room,
+            spaces: spaceRatings,
+          },
+        };
+      });
+    }
+  }, [param.id, spaces, ratings, rooms, spaceImages]);
 
   function handleSelectTab(selected) {
     setContent((prev) => {

@@ -72,6 +72,27 @@ export default function DataContextProvider({ children }) {
     // }
   }
 
+  async function getSpaceImages() {
+    try {
+      const spaceImages = (
+        await axios.get(`${endpoint}/api/spaceImage/get/spaces`)
+      ).data;
+      setData((prev) => {
+        return {
+          ...prev,
+          spaceImages,
+        };
+      });
+    } catch (error) {
+      setData((prev) => {
+        return {
+          ...prev,
+          spaceImages: [],
+        };
+      });
+    }
+  }
+
   async function getSpaceImagesBySpaceId(id) {
     try {
       const spaceImages = (
@@ -264,8 +285,12 @@ export default function DataContextProvider({ children }) {
     //..
     if (action.type === "spaceimages") {
       if (action.method === "get") {
-        await getSpaceImagesBySpaceId(action.data.id);
+        // await getSpaceImagesBySpaceId(action.data.id);
+        await getSpaceImages();
       }
+      // if (action.method === "getAll") {
+      //   await getSpaceImages();
+      // }
       if (action.method === "post") {
         const image = action.data.file;
         const newData = {

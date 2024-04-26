@@ -2,12 +2,13 @@ import axios from "axios";
 import { c_evaluation } from "./checklist";
 
 const API_KEY = "7kfXkOSEwHiflj4IHiHI";
+// const API_KEY = "FGmG3dRIEifT1HLzdCRS";
 
 async function countModel(image) {
   let response;
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-count-det/10",
+    url: "https://detect.roboflow.com/classroom-count-det/13",
     params: {
       api_key: API_KEY,
     },
@@ -30,7 +31,7 @@ async function orderModel(image) {
   let result;
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-order-seg/11",
+    url: "https://detect.roboflow.com/classroom-order-seg/12",
     params: {
       api_key: API_KEY,
     },

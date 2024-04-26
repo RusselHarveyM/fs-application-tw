@@ -38,7 +38,7 @@ export default function Overview({ data }) {
       });
     }
     console.log("usersList overview >> ", usersList);
-  }, [params.id, rooms]);
+  }, [params.id, data]);
 
   useEffect(() => {
     if (data) {

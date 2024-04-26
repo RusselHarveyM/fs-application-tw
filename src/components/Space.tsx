@@ -53,6 +53,8 @@ export default function Space({ data }) {
   const [space, setSpace] = useState(SPACE_DEFINITION);
   const [selectedRating, setSelectedRating] = useState(undefined);
 
+  console.log(data);
+
   useEffect(() => {
     if (data) {
       setSpace((prev) => ({
@@ -105,29 +107,23 @@ export default function Space({ data }) {
       });
     }
     setSpace((prev) => {
-      let latestRating = [];
-      if (space.id !== undefined) {
-        const matchedRatings = ratings?.filter(
-          (rating) => rating.spaceId === space.id
-        );
-        latestRating = matchedRatings?.sort(
-          (a, b) =>
-            new Date(b.dateModified).getTime() -
-            new Date(a.dateModified).getTime()
-        );
-        setSelectedRating(latestRating ? latestRating[0] : []);
-      }
+      // let latestRating = [];
+      // if (space.id !== undefined) {
+      //   const matchedRatings = ratings?.filter(
+      //     (rating) => rating.spaceId === space.id
+      //   );
+      //   latestRating = matchedRatings?.sort(
+      //     (a, b) =>
+      //       new Date(b.dateModified).getTime() -
+      //       new Date(a.dateModified).getTime()
+      //   );
+      setSelectedRating(data?.rating ? data?.rating[0] : []);
+      // }
+      console.log(data?.rating);
       return {
         ...prev,
-        pictures:
-          prev.id !== undefined && !prev.isAssess
-            ? spaceImages?.map((spi) => ({
-                image: spi,
-                prediction: JSON.parse(spi.prediction),
-                forType: spi.forType,
-              }))
-            : prev.pictures,
-        rating: prev.id !== undefined ? latestRating : [],
+        pictures: data?.space.pictures,
+        rating: data?.rating,
         isLoad: prev.pictures !== undefined && false,
         isUpload: false,
         isAssess: false,
@@ -230,8 +226,8 @@ export default function Space({ data }) {
 
   const handleAssessBtn = useCallback(async () => {
     const images = space.pictures.map((imageObject) => ({
-      image: "data:image/png;base64," + imageObject.image.image,
-      forType: imageObject.image.forType,
+      image: "data:image/png;base64," + imageObject.image,
+      forType: imageObject.forType,
     }));
     setSpace((prev) => ({
       ...prev,
@@ -295,10 +291,10 @@ export default function Space({ data }) {
             type: "spaceimages",
             method: "put",
             data: {
-              id: prev?.pictures[i].image.id,
-              spaceId: prev?.pictures[i].image.spaceId,
-              image: prev?.pictures[i].image.image,
-              forType: prev?.pictures[i].image.forType,
+              id: prev?.pictures[i].id,
+              spaceId: prev?.pictures[i].spaceId,
+              image: prev?.pictures[i].image,
+              forType: prev?.pictures[i].forType,
               prediction: JSON.stringify(raw5s.predictions[i]),
             },
           };
@@ -331,16 +327,20 @@ export default function Space({ data }) {
       useEntry(newAction);
     } else {
       const roomId = params.id;
-      const currentSpace = data.find((curr) => curr.name === space.name);
+      // const currentSpace = data.find((curr) => curr.name === space.name);
+      console.log(data);
+      console.log(space);
       let action = {
         type: "spaces",
         method: "put",
         data: {
-          id: currentSpace.id,
-          name: currentSpace.name,
+          id: data.space.id,
+          name: data.space.name,
           roomId: roomId,
-          pictures: currentSpace.pictures,
+          pictures: space.pictures,
           standard: raw5s.standard,
+          assessedDate: null,
+          viewedDate: null,
         },
       };
       useEntry(action);
@@ -504,96 +504,106 @@ export default function Space({ data }) {
 
   return (
     <>
-      {space.isLoad && (
-        <div className=" w-32 h-fit text-center m-auto pt-2 mt-2">
+      {space.pictures === undefined ? (
+        <div className=" w-32 h-fit text-center m-auto pt-2 mt-16">
           <p className="text-neutral-600 animate-bounce">Please wait...</p>
         </div>
-      )}
-      {renderImageUploadModal}
-      {renderImageDeleteModal}
-      <div className="flex flex-col gap-4 p-6 w-[90rem] mx-auto">
-        <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
-          <div className="flex justify-between">
-            <div className="flex items-center gap-4 text-neutral-600 text-2xl">
-              <h2 className="uppercase">{space.name ? space.name : "Space"}</h2>
-              {space.name ? (
-                <p
-                  className={`text-xs ${
-                    space.standard !== "" ? "bg-green-400" : "bg-neutral-400"
-                  } py-2 px-4 rounded-2xl text-white font-semibold opacity-60`}
-                >
-                  {space.standard !== "" ? "Calibrated" : "Not Calibrated"}
+      ) : (
+        <>
+          {renderImageUploadModal}
+          {renderImageDeleteModal}
+
+          <div className="flex flex-col gap-4 p-6 w-[90rem] mx-auto">
+            <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
+              <div className="flex justify-between">
+                <div className="flex items-center gap-4 text-neutral-600 text-2xl">
+                  <h2 className="uppercase">
+                    {space.name ? space.name : "Space"}
+                  </h2>
+                  {space.name ? (
+                    <p
+                      className={`text-xs ${
+                        space.standard !== ""
+                          ? "bg-green-400"
+                          : "bg-neutral-400"
+                      } py-2 px-4 rounded-2xl text-white font-semibold opacity-60`}
+                    >
+                      {space.standard !== "" ? "Calibrated" : "Not Calibrated"}
+                    </p>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
+              <div className="flex flex-col justify-between w-2/3">
+                <ImageDisplay
+                  onDelete={() => showModal("delete")}
+                  selectedImage={space.selectedImage}
+                />
+                <div className="flex justify-between">
+                  <menu className="flex gap-4 justify-end">
+                    {JSON.parse(localStorage.getItem("isLoggedIn")).role !==
+                      "admin" && (
+                      <>
+                        <Button
+                          variant="blue"
+                          onClick={() => showModal("upload")}
+                          disabled={
+                            space.id === undefined ||
+                            space.isUpload ||
+                            space.isAssess ||
+                            space.isLoad
+                              ? true
+                              : false
+                          }
+                        >
+                          Upload
+                        </Button>
+                        <Button
+                          variant="blue"
+                          onClick={handleAssessBtn}
+                          disabled={
+                            space.id === undefined ||
+                            space.pictures === undefined ||
+                            space.pictures?.length === 0 ||
+                            space.isUpload ||
+                            space.isAssess ||
+                            space.isLoad
+                              ? true
+                              : false
+                          }
+                        >
+                          {space?.standard === "" ? "Calibrate" : "Assess"}
+                        </Button>
+                      </>
+                    )}
+                  </menu>
+                </div>
+              </div>
+              <ImageGallery
+                isLoad={
+                  space.isUpload ||
+                  space.selectedImage === undefined ||
+                  space.isAssess
+                }
+                duration={space.assessmentDuration}
+                images={space.pictures}
+                onSelectImage={handleImageSelect}
+              />
+            </div>
+            {space.isAssess && space && (
+              <div className=" w-32 h-fit text-center m-auto pt-2 mt-2">
+                <p className="text-neutral-600 animate-bounce">
+                  Please wait...
                 </p>
-              ) : (
-                ""
-              )}
-            </div>
+              </div>
+            )}
+            {renderAdminView}
           </div>
-        </div>
-        <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
-          <div className="flex flex-col justify-between w-2/3">
-            <ImageDisplay
-              onDelete={() => showModal("delete")}
-              selectedImage={space.selectedImage}
-            />
-            <div className="flex justify-between">
-              <menu className="flex gap-4 justify-end">
-                {JSON.parse(localStorage.getItem("isLoggedIn")).role !==
-                  "admin" && (
-                  <>
-                    <Button
-                      variant="blue"
-                      onClick={() => showModal("upload")}
-                      disabled={
-                        space.id === undefined ||
-                        space.isUpload ||
-                        space.isAssess ||
-                        space.isLoad
-                          ? true
-                          : false
-                      }
-                    >
-                      Upload
-                    </Button>
-                    <Button
-                      variant="blue"
-                      onClick={handleAssessBtn}
-                      disabled={
-                        space.id === undefined ||
-                        space.pictures === undefined ||
-                        space.pictures?.length === 0 ||
-                        space.isUpload ||
-                        space.isAssess ||
-                        space.isLoad
-                          ? true
-                          : false
-                      }
-                    >
-                      {space?.standard === "" ? "Calibrate" : "Assess"}
-                    </Button>
-                  </>
-                )}
-              </menu>
-            </div>
-          </div>
-          <ImageGallery
-            isLoad={
-              space.isUpload ||
-              space.selectedImage === undefined ||
-              space.isAssess
-            }
-            duration={space.assessmentDuration}
-            images={space.pictures}
-            onSelectImage={handleImageSelect}
-          />
-        </div>
-        {space.isAssess && space && (
-          <div className=" w-32 h-fit text-center m-auto pt-2 mt-2">
-            <p className="text-neutral-600 animate-bounce">Please wait...</p>
-          </div>
-        )}
-        {renderAdminView}
-      </div>
+        </>
+      )}
     </>
   );
 }
