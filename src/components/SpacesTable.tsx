@@ -136,11 +136,35 @@ export default function SpacesTable({ data }) {
               statusCss += " bg-neutral-300 text-white  ";
             }
 
+            const viewedDate = data?.space?.viewedDate
+              ? new Date(data?.space?.viewedDate).toLocaleDateString("en-US", {
+                  day: "numeric",
+                  month: "short",
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true,
+                })
+              : "----";
+
+            const assessedDate = data?.space?.assessedDate
+              ? new Date(data?.space?.assessedDate).toLocaleDateString(
+                  "en-US",
+                  {
+                    day: "numeric",
+                    month: "short",
+                    hour: "numeric",
+                    minute: "numeric",
+                    hour12: true,
+                  }
+                )
+              : "----";
             return (
               <TableRow
                 key={data.space.id}
                 onClick={() => handleClickSpace(data)}
-                className="hover:cursor-pointer"
+                className={`hover:cursor-pointer ${
+                  data.space.id === spaceData.space.id && "bg-neutral-50"
+                }`}
               >
                 <TableCell className="font-medium">{data.space.name}</TableCell>
                 {JSON.parse(localStorage.getItem("isLoggedIn")).role ===
@@ -161,12 +185,8 @@ export default function SpacesTable({ data }) {
                 <TableCell className="text-center flex items-center justify-center">
                   <p className={`${statusCss}`}>{statusCaption}</p>
                 </TableCell>
-                <TableCell className="text-right">
-                  {data.space.viewedDate}
-                </TableCell>
-                <TableCell className="text-right">
-                  {data.space.assessedDate}
-                </TableCell>
+                <TableCell className="text-right">{viewedDate}</TableCell>
+                <TableCell className="text-right">{assessedDate}</TableCell>
               </TableRow>
             );
           })}

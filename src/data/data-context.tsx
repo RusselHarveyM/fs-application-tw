@@ -271,6 +271,15 @@ export default function DataContextProvider({ children }) {
       )
       .catch((error) => console.error("Error updating space:", error));
   }
+
+  async function updateSpaceViewedDate(id) {
+    console.log("viewed date id", id);
+    return (await axios.put(`${endpoint}/api/space/${id}/vieweddate`)).data;
+  }
+
+  async function updateSpaceAssessedDate(id) {
+    return (await axios.put(`${endpoint}/api/space/${id}/assesseddate`)).data;
+  }
   /*
   ------------------------
   function handleUseEntry
@@ -589,6 +598,14 @@ export default function DataContextProvider({ children }) {
         } catch (error) {
           console.error("Error creating space:", error);
         }
+      }
+      if (action.method === "viewed") {
+        await updateSpaceViewedDate(action.data.id);
+        await getSpaces();
+      }
+      if (action.method === "assessed") {
+        await updateSpaceAssessedDate(action.data.id);
+        await getSpaces();
       }
       if (action.method === "put") {
         const updatedSpaceData = action.data;

@@ -41,12 +41,11 @@ const SPACE_DEFINITION = {
 };
 
 export default function Space({ data }) {
-  const { rooms, spaceImages, ratings, useEntry } = useContext(DataContext);
+  const { rooms, useEntry } = useContext(DataContext);
   const { toast } = useToast();
   const params = useParams();
   const uploadModal = useRef();
   const forSTDRef = useRef();
-  const cameraInputRef = useRef(null);
   const selectedUploadImages = useRef();
   const deleteModal = useRef();
   const timer = useRef<NodeJS.Timeout | undefined>();
@@ -54,7 +53,7 @@ export default function Space({ data }) {
   const [space, setSpace] = useState(SPACE_DEFINITION);
   // const [selectedRating, setSelectedRating] = useState(undefined);
 
-  console.log(data);
+  const loggedIn = JSON.parse(localStorage.getItem("isLoggedIn"));
 
   useEffect(() => {
     if (data) {
@@ -108,18 +107,6 @@ export default function Space({ data }) {
       });
     }
     setSpace((prev) => {
-      // let latestRating = [];
-      // if (space.id !== undefined) {
-      //   const matchedRatings = ratings?.filter(
-      //     (rating) => rating.spaceId === space.id
-      //   );
-      //   latestRating = matchedRatings?.sort(
-      //     (a, b) =>
-      //       new Date(b.dateModified).getTime() -
-      //       new Date(a.dateModified).getTime()
-      //   );
-      // setSelectedRating(data?.rating ? data?.rating[0] : []);
-      // }
       console.log(data?.rating);
       return {
         ...prev,
@@ -142,20 +129,6 @@ export default function Space({ data }) {
       selectedImage: image,
     }));
   }, []);
-
-  const handleSpaceSelect = useCallback(
-    (selectedSpace) => {
-      const currentSpace = data.find((space) => space.name === selectedSpace);
-      getSpaceData(currentSpace.id);
-      setSpace((prev) => ({
-        ...prev,
-        ...currentSpace,
-        selectedImage: "",
-        isLoad: true,
-      }));
-    },
-    [data, getSpaceData]
-  );
 
   const handleImageUpload = useCallback((event) => {
     const file = event.target.files[0];
@@ -311,7 +284,6 @@ export default function Space({ data }) {
 
       const roomId = params.id;
       const foundRoom = rooms.find((obj) => obj.id === roomId);
-      const loginData = JSON.parse(localStorage.getItem("isLoggedIn"));
 
       let newAction = {
         type: "rooms",
@@ -322,10 +294,18 @@ export default function Space({ data }) {
           roomNumber: foundRoom.roomNumber,
           image: foundRoom.image,
           status: foundRoom.status,
-          modifiedBy: [loginData.id, ...foundRoom.modifiedBy],
+          modifiedBy: [loggedIn.id, ...foundRoom.modifiedBy],
         },
       };
 
+      useEntry(newAction);
+      newAction = {
+        type: "spaces",
+        method: "assessed",
+        data: {
+          id: data.space.id,
+        },
+      };
       useEntry(newAction);
     } else {
       const roomId = params.id;
@@ -365,10 +345,6 @@ export default function Space({ data }) {
     forSTDRef.current.checked = false;
   }, []);
 
-  const handleCameraClick = useCallback(() => {
-    cameraInputRef.current.click();
-  }, []);
-
   function handleResultSelect(selectedDate) {
     setSpace((prev) => {
       const foundRating = space?.rating.find(
@@ -379,6 +355,17 @@ export default function Space({ data }) {
         selectedRating: foundRating,
       };
     });
+  }
+
+  function handleSpaceCheck() {
+    let action = {
+      type: "spaces",
+      method: "viewed",
+      data: {
+        id: data.space.id,
+      },
+    };
+    useEntry(action);
   }
 
   const renderImageUploadModal = space.id && (
@@ -392,7 +379,6 @@ export default function Space({ data }) {
             type="file"
             accept="image/*"
             onChange={handleImageUpload}
-            ref={cameraInputRef}
             capture="environment"
           />
           <fieldset className="flex width-full justify-around">
@@ -433,8 +419,7 @@ export default function Space({ data }) {
     </Modal>
   );
 
-  const renderAdminView = JSON.parse(localStorage.getItem("isLoggedIn"))
-    .role === "admin" && (
+  const renderAdminView = loggedIn.role === "admin" && (
     <div className="relative flex bg-white w-full gap-8 shadow-sm p-8 pt-20  rounded-lg">
       <div className="flex  w-full absolute top-5  ">
         <Select
@@ -520,7 +505,11 @@ export default function Space({ data }) {
         <>
           {renderImageUploadModal}
           {renderImageDeleteModal}
-
+          {space.isAssess && space && (
+            <div className=" w-32 h-fit text-center m-auto pt-2 mt-6">
+              <p className="text-neutral-600 animate-bounce">Please wait...</p>
+            </div>
+          )}
           <div className="flex flex-col gap-4 p-6 w-[90rem] mx-auto">
             <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
               <div className="flex justify-between">
@@ -542,8 +531,14 @@ export default function Space({ data }) {
                     ""
                   )}
                 </div>
+                {loggedIn.role === "admin" && (
+                  <Button variant="blue" onClick={handleSpaceCheck}>
+                    Check
+                  </Button>
+                )}
               </div>
             </div>
+
             <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
               <div className="flex flex-col justify-between w-2/3">
                 <ImageDisplay
@@ -552,8 +547,7 @@ export default function Space({ data }) {
                 />
                 <div className="flex justify-between">
                   <menu className="flex gap-4 justify-end">
-                    {JSON.parse(localStorage.getItem("isLoggedIn")).role !==
-                      "admin" && (
+                    {loggedIn.role !== "admin" && (
                       <>
                         <Button
                           variant="blue"
@@ -601,13 +595,7 @@ export default function Space({ data }) {
                 onSelectImage={handleImageSelect}
               />
             </div>
-            {space.isAssess && space && (
-              <div className=" w-32 h-fit text-center m-auto pt-2 mt-2">
-                <p className="text-neutral-600 animate-bounce">
-                  Please wait...
-                </p>
-              </div>
-            )}
+
             {renderAdminView}
           </div>
         </>

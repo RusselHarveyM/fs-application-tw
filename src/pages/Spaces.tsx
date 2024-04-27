@@ -41,7 +41,7 @@ export default function Spaces() {
     if (!isLoading) {
       setIsLoading(true);
     }
-    if (ratings && spaceImages) {
+    if (rooms && ratings && spaceImages) {
       setContent((prev) => {
         console.log("rooms >>> ", rooms);
         const room = rooms.find((r) => r.id === param.id);
