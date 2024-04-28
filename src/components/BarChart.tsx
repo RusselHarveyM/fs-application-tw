@@ -50,6 +50,8 @@ export function BarChartCustom({ filteredRatings }) {
   const [chartData, setChartData] = useState([]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
+  console.log("filteredRatings >> ", filteredRatings);
+
   useEffect(() => {
     if (filteredRatings.length > 0) {
       console.log(filteredRatings);
@@ -58,7 +60,10 @@ export function BarChartCustom({ filteredRatings }) {
 
       // Calculate monthly averages for the selected year
       filteredRatings.forEach((space) => {
-        space.ratings.forEach((rating) => {
+        // space.ratings.forEach((rating) => {
+        const rating = space.rating[0];
+        if (rating) {
+          console.log(rating);
           const date = new Date(rating.dateModified);
           if (date.getFullYear() === selectedYear) {
             const month = `${date.toLocaleDateString("en-US", {
@@ -78,7 +83,8 @@ export function BarChartCustom({ filteredRatings }) {
             monthlyAverages[month].Shine += rating.shine;
             monthlyAverages[month].count++;
           }
-        });
+        }
+        // });
       });
 
       // Calculate average scores
@@ -100,7 +106,7 @@ export function BarChartCustom({ filteredRatings }) {
   const availableYears = [
     ...new Set(
       filteredRatings.flatMap((space) =>
-        space.ratings.map((rating) =>
+        space.rating.map((rating) =>
           new Date(rating.dateModified).getFullYear()
         )
       )

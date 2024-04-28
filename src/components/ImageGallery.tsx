@@ -43,8 +43,8 @@ export default function ImageGallery({
               tag = imageObject.forType;
             }
             const imageData = {
-              id: imageObject.image.id,
-              image: imageObject.image.image,
+              id: imageObject.id,
+              image: imageObject.image,
               prediction: imageObject.prediction,
             };
             const css =
@@ -53,11 +53,11 @@ export default function ImageGallery({
                 : "border-orange-400 text-white bg-orange-300";
             return (
               <div
-                key={imageObject.image.id}
+                key={imageObject.id}
                 className="relative  hover:scale-105 hover:cursor-pointer"
               >
                 <img
-                  src={`data:image/jpeg;base64,${imageObject.image.image}`}
+                  src={`data:image/jpeg;base64,${imageObject.image}`}
                   alt="gallery-image"
                   onClick={() => onSelectImage(imageData)}
                   className={`h-full w-full object-fit `}

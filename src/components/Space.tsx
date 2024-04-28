@@ -8,7 +8,7 @@ import {
 import ImageGallery from "./ImageGallery";
 import Button from "./Button";
 import ScoreCard from "./ScoreCard";
-import { useState, useContext, useEffect, useRef } from "react";
+import { useState, useContext, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 
 import { DataContext } from "@/data/data-context";
@@ -32,34 +32,54 @@ const SPACE_DEFINITION = {
   selectedImage: "",
   standard: "",
   selectedScore: "",
-  rating: {
-    sort: undefined,
-    setInOrder: undefined,
-    shine: undefined,
-  },
+  rating: [],
   assessmentDuration: 0,
   isLoad: false,
   isUpload: false,
   isAssess: false,
+  selectedRating: undefined,
 };
 
 export default function Space({ data }) {
-  const { rooms, spaceImages, ratings, useEntry } = useContext(DataContext);
-  const [space, setSpace] = useState(SPACE_DEFINITION);
-  const [model, setModel] = useState(undefined);
+  const { rooms, useEntry } = useContext(DataContext);
+  const { toast } = useToast();
+  const params = useParams();
   const uploadModal = useRef();
   const forSTDRef = useRef();
-  const forALLRef = useRef();
-  const cameraInputRef = useRef(null);
   const selectedUploadImages = useRef();
   const deleteModal = useRef();
   const timer = useRef<NodeJS.Timeout | undefined>();
   const duration = useRef();
-  const params = useParams();
-  const { toast } = useToast();
+  const [space, setSpace] = useState(SPACE_DEFINITION);
+  // const [selectedRating, setSelectedRating] = useState(undefined);
+
+  const loggedIn = JSON.parse(localStorage.getItem("isLoggedIn"));
 
   useEffect(() => {
-    console.log("im in");
+    if (data) {
+      setSpace((prev) => ({
+        ...prev,
+        ...data.space,
+        rating: [...data.rating],
+      }));
+    }
+  }, [data]);
+
+  const getSpaceData = useCallback(
+    (id) => {
+      let action = {
+        type: "spaceimages",
+        method: "get",
+        data: {
+          id,
+        },
+      };
+      useEntry(action);
+    },
+    [useEntry]
+  );
+
+  useEffect(() => {
     let prevTimer = timer.current;
     if (timer.current) {
       timer.current = undefined;
@@ -87,33 +107,13 @@ export default function Space({ data }) {
       });
     }
     setSpace((prev) => {
-      let latestRating = [];
-      if (space.id !== undefined) {
-        const matchedRatings = ratings?.filter(
-          (rating) => rating.spaceId === space.id
-        );
-        latestRating = matchedRatings?.sort(
-          (a, b) =>
-            new Date(b.dateModified).getTime() -
-            new Date(a.dateModified).getTime()
-        )[0];
-      }
-
-      console.log("latestRating >>> ", latestRating);
+      console.log(data?.rating);
       return {
         ...prev,
-        pictures:
-          prev.id !== undefined && !prev.isAssess
-            ? spaceImages?.map((spi) => {
-                return {
-                  image: spi,
-                  prediction: undefined,
-                  forType: spi.forType,
-                };
-              })
-            : prev.pictures,
-        rating: prev.id !== undefined && latestRating,
+        pictures: data?.space.pictures ?? [],
+        rating: data?.rating,
         isLoad: prev.pictures !== undefined && false,
+        selectedRating: data?.rating[0],
         isUpload: false,
         isAssess: false,
         selectedImage: "",
@@ -121,43 +121,16 @@ export default function Space({ data }) {
         assessmentDuration: prevTimer ? duration.current : 0,
       };
     });
-  }, [spaceImages, ratings]);
+  }, [data]);
 
-  function getSpaceData(id) {
-    let action = {
-      type: "spaceimages",
-      method: "get",
-      data: {
-        id,
-      },
-    };
-    useEntry(action);
-  }
+  const handleImageSelect = useCallback((image) => {
+    setSpace((prev) => ({
+      ...prev,
+      selectedImage: image,
+    }));
+  }, []);
 
-  function handleImageSelect(image) {
-    setSpace((prev) => {
-      return {
-        ...prev,
-        selectedImage: image,
-      };
-    });
-  }
-
-  function handleSpaceSelect(selectedSpace) {
-    const currentSpace = data.find((space) => space.name === selectedSpace);
-    console.log(currentSpace);
-    getSpaceData(currentSpace.id);
-    setSpace((prev) => {
-      return {
-        ...prev,
-        ...currentSpace,
-        selectedImage: "",
-        isLoad: true,
-      };
-    });
-  }
-
-  function handleImageUpload(event) {
+  const handleImageUpload = useCallback((event) => {
     const file = event.target.files[0];
     selectedUploadImages.current = file;
 
@@ -165,7 +138,6 @@ export default function Space({ data }) {
     const reader = new FileReader();
 
     reader.onloadend = () => {
-      // The result contains the data URL of the image
       const imgElement = document.getElementById("preview") as HTMLImageElement;
       imgElement.src = reader.result as string;
     };
@@ -173,48 +145,45 @@ export default function Space({ data }) {
     if (file) {
       reader.readAsDataURL(file);
     }
-  }
+  }, []);
 
-  function handleImageSubmit(event) {
-    event.preventDefault();
-    let type = forSTDRef.current.checked
-      ? forSTDRef.current.value
-      : // : forALLRef.current.checked
-        // ? forALLRef.current.value
-        "all";
+  const handleImageSubmit = useCallback(
+    (event) => {
+      event.preventDefault();
+      let type = forSTDRef.current.checked ? forSTDRef.current.value : "all";
 
-    forSTDRef.current.checked = false;
-    // forALLRef.current.checked = false;
+      forSTDRef.current.checked = false;
 
-    uploadModal.current.close();
-    let action = {
-      type: "spaceimages",
-      method: "post",
-      data: {
-        spaceId: space.id,
-        forType: type,
-        file: selectedUploadImages.current,
-      },
-    };
-    useEntry(action);
-    setSpace((prev) => {
-      return {
+      uploadModal.current.close();
+      let action = {
+        type: "spaceimages",
+        method: "post",
+        data: {
+          spaceId: space.id,
+          forType: type,
+          prediction: "",
+          file: selectedUploadImages.current,
+        },
+      };
+      useEntry(action);
+      setSpace((prev) => ({
         ...prev,
         isUpload: true,
-      };
-    });
-  }
+      }));
+    },
+    [space.id, useEntry]
+  );
 
-  function showModal(type) {
+  const showModal = useCallback((type) => {
     if (type === "upload") {
       uploadModal.current.open();
     }
     if (type === "delete") {
       deleteModal.current.open();
     }
-  }
+  }, []);
 
-  function handleImageDelete() {
+  const handleImageDelete = useCallback(() => {
     let action = {
       type: "spaceimages",
       method: "delete",
@@ -224,33 +193,21 @@ export default function Space({ data }) {
       },
     };
     useEntry(action);
-    setSpace((prev) => {
-      // const newPictures = prev.pictures.filter(
-      //   (picture) => picture.id !== prev.selectedImage.id
-      // );
-      return {
-        ...prev,
-        // pictures: newPictures,
-        selectedImage: undefined,
-      };
-    });
-  }
+    setSpace((prev) => ({
+      ...prev,
+      selectedImage: undefined,
+    }));
+  }, [space.id, space.selectedImage, useEntry]);
 
-  async function handleAssessBtn() {
-    const images = [
-      ...space.pictures.map((imageObject) => {
-        return {
-          image: "data:image/png;base64," + imageObject.image.image,
-          forType: imageObject.image.forType,
-        };
-      }),
-    ];
-    setSpace((prev) => {
-      return {
-        ...prev,
-        isAssess: true,
-      };
-    });
+  const handleAssessBtn = useCallback(async () => {
+    const images = space.pictures.map((imageObject) => ({
+      image: "data:image/png;base64," + imageObject.image,
+      forType: imageObject.forType,
+    }));
+    setSpace((prev) => ({
+      ...prev,
+      isAssess: true,
+    }));
 
     duration.current = 0;
     timer.current = setInterval(() => {
@@ -258,15 +215,8 @@ export default function Space({ data }) {
     }, 1000);
     const raw5s = await evaluate(images, space?.name, space?.standard);
     if (raw5s.standard === "") {
-      // if not calibrating
-      console.log("predictions >> ", raw5s.predictions);
-
       const commentResult = comment(raw5s);
-      console.log(" III commentResult III", commentResult);
       const { sort, set, shine } = commentResult;
-      console.log(" III raw5s III", raw5s);
-
-      // const { sort, set, shine } = raw5s.comment;
       const { score: sortScore } = raw5s.scores.sort;
       const { score: setScore } = raw5s.scores.set;
       const { score: shineScore } = raw5s.scores.shine;
@@ -274,8 +224,6 @@ export default function Space({ data }) {
       const sortScoreFixed = parseFloat(sortScore.toFixed(1));
       const setScoreFixed = parseFloat(setScore.toFixed(1));
       const shineScoreFixed = parseFloat(shineScore.toFixed(1));
-
-      console.log(" III data III", data);
 
       const totalScore = data.scores?.reduce(
         (acc, score) => acc + (score.sort + score.setInOrder + score.shine) / 3,
@@ -314,6 +262,18 @@ export default function Space({ data }) {
             prediction: raw5s.predictions[i],
             forType: prev?.pictures[i].forType,
           });
+          let action = {
+            type: "spaceimages",
+            method: "put",
+            data: {
+              id: prev?.pictures[i].id,
+              spaceId: prev?.pictures[i].spaceId,
+              image: prev?.pictures[i].image,
+              forType: prev?.pictures[i].forType,
+              prediction: JSON.stringify(raw5s.predictions[i]),
+            },
+          };
+          useEntry(action);
         }
 
         return {
@@ -322,14 +282,9 @@ export default function Space({ data }) {
         };
       });
 
-      // edit room for user attended
-
       const roomId = params.id;
       const foundRoom = rooms.find((obj) => obj.id === roomId);
-      const loginData = JSON.parse(localStorage.getItem("isLoggedIn"));
 
-      console.log("loginData >> ", loginData);
-      console.log("foundROOm >> ", foundRoom);
       let newAction = {
         type: "rooms",
         method: "put",
@@ -339,280 +294,312 @@ export default function Space({ data }) {
           roomNumber: foundRoom.roomNumber,
           image: foundRoom.image,
           status: foundRoom.status,
-          modifiedBy: [loginData.id, ...foundRoom.modifiedBy],
+          modifiedBy: [loggedIn.id, ...foundRoom.modifiedBy],
+        },
+      };
+
+      useEntry(newAction);
+      newAction = {
+        type: "spaces",
+        method: "assessed",
+        data: {
+          id: data.space.id,
         },
       };
       useEntry(newAction);
     } else {
-      // if calibrating
-      console.log("raw5s >>> ", raw5s);
-      console.log("calibrating");
       const roomId = params.id;
-      const currentSpace = data.find((curr) => curr.name === space.name);
+      // const currentSpace = data.find((curr) => curr.name === space.name);
+      console.log(data);
+      console.log(space);
       let action = {
         type: "spaces",
         method: "put",
         data: {
-          id: currentSpace.id,
-          name: currentSpace.name,
+          id: data.space.id,
+          name: data.space.name,
           roomId: roomId,
-          pictures: currentSpace.pictures,
+          pictures: space.pictures,
           standard: raw5s.standard,
+          assessedDate: null,
+          viewedDate: null,
         },
       };
       useEntry(action);
-      setSpace((prev) => {
-        return {
-          ...prev,
-          standard: raw5s.standard,
-          isAssess: false,
-        };
-      });
+      setSpace((prev) => ({
+        ...prev,
+        standard: raw5s.standard,
+        isAssess: false,
+      }));
     }
-  }
+  }, [data, params.id, rooms, space, useEntry]);
 
-  function handleScoreClick(type) {
+  const handleScoreClick = useCallback((type) => {
+    setSpace((prev) => ({
+      ...prev,
+      selectedScore: type,
+    }));
+  }, []);
+
+  const handleImageClose = useCallback(() => {
+    forSTDRef.current.checked = false;
+  }, []);
+
+  function handleResultSelect(selectedDate) {
     setSpace((prev) => {
+      const foundRating = space?.rating.find(
+        (r) => r.dateModified === selectedDate
+      );
       return {
         ...prev,
-        selectedScore: type,
+        selectedRating: foundRating,
       };
     });
   }
 
-  function handleImageClose() {
-    forSTDRef.current.checked = false;
-    // forALLRef.current.checked = false;
+  function handleSpaceCheck() {
+    let action = {
+      type: "spaces",
+      method: "viewed",
+      data: {
+        id: data.space.id,
+      },
+    };
+    useEntry(action);
   }
 
-  const handleCameraClick = () => {
-    cameraInputRef.current.click();
-  };
+  const renderImageUploadModal = space.id && (
+    <Modal
+      buttonVariant="blue"
+      buttonCaption="Submit"
+      input={
+        <>
+          <Input
+            id="picture"
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            capture="environment"
+          />
+          <fieldset className="flex width-full justify-around">
+            <div className="flex gap-2 justify-center items-center">
+              <input
+                ref={forSTDRef}
+                type="radio"
+                id="std"
+                name="choice"
+                value="std"
+              />
+              <label htmlFor="std" className="text-xs text-neutral-600">
+                STD
+              </label>
+            </div>
+          </fieldset>
+          <img id="preview" className="h-24 w-full object-contain" />
+        </>
+      }
+      ref={uploadModal}
+      onSubmit={handleImageSubmit}
+      onClose={handleImageClose}
+    >
+      <h2 className="text-neutral-500 text-xl mb-4">Upload an Image</h2>
+    </Modal>
+  );
+
+  const renderImageDeleteModal = space.selectedImage && (
+    <Modal
+      ref={deleteModal}
+      buttonCaption="Delete"
+      buttonVariant="red"
+      onSubmit={handleImageDelete}
+    >
+      <h2 className="text-neutral-500 text-xl mb-4">
+        Are you sure you want to delete this image?
+      </h2>
+    </Modal>
+  );
+
+  const renderAdminView = loggedIn.role === "admin" && (
+    <div className="relative flex bg-white w-full gap-8 shadow-sm p-8 pt-20  rounded-lg">
+      <div className="flex  w-full absolute top-5  ">
+        <Select
+          onValueChange={(selectedDate) => handleResultSelect(selectedDate)}
+          disabled={space.isLoad || space.isAssess}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Most Recent" />
+          </SelectTrigger>
+          <SelectContent>
+            {space?.rating?.map((r) => {
+              const date = new Date(r.dateModified);
+              const formattedDate = date.toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "short",
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true,
+              });
+              return (
+                <SelectItem
+                  key={r.id}
+                  value={r.dateModified}
+                  className="hover:cursor-pointer"
+                >
+                  {formattedDate}
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex flex-col gap-4 justify-center">
+        <ScoreCard
+          isLoad={space.isAssess}
+          score={
+            space.isLoad || space.isAssess ? 0 : space.selectedRating?.sort
+          }
+          onClick={() => {
+            if (space.selectedScore !== "sort") handleScoreClick("sort");
+          }}
+        />
+        <ScoreCard
+          isLoad={space.isAssess}
+          type="set"
+          score={
+            space.isLoad || space.isAssess
+              ? 0
+              : space.selectedRating?.setInOrder
+          }
+          onClick={() => {
+            if (space.selectedScore !== "set in order")
+              handleScoreClick("set in order");
+          }}
+        />
+        <ScoreCard
+          isLoad={space.isAssess}
+          type="shine"
+          score={
+            space.isLoad || space.isAssess ? 0 : space.selectedRating?.shine
+          }
+          onClick={() => {
+            if (space.selectedScore !== "shine") handleScoreClick("shine");
+          }}
+        />
+      </div>
+      <Comment
+        isLoad={space.isAssess || space.isLoad}
+        selected={space.selectedScore}
+        ratingId={space.selectedRating?.id}
+      />
+    </div>
+  );
 
   return (
     <>
-      {space.isLoad && (
-        <div className=" w-32 h-fit text-center m-auto pt-2 mt-2">
+      {space.pictures === undefined ? (
+        <div className=" w-32 h-fit text-center m-auto pt-2 mt-16">
           <p className="text-neutral-600 animate-bounce">Please wait...</p>
         </div>
-      )}
-      <Modal
-        buttonVariant="blue"
-        buttonCaption="Submit"
-        input={
-          <>
-            <Input
-              id="picture"
-              type="file"
-              accept="image/png, image/jpeg"
-              onChange={handleImageUpload}
-              ref={cameraInputRef}
-              capture="environment"
-            />
-            <fieldset className="flex width-full justify-around">
-              <div className="flex gap-2 justify-center items-center">
-                <input
-                  ref={forSTDRef}
-                  type="radio"
-                  id="std"
-                  name="choice"
-                  value="std"
-                />
-                <label htmlFor="std" className="text-xs text-neutral-600">
-                  STD
-                </label>
-              </div>
-            </fieldset>
-            <img id="preview" className="h-24 w-full object-contain" />
-          </>
-        }
-        ref={uploadModal}
-        onSubmit={handleImageSubmit}
-        onClose={handleImageClose}
-      >
-        <h2 className="text-neutral-500 text-xl mb-4">Upload an Image</h2>
-      </Modal>
-      <Modal
-        ref={deleteModal}
-        buttonCaption="Delete"
-        buttonVariant="red"
-        onSubmit={handleImageDelete}
-      >
-        <h2 className="text-neutral-500 text-xl mb-4">
-          Are you sure you want to delete this image?
-        </h2>
-      </Modal>
-      <div className="flex flex-col gap-4 p-6 w-[90rem] mx-auto">
-        <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
-          <div className="flex justify-between">
-            <div className="flex items-center gap-4 text-neutral-600 text-2xl">
-              <h2 className="uppercase">{space.name ? space.name : "Space"}</h2>
-              {space.name ? (
-                <p
-                  className={`text-xs ${
-                    space.standard !== "" ? "bg-green-400" : "bg-neutral-400"
-                  } py-2 px-4 rounded-2xl text-white font-semibold opacity-60`}
-                >
-                  {space.standard !== "" ? "Calibrated" : "Not Calibrated"}
-                </p>
-              ) : (
-                ""
-              )}
+      ) : (
+        <>
+          {renderImageUploadModal}
+          {renderImageDeleteModal}
+          {space.isAssess && space && (
+            <div className=" w-32 h-fit text-center m-auto pt-2 mt-6">
+              <p className="text-neutral-600 animate-bounce">Please wait...</p>
             </div>
-            <Select
-              onValueChange={(selectedName) => handleSpaceSelect(selectedName)}
-              disabled={space.isLoad || space.isAssess}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select a space" />
-              </SelectTrigger>
-              <SelectContent>
-                {data.map((curr) => {
-                  return (
-                    <SelectItem
-                      key={curr.id}
-                      value={curr.name}
-                      className="hover:cursor-pointer"
+          )}
+          <div className="flex flex-col gap-4 p-6 w-[90rem] mx-auto">
+            <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
+              <div className="flex justify-between">
+                <div className="flex items-center gap-4 text-neutral-600 text-2xl">
+                  <h2 className="uppercase">
+                    {space.name ? space.name : "Space"}
+                  </h2>
+                  {space.name ? (
+                    <p
+                      className={`text-xs ${
+                        space.standard !== ""
+                          ? "bg-green-400"
+                          : "bg-neutral-400"
+                      } py-2 px-4 rounded-2xl text-white font-semibold opacity-60`}
                     >
-                      {curr.name}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
-          <div className="flex flex-col justify-between w-2/3">
-            <ImageDisplay
-              model={model}
-              onDelete={() => showModal("delete")}
-              selectedImage={space.selectedImage}
-            />
-            <div className="flex justify-between">
-              <Select
-                onValueChange={(selected) => {
-                  setModel(selected);
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by Model" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="model1">Model 1</SelectItem>
-                  <SelectItem value="model2">Model 2</SelectItem>
-                  <SelectItem value="model3">Model 3</SelectItem>
-                  <SelectItem value="model4">Model 4</SelectItem>
-                  <SelectItem value="model5">Model 5</SelectItem>
-                </SelectContent>
-              </Select>
-              <menu className="flex gap-4 justify-end">
-                {JSON.parse(localStorage.getItem("isLoggedIn")).role !==
-                  "admin" && (
-                  <>
-                    {" "}
-                    <Button
-                      variant="blue"
-                      onClick={() => showModal("upload")}
-                      disabled={
-                        space.id === undefined ||
-                        space.isUpload ||
-                        space.isAssess ||
-                        space.isLoad
-                          ? true
-                          : false
-                      }
-                    >
-                      Upload
-                    </Button>
-                    <Button
-                      variant="blue"
-                      onClick={handleAssessBtn}
-                      disabled={
-                        space.id === undefined ||
-                        space.pictures === undefined ||
-                        space.pictures?.length === 0 ||
-                        space.isUpload ||
-                        space.isAssess ||
-                        space.isLoad
-                          ? true
-                          : false
-                      }
-                    >
-                      {space?.standard === "" ? "Calibrate" : "Assess"}
-                    </Button>
-                  </>
+                      {space.standard !== "" ? "Calibrated" : "Not Calibrated"}
+                    </p>
+                  ) : (
+                    ""
+                  )}
+                </div>
+                {loggedIn.role === "admin" && (
+                  <Button variant="blue" onClick={handleSpaceCheck}>
+                    Check
+                  </Button>
                 )}
-              </menu>
+              </div>
             </div>
-          </div>
-          <ImageGallery
-            isLoad={
-              space.isUpload ||
-              space.selectedImage === undefined ||
-              space.isAssess
-            }
-            duration={space.assessmentDuration}
-            images={space.pictures}
-            onSelectImage={handleImageSelect}
-          />
-        </div>
-        {JSON.parse(localStorage.getItem("isLoggedIn")).role === "admin" && (
-          <>
-            {space.isAssess && (
-              <div className=" w-32 h-fit text-center m-auto pt-2 mt-2">
-                <p className="text-neutral-600 animate-bounce">
-                  Please wait...
-                </p>
+
+            <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
+              <div className="flex flex-col justify-between w-2/3">
+                <ImageDisplay
+                  onDelete={() => showModal("delete")}
+                  selectedImage={space.selectedImage}
+                />
+                <div className="flex justify-between">
+                  <menu className="flex gap-4 justify-end">
+                    {loggedIn.role !== "admin" && (
+                      <>
+                        <Button
+                          variant="blue"
+                          onClick={() => showModal("upload")}
+                          disabled={
+                            space.id === undefined ||
+                            space.isUpload ||
+                            space.isAssess ||
+                            space.isLoad
+                              ? true
+                              : false
+                          }
+                        >
+                          Upload
+                        </Button>
+                        <Button
+                          variant="blue"
+                          onClick={handleAssessBtn}
+                          disabled={
+                            space.id === undefined ||
+                            space.pictures === undefined ||
+                            space.pictures?.length === 0 ||
+                            space.isUpload ||
+                            space.isAssess ||
+                            space.isLoad
+                              ? true
+                              : false
+                          }
+                        >
+                          {space?.standard === "" ? "Calibrate" : "Assess"}
+                        </Button>
+                      </>
+                    )}
+                  </menu>
+                </div>
               </div>
-            )}
-            <div className="flex bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
-              <div className="flex flex-col gap-4 justify-center">
-                <ScoreCard
-                  isLoad={space.isAssess}
-                  score={
-                    space.isLoad || space.isAssess ? 0 : space.rating?.sort
-                  }
-                  onClick={() => {
-                    if (space.selectedScore !== "sort")
-                      handleScoreClick("sort");
-                  }}
-                />
-                <ScoreCard
-                  isLoad={space.isAssess}
-                  type="set"
-                  score={
-                    space.isLoad || space.isAssess
-                      ? 0
-                      : space.rating?.setInOrder
-                  }
-                  onClick={() => {
-                    if (space.selectedScore !== "set in order")
-                      handleScoreClick("set in order");
-                  }}
-                />
-                <ScoreCard
-                  isLoad={space.isAssess}
-                  type="shine"
-                  score={
-                    space.isLoad || space.isAssess ? 0 : space.rating?.shine
-                  }
-                  onClick={() => {
-                    if (space.selectedScore !== "shine")
-                      handleScoreClick("shine");
-                  }}
-                />
-              </div>
-              <Comment
-                isLoad={space.isAssess || space.isLoad}
-                selected={space.selectedScore}
-                ratingId={space.rating?.id}
+              <ImageGallery
+                isLoad={
+                  space.isUpload ||
+                  space.selectedImage === undefined ||
+                  space.isAssess
+                }
+                duration={space.assessmentDuration}
+                images={space.pictures}
+                onSelectImage={handleImageSelect}
               />
             </div>
-          </>
-        )}
-      </div>
+
+            {renderAdminView}
+          </div>
+        </>
+      )}
     </>
   );
 }

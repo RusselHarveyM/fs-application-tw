@@ -72,6 +72,27 @@ export default function DataContextProvider({ children }) {
     // }
   }
 
+  async function getSpaceImages() {
+    try {
+      const spaceImages = (
+        await axios.get(`${endpoint}/api/spaceImage/get/spaces`)
+      ).data;
+      setData((prev) => {
+        return {
+          ...prev,
+          spaceImages,
+        };
+      });
+    } catch (error) {
+      setData((prev) => {
+        return {
+          ...prev,
+          spaceImages: [],
+        };
+      });
+    }
+  }
+
   async function getSpaceImagesBySpaceId(id) {
     try {
       const spaceImages = (
@@ -241,6 +262,24 @@ export default function DataContextProvider({ children }) {
       };
     });
   }
+
+  async function updateSpaceImages(data) {
+    return axios
+      .put(`${endpoint}/api/spaceimage/${data.id}`, data)
+      .then(() =>
+        console.log(`SpaceImage with ID ${data.id} updated successfully`)
+      )
+      .catch((error) => console.error("Error updating space:", error));
+  }
+
+  async function updateSpaceViewedDate(id) {
+    console.log("viewed date id", id);
+    return (await axios.put(`${endpoint}/api/space/${id}/vieweddate`)).data;
+  }
+
+  async function updateSpaceAssessedDate(id) {
+    return (await axios.put(`${endpoint}/api/space/${id}/assesseddate`)).data;
+  }
   /*
   ------------------------
   function handleUseEntry
@@ -255,16 +294,32 @@ export default function DataContextProvider({ children }) {
     //..
     if (action.type === "spaceimages") {
       if (action.method === "get") {
-        await getSpaceImagesBySpaceId(action.data.id);
+        // await getSpaceImagesBySpaceId(action.data.id);
+        await getSpaceImages();
       }
+      // if (action.method === "getAll") {
+      //   await getSpaceImages();
+      // }
       if (action.method === "post") {
         const image = action.data.file;
         const newData = {
           spaceId: action.data.spaceId,
           forType: action.data.forType,
+          prediction: action.data.prediction,
           image,
         };
         await addSpaceImage(newData, action.data.spaceId);
+        await getSpaceImagesBySpaceId(action.data.spaceId);
+      }
+      if (action.method === "put") {
+        const newData = {
+          id: action.data.id,
+          spaceId: action.data.spaceId,
+          forType: action.data.forType,
+          prediction: action.data.prediction,
+          image: action.data.image,
+        };
+        await updateSpaceImages(newData);
         await getSpaceImagesBySpaceId(action.data.spaceId);
       }
       if (action.method === "delete") {
@@ -346,19 +401,19 @@ export default function DataContextProvider({ children }) {
         try {
           // Call the addNewUser function to add the new user to the backend
           await addNewUser(action.data);
-      
+
           // Fetch the updated list of users from the backend
           const updatedUsers = (await axios.get(`${endpoint}/api/user`)).data;
-      
+
           // Update the state with the new list of users
           setData((prevData) => ({
             ...prevData,
-            users: updatedUsers.map(user => ({
+            users: updatedUsers.map((user) => ({
               ...user,
-              Name: `${user.firstName} ${user.lastName}`
+              Name: `${user.firstName} ${user.lastName}`,
             })),
           }));
-      
+
           console.log("Newly added users:", updatedUsers);
         } catch (error) {
           console.error("Error adding new user:", error);
@@ -457,7 +512,9 @@ export default function DataContextProvider({ children }) {
               (building) => building.buildingName !== buildingName
             ),
           }));
-          console.log(`Building with Name ${buildingName} deleted successfully`);
+          console.log(
+            `Building with Name ${buildingName} deleted successfully`
+          );
         } catch (error) {
           console.error("Error deleting Building:", error);
         }
@@ -541,6 +598,14 @@ export default function DataContextProvider({ children }) {
         } catch (error) {
           console.error("Error creating space:", error);
         }
+      }
+      if (action.method === "viewed") {
+        await updateSpaceViewedDate(action.data.id);
+        await getSpaces();
+      }
+      if (action.method === "assessed") {
+        await updateSpaceAssessedDate(action.data.id);
+        await getSpaces();
       }
       if (action.method === "put") {
         const updatedSpaceData = action.data;
