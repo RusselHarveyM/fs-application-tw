@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import classNames from "classnames";
 
 import {
   ChevronLeftIcon,
@@ -120,7 +121,13 @@ export function DataTable<TData, TValue>({
           placeholder={"Search all columns..."}
           value={globalSearchQuery}
           onChange={handleGlobalSearchChange}
-          className="max-w-sm"
+          className={classNames(
+            "w-full",
+            "sm:w-40", // Width for small screens
+            "md:w-56", // Width for medium screens
+            "lg:w-72", // Width for large screens
+            "xl:w-96" // Width for extra large screens
+          )}
         />
         {renderAddButton()}
         <DropdownMenu>
