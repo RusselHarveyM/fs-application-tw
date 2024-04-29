@@ -118,12 +118,12 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder={"Search all columns..."}
+          placeholder={"Search"}
           value={globalSearchQuery}
           onChange={handleGlobalSearchChange}
           className={classNames(
-            "w-full",
-            "sm:w-40", // Width for small screens
+            "w-20",
+            "sm:w-30", // Width for small screens
             "md:w-56", // Width for medium screens
             "lg:w-72", // Width for large screens
             "xl:w-96" // Width for extra large screens

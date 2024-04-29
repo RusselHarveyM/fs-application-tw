@@ -1,6 +1,6 @@
 import React, { useContext, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { UserRoundPlus } from "lucide-react";
 import { DataContext } from "@/data/data-context";
 import AddUserModal from "@/components/AddUserModal";
 
@@ -39,8 +39,8 @@ const AddUserButton = ({ buttonVariant }) => {
         className="flex items-center ml-2"
         onClick={() => addUserModal.current.open()} // Open the AddUserModal when button is clicked
       >
-        Add Entry
-        <Plus className="h-4 w-4" />
+        <span className=" hidden sm:inline"> Add User</span>
+        <UserRoundPlus className="h-4 w-4 sm:hidden" />
       </Button>
     </>
   );
