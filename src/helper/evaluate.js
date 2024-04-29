@@ -8,7 +8,8 @@ async function countModel(image) {
   let response;
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-count-det/13",
+    url: "https://detect.roboflow.com/new-count-model/4",
+    // url: "https://detect.roboflow.com/classroom-count-det/13",
     params: {
       api_key: API_KEY,
     },
@@ -54,7 +55,8 @@ async function pbModel(image) {
   let response;
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-3igmn/11",
+    url: "https://detect.roboflow.com/classroom-type-identification/11",
+    // url: "https://detect.roboflow.com/classroom-3igmn/11",
     params: {
       api_key: API_KEY,
     },
@@ -79,7 +81,7 @@ async function blueModel(image) {
 
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-blue-det/3",
+    url: "https://detect.roboflow.com/classroom-blue-det/7",
     params: {
       api_key: API_KEY,
     },
