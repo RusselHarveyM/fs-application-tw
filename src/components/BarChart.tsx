@@ -137,7 +137,7 @@ export function BarChartCustom({ filteredRatings }) {
         </select>
       </div>
       <BarChart
-        className="rounded-2xl shadow w-full bg-white p-8 h-full"
+        className="rounded-2xl shadow w-full bg-white p-8 md:h-full sm:h-[30rem]"
         // data={DUMMY_DATA}
         data={chartData}
         index="date"
