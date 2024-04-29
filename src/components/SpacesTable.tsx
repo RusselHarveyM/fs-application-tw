@@ -13,78 +13,6 @@ import Space from "./Space";
 import { useState, useContext } from "react";
 import { DataContext } from "@/data/data-context";
 
-const invoices = [
-  {
-    spaceName: "INV001",
-    sort: "Paid",
-    setInOrder: "$250.00",
-    shine: "Credit Card",
-    lastAssessed: "April 26",
-    lastChecked: "April 26",
-
-    status: "viewed",
-  },
-  {
-    spaceName: "INV002",
-    sort: "Pending",
-    setInOrder: "$150.00",
-    shine: "PayPal",
-    lastAssessed: "April 26",
-    lastChecked: "April 26",
-
-    status: "viewed",
-  },
-  {
-    spaceName: "INV003",
-    sort: "Unpaid",
-    setInOrder: "$350.00",
-    shine: "Bank Transfer",
-    lastAssessed: "April 26",
-    lastChecked: "April 26",
-
-    status: "viewed",
-  },
-  {
-    spaceName: "INV004",
-    sort: "Paid",
-    setInOrder: "$450.00",
-    shine: "Credit Card",
-    lastAssessed: "April 26",
-    lastChecked: "April 26",
-
-    status: "viewed",
-  },
-  {
-    spaceName: "INV005",
-    sort: "Paid",
-    setInOrder: "$550.00",
-    shine: "PayPal",
-    lastAssessed: "April 26",
-    lastChecked: "April 26",
-
-    status: "viewed",
-  },
-  {
-    spaceName: "INV006",
-    sort: "Pending",
-    setInOrder: "$200.00",
-    shine: "Bank Transfer",
-    lastAssessed: "April 26",
-    lastChecked: "April 26",
-
-    status: "viewed",
-  },
-  {
-    spaceName: "INV007",
-    sort: "Unpaid",
-    setInOrder: "$300.00",
-    shine: "Credit Card",
-    lastAssessed: "April 26",
-    lastChecked: "April 26",
-    status: "viewed",
-  },
-];
-
 export default function SpacesTable({ data }) {
   console.log(data);
   const [spaceData, setSpaceData] = useState(undefined);
@@ -163,7 +91,7 @@ export default function SpacesTable({ data }) {
                 key={data.space.id}
                 onClick={() => handleClickSpace(data)}
                 className={`hover:cursor-pointer ${
-                  data.space.id === spaceData.space.id && "bg-neutral-50"
+                  data.space.id === spaceData?.space?.id && "bg-neutral-50"
                 }`}
               >
                 <TableCell className="font-medium">{data.space.name}</TableCell>
