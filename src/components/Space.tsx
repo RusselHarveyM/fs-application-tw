@@ -419,85 +419,87 @@ export default function Space({ data }) {
     </Modal>
   );
 
+  const isAssessedThisMonth =
+    data.space.assessedDate &&
+    new Date(data.space.assessedDate).getMonth() === new Date().getMonth();
+
   const renderAdminView =
     loggedIn.role === "admin" ||
-    (data.space.assessedDate &&
-      new Date(data.space.assessedDate).getMonth() ===
-        new Date().getMonth() && (
-        <div className="relative flex bg-white w-full gap-8 shadow-sm p-8 pt-20  rounded-lg">
-          <div className="flex  w-full absolute top-5  ">
-            <Select
-              onValueChange={(selectedDate) => handleResultSelect(selectedDate)}
-              disabled={space.isLoad || space.isAssess}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Most Recent" />
-              </SelectTrigger>
-              <SelectContent>
-                {space?.rating?.map((r) => {
-                  const date = new Date(r.dateModified);
-                  const formattedDate = date.toLocaleDateString("en-US", {
-                    day: "numeric",
-                    month: "short",
-                    hour: "numeric",
-                    minute: "numeric",
-                    hour12: true,
-                  });
-                  return (
-                    <SelectItem
-                      key={r.id}
-                      value={r.dateModified}
-                      className="hover:cursor-pointer"
-                    >
-                      {formattedDate}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          </div>
+    (loggedIn.role === "user" && isAssessedThisMonth) ? (
+      <div className="relative flex bg-white md:w-full sm:w-[42rem] gap-8 shadow-sm p-8 pt-20  rounded-lg">
+        <div className="flex  w-full absolute top-5  ">
+          <Select
+            onValueChange={(selectedDate) => handleResultSelect(selectedDate)}
+            disabled={space.isLoad || space.isAssess}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Most Recent" />
+            </SelectTrigger>
+            <SelectContent>
+              {space?.rating?.map((r) => {
+                const date = new Date(r.dateModified);
+                const formattedDate = date.toLocaleDateString("en-US", {
+                  day: "numeric",
+                  month: "short",
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true,
+                });
+                return (
+                  <SelectItem
+                    key={r.id}
+                    value={r.dateModified}
+                    className="hover:cursor-pointer"
+                  >
+                    {formattedDate}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div className="flex flex-col gap-4 justify-center">
-            <ScoreCard
-              isLoad={space.isAssess}
-              score={
-                space.isLoad || space.isAssess ? 0 : space.selectedRating?.sort
-              }
-              onClick={() => {
-                if (space.selectedScore !== "sort") handleScoreClick("sort");
-              }}
-            />
-            <ScoreCard
-              isLoad={space.isAssess}
-              type="set"
-              score={
-                space.isLoad || space.isAssess
-                  ? 0
-                  : space.selectedRating?.setInOrder
-              }
-              onClick={() => {
-                if (space.selectedScore !== "set in order")
-                  handleScoreClick("set in order");
-              }}
-            />
-            <ScoreCard
-              isLoad={space.isAssess}
-              type="shine"
-              score={
-                space.isLoad || space.isAssess ? 0 : space.selectedRating?.shine
-              }
-              onClick={() => {
-                if (space.selectedScore !== "shine") handleScoreClick("shine");
-              }}
-            />
-          </div>
-          <Comment
-            isLoad={space.isAssess || space.isLoad}
-            selected={space.selectedScore}
-            ratingId={space.selectedRating?.id}
+        <div className="flex flex-col gap-4 justify-center">
+          <ScoreCard
+            isLoad={space.isAssess}
+            score={
+              space.isLoad || space.isAssess ? 0 : space.selectedRating?.sort
+            }
+            onClick={() => {
+              if (space.selectedScore !== "sort") handleScoreClick("sort");
+            }}
+          />
+          <ScoreCard
+            isLoad={space.isAssess}
+            type="set"
+            score={
+              space.isLoad || space.isAssess
+                ? 0
+                : space.selectedRating?.setInOrder
+            }
+            onClick={() => {
+              if (space.selectedScore !== "set in order")
+                handleScoreClick("set in order");
+            }}
+          />
+          <ScoreCard
+            isLoad={space.isAssess}
+            type="shine"
+            score={
+              space.isLoad || space.isAssess ? 0 : space.selectedRating?.shine
+            }
+            onClick={() => {
+              if (space.selectedScore !== "shine") handleScoreClick("shine");
+            }}
           />
         </div>
-      ));
+        <Comment
+          isLoad={space.isAssess || space.isLoad}
+          selected={space.selectedScore}
+          ratingId={space.selectedRating?.id}
+        />
+      </div>
+    ) : null;
 
   return (
     <>
@@ -514,8 +516,8 @@ export default function Space({ data }) {
               <p className="text-neutral-600 animate-bounce">Please wait...</p>
             </div>
           )}
-          <div className="flex flex-col gap-4 p-6 w-[90rem] mx-auto">
-            <div className="flex flex-col bg-white w-full gap-8 shadow-sm py-8 px-16 rounded-lg">
+          <div className="flex flex-col gap-4 md:p-6 sm:p-0 md:w-[90rem] sm:w-[44rem] mx-auto">
+            <div className="flex flex-col bg-white md:w-full sm:w-[40rem] gap-8 shadow-sm py-8 md:px-16 sm:px-8 rounded-lg">
               <div className="flex justify-between">
                 <div className="flex items-center gap-4 text-neutral-600 text-2xl">
                   <h2 className="uppercase">
@@ -543,14 +545,14 @@ export default function Space({ data }) {
               </div>
             </div>
 
-            <div className="flex  bg-white w-full gap-8 shadow-sm p-8 rounded-lg">
-              <div className="flex flex-col justify-between w-2/3">
+            <div className="flex md:flex-row sm:flex-col bg-white md:w-full sm:w-[42rem] gap-8 shadow-sm p-8 rounded-lg">
+              <div className="flex flex-col justify-between md:w-2/3">
                 <ImageDisplay
                   onDelete={() => showModal("delete")}
                   selectedImage={space.selectedImage}
                 />
-                <div className="flex justify-between">
-                  <menu className="flex gap-4 justify-end">
+                <div className="flex justify-between sm:justify-end">
+                  <menu className="flex gap-4 sm:pt-8 justify-end">
                     {loggedIn.role !== "admin" && (
                       <>
                         <Button

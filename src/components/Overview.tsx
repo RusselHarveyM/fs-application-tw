@@ -76,17 +76,19 @@ export default function Overview({ data }) {
   }, [data]);
 
   return (
-    <div className="flex flex-col p-6 w-[97rem] mx-auto gap-4">
-      <h2 className="text-2xl text-neutral-700 font-bold mt-2">Overview</h2>
+    <div className="flex flex-col p-6 md:w-[97rem] sm:w-[45rem] mx-auto gap-4">
+      <h2 className="md:text-2xl sm:text-3xl sm:text-center text-neutral-700 font-bold mt-2">
+        Overview
+      </h2>
       <div className="flex w-full justify-around mt-4 mx-auto">
         <Card score={scores?.average ?? 0} title={"Overall"} percent="8%" />
         <Card score={scores?.sort ?? 0} title={"Sort"} />
         <Card score={scores?.set ?? 0} title={"Set In Order"} percent="14%" />
         <Card score={scores?.shine ?? 0} title={"Shine"} />
       </div>
-      <div className="flex gap-4 w-full h-[35rem] mt-8">
+      <div className="flex md:flex-row sm:flex-col gap-4 w-full h-[35rem] mt-8">
         <BarChartCustom filteredRatings={data.spaces} />
-        <div className="w-1/4 h-full bg-white shadow rounded-2xl p-8">
+        <div className="md:w-1/4 sm:full h-full bg-white shadow rounded-2xl p-8">
           <h2 className="text-lg text-neutral-700 font-semibold">
             Recent Users
           </h2>

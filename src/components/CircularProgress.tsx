@@ -12,14 +12,14 @@ export default function CircularProgress({
   let loadCss = "animate-spin";
   return (
     <div
-      className={`flex flex-col items-center justify-center gap-4 object-contain w-80 h-full relative ${
+      className={`flex flex-col items-center w-80 justify-center gap-4 object-contain  h-full relative ${
         isLoad && loadCss
       }`}
     >
       <p
         className={`absolute top-0 ${
           title ? "bottom-10" : "bottom-0"
-        } left-0 right-0 m-auto text-5xl font-bold flex items-center justify-center`}
+        } left-0 right-0 m-auto md:text-5xl sm:text-4xl font-bold flex items-center justify-center`}
         style={{
           color: strokeColor,
           height: "fit-content",
@@ -44,7 +44,7 @@ export default function CircularProgress({
       />
       {title && (
         <h2
-          className="text-3xl font-bold uppercase"
+          className="md:text-3xl sm:text-xl font-bold uppercase"
           style={{ color: strokeColor }}
         >
           {title}

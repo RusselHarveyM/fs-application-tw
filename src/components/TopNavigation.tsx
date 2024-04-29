@@ -7,19 +7,19 @@ export default function TopNavigation() {
   const highlightNavClass =
     "border-b-4 font-bold border-red-500 text-red-500 rounded-none";
   return (
-    <nav className="py-6 px-8 mb-4 w-full">
+    <nav className="py-6 px-8 mb-4 w-[100vw] ">
       <ul className="flex w-full justify-between">
         <li className="w-1/3">
           <NavLink to={"/home"}>
             <img
               src={Logo}
               alt="profile-logo"
-              className="w-16 h-16 object-contain hover:cursor-pointer"
+              className="md:w-16 md:h-16 sm:w-14 sm:h-14 object-contain hover:cursor-pointer"
             />
           </NavLink>
         </li>
         <li className="w-1/3 flex items-center justify-center">
-          <ul className="flex items-center justify-center gap-4">
+          <ul className="flex items-center justify-center gap-4 sm:text-sm md:text-base">
             <NavLink
               to={"/home"}
               className={
@@ -43,7 +43,7 @@ export default function TopNavigation() {
             <img
               src={Settings}
               alt="settings-icon"
-              className="hover:cursor-pointer hover:brightness-50"
+              className="hover:cursor-pointer hover:brightness-50 md:w-6 md:h-6 sm:w-6 sm:h-6"
             />
           </NavLink>
         </li>

@@ -34,7 +34,7 @@ export default function SpacesTable({ data }) {
   }
 
   return (
-    <div className="w-[90rem] mx-auto bg-white rounded-lg mt-10 flex flex-col items-center justify-center p-6">
+    <div className="md:w-[90rem] sm:w-[44rem] mx-auto bg-white rounded-lg mt-10 flex flex-col items-center justify-center p-6">
       <Table>
         <TableCaption>A list of your recent spaces.</TableCaption>
         <TableHeader>
