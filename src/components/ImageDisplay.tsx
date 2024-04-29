@@ -29,7 +29,7 @@ export default function ImageDisplay({
   };
 
   return (
-    <div className="relative grid grid-cols-1 grid-rows-1 bg-neutral-100 h-[26rem]">
+    <div className="relative grid grid-cols-1 grid-rows-1 sm:w-full bg-neutral-100 h-[26rem]">
       {selectedImage && (
         <div className="z-50 m-4 w-5 h-5 relative p-4 rounded-full bg-neutral-200 bg-opacity-30 ">
           <Trash

@@ -11,7 +11,7 @@ export default function ImageGallery({
 
   return (
     <div
-      className={`grid grid-cols-4 grid-rows-5 w-1/3 h-[30rem] bg-neutral-100 ${
+      className={`grid md:grid-cols-4 md:grid-rows-5 sm:grid-cols-7 sm:grid-rows-2 md:w-1/3 sm:w-full md:h-[30rem] sm:h-[10rem] bg-neutral-100 ${
         (images && images?.length > 0) || isLoad ? undefined : cssLoad
       } relative`} // Add relative here to position the child absolute elements
     >
@@ -64,7 +64,7 @@ export default function ImageGallery({
                 />
                 <sup
                   className={
-                    "absolute top-16 right-1  h-6 w-fit py-1 px-1 flex justify-center items-center rounded-lg border-4   uppercase font-bold text-md " +
+                    "absolute md:top-16 sm:top-14 right-1  h-6 w-fit py-1 px-1 flex justify-center items-center rounded-lg border-4   uppercase font-bold text-md " +
                     css
                   }
                 >

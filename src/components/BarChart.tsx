@@ -118,7 +118,7 @@ export function BarChartCustom({ filteredRatings }) {
   };
 
   return (
-    <div className="relative w-3/4">
+    <div className="relative md:w-3/4 sm:w-full">
       <div className="flex absolute top-4 left-8 justify-center items-center mb-4">
         <label htmlFor="year" className="mr-2 text-neutral-500">
           Select Year:
@@ -137,7 +137,7 @@ export function BarChartCustom({ filteredRatings }) {
         </select>
       </div>
       <BarChart
-        className="rounded-2xl shadow w-full bg-white p-8 h-full"
+        className="rounded-2xl shadow w-full bg-white p-8 md:h-full sm:h-[30rem]"
         // data={DUMMY_DATA}
         data={chartData}
         index="date"

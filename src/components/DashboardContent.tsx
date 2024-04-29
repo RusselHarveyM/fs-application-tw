@@ -75,7 +75,7 @@ export default function DashboardContent() {
   }
   return (
     <div className="flex flex-col w-full m-auto py-6 px-8 mb-18">
-      <div className="flex justify-center items-center h-2/5 gap-56 mt-8 mb-16">
+      <div className="flex justify-center items-center md:gap-56 sm:gap-28 mt-8 mb-16 ">
         <CircularProgress
           percent={10}
           title="overall"
@@ -90,10 +90,10 @@ export default function DashboardContent() {
         />
       </div>
       <div className="flex flex-col gap-8 items-center justify-center h-1/6 my-8 ">
-        <menu className="flex bg-stone-100 rounded-full py-2 px-4">
+        <menu className="flex bg-stone-100 rounded-full py-2 px-4 md:w-[288px] md:h-[160px] sm:w-[190] sm:h-[90]">
           <NavLink
             to="/home"
-            className={`flex justify-center flex-col items-center ${
+            className={`flex justify-center flex-col items-center sm:w-[96px] md:w-[123.2px] ${
               content.selectedTab === "buildings" ? "font-bold" : ""
             }`}
             onClick={() => handleTabSelect("buildings")}
@@ -104,7 +104,9 @@ export default function DashboardContent() {
               isSelected={content.selectedTab === "buildings"}
               isDisabled={false}
             />
-            <h3 className="text-neutral-600">Buildings</h3>
+            <h3 className="text-neutral-600 md:text-base sm:text-sm ">
+              Buildings
+            </h3>
           </NavLink>
           <Button
             liCss="flex justify-center flex-col items-center"
@@ -118,7 +120,7 @@ export default function DashboardContent() {
               isSelected={content.selectedTab === "rooms"}
               isDisabled={content.selectedTab === "rooms" ? false : true}
             />
-            <h3 className="text-neutral-600">Rooms</h3>
+            <h3 className="text-neutral-600  md:text-base sm:text-sm">Rooms</h3>
           </Button>
         </menu>
         <p className="text-neutral-500">
@@ -134,7 +136,7 @@ export default function DashboardContent() {
           </span>
         </p>
       </div>
-      <div className="flex flex-wrap justify-center pt-8 m-auto gap-4 w-[95rem] h-[40rem] rounded-[2rem] hover:cursor-pointer">
+      <div className="flex flex-wrap justify-center pt-8 m-auto gap-4 sm:w-full sm:h-[20rem] md:w-[95rem] md:h-[40rem] rounded-[2rem] hover:cursor-pointer">
         {content.data?.length > 0 ? (
           content.data.map((item, index) => (
             <div

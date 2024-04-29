@@ -20,7 +20,7 @@ export default function ScoreCard({
   return (
     <button
       className={
-        "relative flex flex-col gap-4 w-64 h-32 shadow-md px-4 py-2 rounded-lg hover:cursor-pointer transition delay-150 ease-in-out hover:scale-105 hover:brightness-110" +
+        "relative flex flex-col gap-4 md:w-64 sm:w-48 h-32 shadow-md px-4 py-2 rounded-lg hover:cursor-pointer transition delay-150 ease-in-out hover:scale-105 hover:brightness-110" +
         cssContainerHighlight
       }
       {...props}
@@ -31,10 +31,16 @@ export default function ScoreCard({
         />
       )}
 
-      <h2 className={"text-3xl font-semibold uppercase" + cssTextHighlight}>
+      <h2
+        className={
+          "md:text-3xl sm:text-3xl font-semibold uppercase" + cssTextHighlight
+        }
+      >
         {type}
       </h2>
-      <code className={"text-6xl font-semibold" + cssTextHighlight}>
+      <code
+        className={"md:text-6xl sm:text-5xl font-semibold" + cssTextHighlight}
+      >
         {score}
       </code>
     </button>

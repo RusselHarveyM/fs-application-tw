@@ -19,11 +19,19 @@ export default function Card({ title, score, percent = "20.1%" }) {
   }
 
   return (
-    <div className="relative  flex flex-col shadow gap-1 bg-white rounded-2xl w-[22%] h-[10rem] px-6 py-8">
-      <h2 className="text-lg text-neutral-600 font-semibold">{title}</h2>
-      <p className={`font-bold text-2xl ${textTheme} `}>{score}/ 10</p>
-      <p className="text-neutral-400 ">+{percent} from last month</p>
-      <div className="absolute -right-28 h-10">
+    <div className="relative  flex flex-col shadow gap-1 bg-white rounded-2xl md:w-[22%] sm:w-[24%] h-[10rem] px-6 py-8">
+      <h2 className="md:text-lg sm:text-md text-neutral-600 font-semibold">
+        {title}
+      </h2>
+      <p
+        className={`font-bold md:text-2xl sm:text-lg sm:pl-8 sm:pt-2 md:pl-0 ${textTheme} `}
+      >
+        {score}/ 10
+      </p>
+      <p className="text-neutral-400 md:text-base sm:text-sm sm:pt-2 ">
+        +{percent} from last month
+      </p>
+      <div className="absolute sm:-left-32 sm:bottom-16  sm:h-8 md:h-10 md:left-28 md:top-6 ">
         <CircularProgress
           percent={score}
           average={true}
