@@ -6,13 +6,7 @@ import UserItem from "./UserItem";
 
 export default function Overview({ data }) {
   const { users } = useContext(DataContext);
-  const [scores, setScores] = useState({
-    average: 0,
-    sort: 0,
-    set: 0,
-    shine: 0,
-    count: 0,
-  });
+  const [scores, setScores] = useState();
   const [recentUsers, setRecentUsers] = useState({
     totalLength: 0,
     users: [],
@@ -34,43 +28,82 @@ export default function Overview({ data }) {
       });
     }
     console.log("usersList overview >> ", usersList);
-  }, [data]);
+  }, [data, users]);
 
   useEffect(() => {
     if (data) {
-      let avgScore = { sort: 0, set: 0, shine: 0, count: 0 };
+      const monthlyAverages = {};
 
       for (const space of data.spaces) {
         const rating = space.rating[0];
-        console.log(space);
         if (rating) {
-          avgScore.sort += rating?.sort;
-          avgScore.set += rating?.setInOrder;
-          avgScore.shine += rating?.shine;
-          avgScore.count++;
+          const date = new Date(space.dateModified);
+          const month = `${date.toLocaleDateString("en-US", {
+            month: "short",
+          })} ${date.getFullYear()}`;
+          if (!monthlyAverages[month]) {
+            monthlyAverages[month] = {
+              date: month,
+              Sort: 0,
+              "Set In Order": 0,
+              Shine: 0,
+              count: 0,
+            };
+          }
+          monthlyAverages[month].Sort += rating.sort;
+          monthlyAverages[month]["Set In Order"] += rating.setInOrder;
+          monthlyAverages[month].Shine += rating.shine;
+          monthlyAverages[month].count++;
         }
       }
 
-      const total = avgScore.sort + avgScore.set + avgScore.shine;
-      if (total > 0) {
-        setScores(() => {
-          const totalScores = total;
-          const average = totalScores / avgScore.count;
-          const percScore = average / 30;
-          const score = percScore * 10;
-          const finalScore = Math.min(Math.max(score, 1), 10);
+      const averageScores = Object.values(monthlyAverages).map((average) => {
+        let sort = (average.Sort / average.count).toFixed(1);
+        let set = (average["Set In Order"] / average.count).toFixed(1);
+        let shine = (average.Shine / average.count).toFixed(1);
+        return {
+          date: average.date,
+          Sort: sort,
+          "Set In Order": set,
+          Shine: shine,
+          Average: (
+            (parseFloat(sort) + parseFloat(set) + parseFloat(shine)) /
+            3
+          ).toFixed(1),
+        };
+      });
 
-          const sort = avgScore.sort / avgScore.count;
-          const set = avgScore.set / avgScore.count;
-          const shine = avgScore.shine / avgScore.count;
+      averageScores.sort((a, b) => new Date(a.date) - new Date(b.date));
+      console.log("average scores pppp", averageScores);
 
-          return {
-            average: finalScore.toFixed(1),
-            sort: sort.toFixed(1),
-            set: set.toFixed(1),
-            shine: shine.toFixed(1),
-          };
-        });
+      if (averageScores.length > 1) {
+        const currentMonth = averageScores[averageScores.length - 1];
+        const previousMonth = averageScores[averageScores.length - 2];
+
+        const sortDifference =
+          ((currentMonth.Sort - previousMonth.Sort) / previousMonth.Sort) * 100;
+        const setDifference =
+          ((currentMonth["Set In Order"] - previousMonth["Set In Order"]) /
+            previousMonth["Set In Order"]) *
+          100;
+        const shineDifference =
+          ((currentMonth.Shine - previousMonth.Shine) / previousMonth.Shine) *
+          100;
+
+        const overallDifference =
+          ((currentMonth.Average - previousMonth.Average) /
+            previousMonth.Average) *
+          100;
+
+        setScores(() => ({
+          average: currentMonth,
+          sortDifference: sortDifference.toFixed(1),
+          setDifference: setDifference.toFixed(1),
+          shineDifference: shineDifference.toFixed(1),
+          overallDifference: overallDifference.toFixed(1),
+        }));
+      } else {
+        setScores(() => ({ average: averageScores[0] }));
       }
     }
   }, [data]);
@@ -81,13 +114,29 @@ export default function Overview({ data }) {
         Overview
       </h2>
       <div className="flex w-full justify-around mt-4 mx-auto">
-        <Card score={scores?.average ?? 0} title={"Overall"} percent="8%" />
-        <Card score={scores?.sort ?? 0} title={"Sort"} />
-        <Card score={scores?.set ?? 0} title={"Set In Order"} percent="14%" />
-        <Card score={scores?.shine ?? 0} title={"Shine"} />
+        <Card
+          score={scores?.average?.Average ?? 0}
+          title={"Overall"}
+          percent={`${scores?.overallDifference ?? 0}%`}
+        />
+        <Card
+          score={scores?.average?.Sort ?? 0}
+          title={"Sort"}
+          percent={`${scores?.sortDifference ?? 0}%`}
+        />
+        <Card
+          score={(scores?.average && scores?.average["Set In Order"]) ?? 0}
+          title={"Set In Order"}
+          percent={`${scores?.setDifference ?? 0}%`}
+        />
+        <Card
+          score={scores?.average?.Shine ?? 0}
+          title={"Shine"}
+          percent={`${scores?.shineDifference ?? 0}%`}
+        />
       </div>
       <div className="flex md:flex-row sm:flex-col gap-4 w-full h-[35rem] mt-8">
-        <BarChartCustom filteredRatings={data.spaces} />
+        <BarChartCustom data={data.spaces} scores={scores} />
         <div className="md:w-1/4 sm:full h-full bg-white shadow rounded-2xl p-8">
           <h2 className="text-lg text-neutral-700 font-semibold">
             Recent Users

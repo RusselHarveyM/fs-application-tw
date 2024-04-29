@@ -75,7 +75,7 @@ export default function DashboardContent() {
   }
   return (
     <div className="flex flex-col w-full m-auto py-6 px-8 mb-18">
-      <div className="flex justify-center items-center md:gap-56 sm:gap-28 mt-8 mb-16 ">
+      <div className="flex justify-center items-center sm:w-[30rem] md:w-full m-auto md:gap-56 sm:gap-28 mt-8 mb-16 ">
         <CircularProgress
           percent={10}
           title="overall"

@@ -46,20 +46,20 @@ const DUMMY_DATA = [
   },
 ];
 
-export function BarChartCustom({ filteredRatings }) {
-  const [chartData, setChartData] = useState([]);
+export function BarChartCustom({ data, scores }) {
+  const [chartData, setChartData] = useState(scores);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  console.log("filteredRatings >> ", filteredRatings);
+  // console.log("filteredRatings >> ", filteredRatings);
 
   useEffect(() => {
-    if (filteredRatings.length > 0) {
-      console.log(filteredRatings);
+    if (data.length > 0) {
+      console.log(data);
 
       const monthlyAverages = {};
 
       // Calculate monthly averages for the selected year
-      filteredRatings.forEach((space) => {
+      data.forEach((space) => {
         // space.ratings.forEach((rating) => {
         const rating = space.rating[0];
         if (rating) {
@@ -100,12 +100,12 @@ export function BarChartCustom({ filteredRatings }) {
 
       setChartData(averageScores);
     }
-  }, [filteredRatings, selectedYear]);
+  }, [data, selectedYear]);
 
   // Extract available years from filteredRatings
   const availableYears = [
     ...new Set(
-      filteredRatings.flatMap((space) =>
+      data.flatMap((space) =>
         space.rating.map((rating) =>
           new Date(rating.dateModified).getFullYear()
         )

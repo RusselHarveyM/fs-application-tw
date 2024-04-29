@@ -40,7 +40,7 @@ export default function Sidebar({
           >
             <ArrowLeft />
             {isLoad ? (
-              <h2 className="animate-pulse md:w-40 sm:w-30 rounded h-5 bg-neutral-300 text-xl text-neutral-600" />
+              <h2 className="animate-pulse md:w-40 sm:w-28 rounded h-5 bg-neutral-300 text-xl text-neutral-600" />
             ) : (
               buildingData?.buildingName
             )}
@@ -48,7 +48,7 @@ export default function Sidebar({
           <div className="flex gap-4 items-center w-[90%] h-24 mb-4 mt-4 ">
             {isLoad ? (
               <>
-                <div className="animate-pulse w-20 h-20 object-fill rounded-md bg-neutral-300"></div>
+                <div className="animate-pulse md:w-20 md:h-20 sm:w-16 sm:h-16 object-fill rounded-md bg-neutral-300"></div>
                 <h2 className="animate-pulse w-32 rounded h-5 bg-neutral-300 text-xl text-neutral-600" />
               </>
             ) : (
@@ -56,7 +56,7 @@ export default function Sidebar({
                 <img
                   src={`data:image/jpeg;base64,${roomData?.image}`}
                   alt="room-image"
-                  className="sm:w-16 w sm:h-16 md:w-20 md:h-20 object-fill rounded-md bg-stone-100"
+                  className="sm:w-16  sm:h-16 md:w-20 md:h-20 object-fill rounded-md bg-stone-100"
                 />
                 <h2 className="sm:text-md md:text-xl text-neutral-600">
                   {roomData.roomNumber}
