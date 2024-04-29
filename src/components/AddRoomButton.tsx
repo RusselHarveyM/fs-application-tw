@@ -39,8 +39,8 @@ const AddRoomButton = () => {
         className="flex items-center ml-2"
         onClick={() => addRoomModal.current.open()}
       >
-        Add Entry
-        <Plus className="h-4 w-4" />
+        <span className=" hidden sm:inline">Add Room</span>
+        <Plus className="h-4 w-4 sm:hidden"/>
       </Button>
     </>
   );

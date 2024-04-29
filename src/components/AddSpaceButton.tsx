@@ -43,8 +43,8 @@ const AddSpaceButton = () => {
         className="flex items-center ml-2"
         onClick={() => addSpaceModal.current.open()}
       >
-        Add Entry
-        <Plus className="h-4 w-4" />
+        <span className=" hidden sm:inline">Add Space</span>
+        <Plus className="h-4 w-4 sm:hidden"/>
       </Button>
     </>
   );
