@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import AddSpaceModal from "@/components/AddSpaceModal";
+import EditSpaceModal from "@/components/EditSpaceModal";
 import Modal from "@/components/Modal";
 import { useContext, useRef } from "react";
 import { DataContext } from "@/data/data-context";
@@ -82,15 +82,18 @@ export const spaceColumns: ColumnDef<Space>[] = [
             method: "put",
             data: {
               id: space.id,
-              data: { id: space.id, pictures: null, ...data },
+              data: { id: space.id, roomId: space.roomId, pictures: null, ...data },
             },
           };
+          //help me print the space.roomId here
+          console.log(">>>>>>>>>>>>>>>>Space Room ID:", space.roomId);
+          console.log(action);
           // Call the useEntry function to update the user
           useEntry(action);
           // console.log(`User with ID ${user.id} updated successfully`);
           editModal.current.close(); // Close the modal after successful update
         } catch (error) {
-          console.error("Error updating user:", error);
+          console.error("Error updating space:", error);
         }
       }
 
@@ -121,12 +124,11 @@ export const spaceColumns: ColumnDef<Space>[] = [
 
       return (
         <>
-          <AddSpaceModal
-            buttonCaption="Edit Entry"
+          <EditSpaceModal
+            buttonCaption="Edit Space"
             buttonVariant="blue"
             ref={editModal}
             onSubmit={handleSpaceEdit}
-            isEditing={true} // Indicate that it's in edit mode
             initialValues={space} // Pass the selected space's data as initialValues
           />
           <Modal

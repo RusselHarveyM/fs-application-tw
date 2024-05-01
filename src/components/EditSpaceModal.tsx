@@ -5,7 +5,7 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import { Input } from "./ui/input";
 import { DataContext } from "@/data/data-context"; // Import DataContext
 
-const AddSpaceModal = forwardRef(function AddSpaceModal(
+const EditSpaceModal = forwardRef(function EditSpaceModal(
   {
     buttonVariant = undefined,
     buttonCaption,
@@ -16,44 +16,49 @@ const AddSpaceModal = forwardRef(function AddSpaceModal(
 ) {
   const dialog = useRef();
   const { rooms } = useContext(DataContext);
-  const [newSpace, setNewSpace] = useState(initialValues);
+  const [editedSpace, setEditedSpace] = useState(initialValues);
 
   useImperativeHandle(ref, () => ({
     open() {
       dialog.current.showModal();
-      setNewSpace(initialValues); // Reset form data when modal is opened
+      setEditedSpace(initialValues); // Set initial values when modal is opened
     },
     close() {
       dialog.current.close();
     },
     setInitialValues(values) {
-      setNewSpace(values);
+      setEditedSpace(values);
     },
   }));
 
   const handleInputChange = (event, field) => {
-    setNewSpace((prevSpace) => ({
+    setEditedSpace((prevSpace) => ({
       ...prevSpace,
       [field]: event.target.value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission
 
     const requestBody = {
-      id: newSpace.id,
-      name: newSpace.name,
-      roomId: newSpace.roomId,
-      pictures: newSpace.pictures,
+      id: editedSpace.id,
+      name: editedSpace.name,
+      roomId: editedSpace.roomId,
+      pictures: editedSpace.pictures,
       standard: null,
+      viewedDate: null,
+      assessedDate: null,
     };
 
-    onSubmit(requestBody).then((response) => {
-      const { roomId } = response.data; // Assuming the response contains the generated roomId
-      setNewSpace((prevSpace) => ({ ...prevSpace, id: roomId }));
-    }); // Pass request to onSubmit handler
-    dialog.current.close(); // Close the modal after submission
+    try {
+      // Call the onSubmit handler to submit the form data
+      await onSubmit(requestBody);
+      // Close the modal after successful submission
+      dialog.current.close();
+    } catch (error) {
+      console.error("Error updating building:", error);
+    }
   };
 
   return createPortal(
@@ -68,7 +73,7 @@ const AddSpaceModal = forwardRef(function AddSpaceModal(
         <div className="sm:max-w-[425px]">
           <div>
             <h2 className="text-lg font-semibold mb-2 text-center">
-              Add Space
+              Edit Space
             </h2>
           </div>
           <div className="grid gap-4 py-4">
@@ -78,7 +83,7 @@ const AddSpaceModal = forwardRef(function AddSpaceModal(
               </Label>
               <select
                 id="roomId"
-                value={newSpace.roomId}
+                value={editedSpace.roomId}
                 onChange={(e) => handleInputChange(e, "roomId")}
                 className="col-span-3"
               >
@@ -97,7 +102,7 @@ const AddSpaceModal = forwardRef(function AddSpaceModal(
               <Input
                 id="name"
                 type="text"
-                value={newSpace.name}
+                value={editedSpace.name}
                 onChange={(e) => handleInputChange(e, "name")}
                 placeholder="Space Name"
                 className="col-span-3"
@@ -127,4 +132,4 @@ const AddSpaceModal = forwardRef(function AddSpaceModal(
   );
 });
 
-export default AddSpaceModal;
+export default EditSpaceModal;
