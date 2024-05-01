@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
+import { isAdminLoggedIn } from "@/helper/auth";
 import Logo from "../assets/citu_logo.png";
 import Settings from "../assets/Settings.png";
 
@@ -28,14 +29,16 @@ export default function TopNavigation() {
             >
               Home
             </NavLink>
-            <NavLink
-              to={"manage"}
-              className={({ isActive }) =>
-                isActive ? highlightNavClass : undefined
-              }
-            >
-              Manage
-            </NavLink>
+            {isAdminLoggedIn() && (
+              <NavLink
+                to={"manage"}
+                className={({ isActive }) =>
+                  isActive ? highlightNavClass : undefined
+                }
+              >
+                Manage
+              </NavLink>
+            )}
           </ul>
         </li>
         <li className="w-1/3 flex items-center justify-end">

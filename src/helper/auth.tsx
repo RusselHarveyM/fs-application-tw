@@ -9,8 +9,21 @@ export function getAuthToken() {
   return storedItem;
 }
 
+export function isAdminLoggedIn() {
+  const loggedIn = getAuthToken();
+  if (loggedIn.role === "admin") return true;
+  return false;
+}
+
 export function tokenLoader() {
   return getAuthToken();
+}
+
+export function checkAuthLoaderSpecial() {
+  if (!isAdminLoggedIn()) {
+    return redirect("/home");
+  }
+  return null;
 }
 
 export function checkAuthLoader() {
