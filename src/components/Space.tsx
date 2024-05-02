@@ -538,7 +538,11 @@ export default function Space({ data }) {
                   )}
                 </div>
                 {loggedIn.role === "admin" && (
-                  <Button variant="blue" onClick={handleSpaceCheck}>
+                  <Button
+                    variant="blue"
+                    onClick={handleSpaceCheck}
+                    disabled={space.standard === ""}
+                  >
                     Check
                   </Button>
                 )}
