@@ -526,12 +526,14 @@ export default function Space({ data }) {
                   {space.name ? (
                     <p
                       className={`text-xs ${
-                        space.standard !== ""
+                        space.standard !== "" && space.standard
                           ? "bg-green-400"
                           : "bg-neutral-400"
                       } py-2 px-4 rounded-2xl text-white font-semibold opacity-60`}
                     >
-                      {space.standard !== "" ? "Calibrated" : "Not Calibrated"}
+                      {space.standard !== "" && space.standard
+                        ? "Calibrated"
+                        : "Not Calibrated"}
                     </p>
                   ) : (
                     ""
@@ -587,7 +589,9 @@ export default function Space({ data }) {
                               : false
                           }
                         >
-                          {space?.standard === "" ? "Calibrate" : "Assess"}
+                          {space?.standard === "" || !space?.standard
+                            ? "Calibrate"
+                            : "Assess"}
                         </Button>
                       </>
                     )}

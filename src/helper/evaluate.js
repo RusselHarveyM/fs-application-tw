@@ -456,8 +456,9 @@ export default async function evaluate(images, spacename, standard) {
     // end
   }
   console.log("before", objects);
+  console.log("standard", standard);
 
-  if (standard !== "") {
+  if (standard !== "" && standard !== null) {
     const c_result = await c_evaluation(objects, spacename, standard);
     console.log("c_result >>> ", c_result);
 
