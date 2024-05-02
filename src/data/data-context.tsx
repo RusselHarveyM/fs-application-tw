@@ -221,6 +221,8 @@ export default function DataContextProvider({ children }) {
   }
 
   async function updateSpace(spaceId, updatedSpaceData) {
+    console.log(updatedSpaceData);
+    console.log(updatedSpaceData.data.roomId);
     return axios
       .put(`${endpoint}/api/space/${spaceId}`, updatedSpaceData)
       .then(() => console.log(`Space with ID ${spaceId} updated successfully`))
@@ -610,6 +612,7 @@ export default function DataContextProvider({ children }) {
       if (action.method === "put") {
         const updatedSpaceData = action.data;
         const spaceId = action.data.id;
+        console.log("update space data:", updatedSpaceData)
         try {
           await updateSpace(spaceId, updatedSpaceData);
           await getSpaces();
