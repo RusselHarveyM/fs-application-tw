@@ -543,7 +543,15 @@ export default function Space({ data }) {
                   <Button
                     variant="blue"
                     onClick={handleSpaceCheck}
-                    disabled={!checkMonth(data?.space?.assessedDate)}
+                    disabled={
+                      data?.space?.viewedDate === null &&
+                      data?.space?.assessedDate === null
+                        ? true
+                        : checkMonth(data?.space?.assessedDate) === true &&
+                          checkMonth(data?.space?.viewedDate) === false
+                        ? false
+                        : true
+                    }
                   >
                     Check
                   </Button>
