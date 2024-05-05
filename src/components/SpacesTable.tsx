@@ -59,7 +59,10 @@ export default function SpacesTable({ data }) {
           {data.map((data) => {
             let statusCss = "w-fit rounded-xl py-2 px-4";
             let statusCaption = "not viewed";
-            if (checkMonth(data.space.viewedDate)) {
+            if (
+              checkMonth(data.space.viewedDate) &&
+              checkMonth(data.space.assessedDate)
+            ) {
               statusCaption = "viewed";
               statusCss += " bg-purple-500 text-white  ";
             } else {

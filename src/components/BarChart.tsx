@@ -50,8 +50,6 @@ export function BarChartCustom({ data, scores }) {
   const [chartData, setChartData] = useState(scores);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  // console.log("filteredRatings >> ", filteredRatings);
-
   useEffect(() => {
     if (data.length > 0) {
       console.log(data);

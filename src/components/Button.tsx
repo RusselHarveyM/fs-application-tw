@@ -22,7 +22,7 @@ export default function Button({
   }
   return (
     <li className={liCss + " list-none"}>
-      <button {...props} className={cssClasses}>
+      <button {...props} className={cssClasses} >
         {children}
       </button>
     </li>
