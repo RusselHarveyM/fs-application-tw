@@ -1,5 +1,4 @@
 export function checkMonth(date) {
-  console.log("dateeee:", date);
   if (date) {
     const currDate = new Date(date).getMonth();
     return currDate === new Date().getMonth();
