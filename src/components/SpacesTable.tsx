@@ -69,15 +69,19 @@ export default function SpacesTable({ data }) {
               statusCss += " bg-neutral-300 text-white  ";
             }
 
-            const viewedDate = data?.space?.viewedDate
-              ? new Date(data?.space?.viewedDate).toLocaleDateString("en-US", {
-                  day: "numeric",
-                  month: "short",
-                  hour: "numeric",
-                  minute: "numeric",
-                  hour12: true,
-                })
-              : "----";
+            const viewedDate =
+              data?.space?.viewedDate && data?.space?.assessedDate
+                ? new Date(data?.space?.viewedDate).toLocaleDateString(
+                    "en-US",
+                    {
+                      day: "numeric",
+                      month: "short",
+                      hour: "numeric",
+                      minute: "numeric",
+                      hour12: true,
+                    }
+                  )
+                : "----";
 
             const assessedDate = data?.space?.assessedDate
               ? new Date(data?.space?.assessedDate).toLocaleDateString(
