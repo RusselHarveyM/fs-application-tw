@@ -24,6 +24,8 @@ import Comment from "./Comment";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
 
+import { checkMonth } from "@/helper/dateChecker.js";
+
 const SPACE_DEFINITION = {
   id: undefined,
   name: "",
@@ -214,7 +216,7 @@ export default function Space({ data }) {
       duration.current += 1;
     }, 1000);
     const raw5s = await evaluate(images, space?.name, space?.standard);
-    if (raw5s.standard === "") {
+    if (raw5s.standard === "" || !checkMonth(data?.space?.assessedDate)) {
       const commentResult = comment(raw5s);
       const { sort, set, shine } = commentResult;
       const { score: sortScore } = raw5s.scores.sort;
@@ -419,13 +421,9 @@ export default function Space({ data }) {
     </Modal>
   );
 
-  const isAssessedThisMonth =
-    data.space.assessedDate &&
-    new Date(data.space.assessedDate).getMonth() === new Date().getMonth();
-
   const renderAdminView =
     loggedIn.role === "admin" ||
-    (loggedIn.role === "user" && isAssessedThisMonth) ? (
+    (loggedIn.role === "user" && checkMonth(data?.space?.assessedDate)) ? (
       <div className="relative flex bg-white md:w-full sm:w-[42rem] gap-8 shadow-sm p-8 pt-20  rounded-lg">
         <div className="flex  w-full absolute top-5  ">
           <Select
@@ -526,12 +524,14 @@ export default function Space({ data }) {
                   {space.name ? (
                     <p
                       className={`text-xs ${
-                        space.standard !== "" && space.standard
+                        space.standard !== "" &&
+                        checkMonth(data?.space?.assessedDate)
                           ? "bg-green-400"
                           : "bg-neutral-400"
                       } py-2 px-4 rounded-2xl text-white font-semibold opacity-60`}
                     >
-                      {space.standard !== "" && space.standard
+                      {space.standard !== "" &&
+                      checkMonth(data?.space?.assessedDate)
                         ? "Calibrated"
                         : "Not Calibrated"}
                     </p>
@@ -543,7 +543,7 @@ export default function Space({ data }) {
                   <Button
                     variant="blue"
                     onClick={handleSpaceCheck}
-                    disabled={space.standard === ""}
+                    disabled={checkMonth(data?.space?.assessedDate)}
                   >
                     Check
                   </Button>
@@ -589,7 +589,8 @@ export default function Space({ data }) {
                               : false
                           }
                         >
-                          {space?.standard === "" || !space?.standard
+                          {space?.standard === "" ||
+                          !checkMonth(data?.space?.assessedDate)
                             ? "Calibrate"
                             : "Assess"}
                         </Button>

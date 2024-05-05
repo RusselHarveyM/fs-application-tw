@@ -13,6 +13,8 @@ import Space from "./Space";
 import { useState, useContext } from "react";
 import { DataContext } from "@/data/data-context";
 
+import { checkMonth } from "@/helper/dateChecker";
+
 export default function SpacesTable({ data }) {
   console.log(data);
   const [spaceData, setSpaceData] = useState(undefined);
@@ -57,7 +59,7 @@ export default function SpacesTable({ data }) {
           {data.map((data) => {
             let statusCss = "w-fit rounded-xl py-2 px-4";
             let statusCaption = "not viewed";
-            if (data.space.viewedDate) {
+            if (checkMonth(data.space.viewedDate)) {
               statusCaption = "viewed";
               statusCss += " bg-purple-500 text-white  ";
             } else {
