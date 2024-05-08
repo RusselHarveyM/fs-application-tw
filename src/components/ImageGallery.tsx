@@ -15,13 +15,13 @@ export default function ImageGallery({
         (images && images?.length > 0) || isLoad ? undefined : cssLoad
       } relative`} // Add relative here to position the child absolute elements
     >
-      {!isLoad ? (
+      {/* {!isLoad ? (
         <p className="absolute m-2 bottom-2 right-2 text-neutral-600 text-xs">
           {duration.toFixed(2)}s
         </p>
       ) : (
         <Skeleton className="absolute m-2 bottom-2 right-2 w-20 h-6 z-40 bg-neutral-200" />
-      )}
+      )} */}
 
       {isLoad && (
         <div className="absolute top-0 left-0 flex justify-center items-center  w-[27rem] h-[30rem] bg-neutral-50 opacity-90">
@@ -33,7 +33,6 @@ export default function ImageGallery({
 
       {images && images?.length > 0
         ? images.map((imageObject: any) => {
-            console.log(imageObject);
             let tag = "all";
             if (imageObject.forType === "all" && allFlag === 0) {
               allFlag = 1;
@@ -54,7 +53,11 @@ export default function ImageGallery({
             return (
               <div
                 key={imageObject.id}
-                className="relative  hover:scale-105 hover:cursor-pointer"
+                className={`relative ${
+                  isLoad
+                    ? "opacity-50"
+                    : " hover:cursor-pointer hover:scale-105"
+                }  `}
               >
                 <img
                   src={`data:image/jpeg;base64,${imageObject.image}`}

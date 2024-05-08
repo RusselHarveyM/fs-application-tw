@@ -142,7 +142,7 @@ export default function Overview({ data }) {
             Recent Users
           </h2>
           <p className="text-neutral-400 text-sm">
-            {recentUsers.totalLength} users attended to this room this year.
+            {recentUsers.totalLength} users attended to this room.
           </p>
           {recentUsers.users.map((user, index) => {
             return (

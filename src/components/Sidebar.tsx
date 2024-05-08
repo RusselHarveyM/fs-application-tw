@@ -39,11 +39,7 @@ export default function Sidebar({
             }
           >
             <ArrowLeft />
-            {isLoad ? (
-              <h2 className="animate-pulse md:w-40 sm:w-28 rounded h-5 bg-neutral-300 text-xl text-neutral-600" />
-            ) : (
-              buildingData?.buildingName
-            )}
+            {buildingData?.buildingName}
           </NavLink>
           <div className="flex gap-4 items-center w-[90%] h-24 mb-4 mt-4 ">
             {isLoad ? (
@@ -85,7 +81,7 @@ export default function Sidebar({
               <Box />
               Spaces
             </Button>
-            <Button
+            {/* <Button
               cssAdOns={`flex gap-2 ${
                 selectedTab === "redtags" ? highlightNavClass : undefined
               }`}
@@ -94,7 +90,7 @@ export default function Sidebar({
             >
               <Tag />
               Red Tags
-            </Button>
+            </Button> */}
           </menu>
         </aside>
       )}

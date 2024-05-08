@@ -72,6 +72,27 @@ export default function DataContextProvider({ children }) {
     // }
   }
 
+  async function getSpaceImagesById(id) {
+    try {
+      const spaceImages = (
+        await axios.get(`${endpoint}/api/spaceImage/get/${id}`)
+      ).data;
+      setData((prev) => {
+        return {
+          ...prev,
+          spaceImages,
+        };
+      });
+    } catch (error) {
+      setData((prev) => {
+        return {
+          ...prev,
+          spaceImages: [],
+        };
+      });
+    }
+  }
+
   async function getSpaceImages() {
     try {
       const spaceImages = (
@@ -281,6 +302,69 @@ export default function DataContextProvider({ children }) {
   async function updateSpaceAssessedDate(id) {
     return (await axios.put(`${endpoint}/api/space/${id}/assesseddate`)).data;
   }
+
+  async function updateSpaceCalibrationDate(id) {
+    return (await axios.put(`${endpoint}/api/space/${id}/calibrationdate`))
+      .data;
+  }
+
+  async function getRatings() {
+    try {
+      const ratings = (await axios.get(`${endpoint}/api/ratings`)).data;
+      setData((prev) => {
+        return {
+          ...prev,
+          ratings,
+        };
+      });
+    } catch (e) {
+      setData((prev) => {
+        return {
+          ...prev,
+          ratings: [],
+        };
+      });
+    }
+  }
+
+  async function getRatingsById(id) {
+    try {
+      const ratings = (await axios.get(`${endpoint}/api/ratings/${id}/ratings`))
+        .data;
+      setData((prev) => {
+        return {
+          ...prev,
+          ratings,
+        };
+      });
+    } catch (e) {
+      setData((prev) => {
+        return {
+          ...prev,
+          ratings: [],
+        };
+      });
+    }
+  }
+
+  async function getComments() {
+    try {
+      const comments = (await axios.get(`${endpoint}/api/comments`)).data;
+      setData((prev) => {
+        return {
+          ...prev,
+          comments,
+        };
+      });
+    } catch (e) {
+      setData((prev) => {
+        return {
+          ...prev,
+          comments: [],
+        };
+      });
+    }
+  }
   /*
   ------------------------
   function handleUseEntry
@@ -297,6 +381,10 @@ export default function DataContextProvider({ children }) {
       if (action.method === "get") {
         // await getSpaceImagesBySpaceId(action.data.id);
         await getSpaceImages();
+      }
+      if (action.method === "getById") {
+        // await getSpaceImagesBySpaceId(action.data.id);
+        await getSpaceImagesById(action.data.id);
       }
       // if (action.method === "getAll") {
       //   await getSpaceImages();
@@ -331,15 +419,10 @@ export default function DataContextProvider({ children }) {
     }
     if (action.type === "ratings") {
       if (action.method === "get") {
-        const ratings = (await axios.get(`${endpoint}/api/ratings`)).data;
-        console.log(ratings);
-
-        setData((prev) => {
-          return {
-            ...prev,
-            ratings,
-          };
-        });
+        await getRatings();
+      }
+      if (action.method === "getById") {
+        await getRatingsById(action.data.id);
       }
       if (action.method === "post") {
         let scores = action.data.scores;
@@ -386,15 +469,7 @@ export default function DataContextProvider({ children }) {
     }
     if (action.type === "comments") {
       if (action.method === "get") {
-        const comments = (await axios.get(`${endpoint}/api/comment`)).data;
-        console.log(comments);
-
-        setData((prev) => {
-          return {
-            ...prev,
-            comments,
-          };
-        });
+        await getComments();
       }
     }
     if (action.type === "users") {
@@ -606,6 +681,10 @@ export default function DataContextProvider({ children }) {
       }
       if (action.method === "assessed") {
         await updateSpaceAssessedDate(action.data.id);
+        await getSpaces();
+      }
+      if (action.method === "calibrate") {
+        await updateSpaceCalibrationDate(action.data.id);
         await getSpaces();
       }
       if (action.method === "put") {

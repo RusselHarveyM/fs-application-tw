@@ -10,30 +10,26 @@ import {
 } from "@/components/ui/table";
 
 import Space from "./Space";
-import { useState, useContext } from "react";
-import { DataContext } from "@/data/data-context";
+import { useState } from "react";
 
-import { checkMonth } from "@/helper/dateChecker";
+import { checkMonth, getDateString, sortDate } from "@/helper/date";
+import { isAdminLoggedIn } from "@/helper/auth";
 
-export default function SpacesTable({ data }) {
+export default function SpacesTable({ data, ratings }) {
   console.log(data);
-  const [spaceData, setSpaceData] = useState(undefined);
-  const { useEntry } = useContext(DataContext);
+  const spaceId = data[0].id;
+  const [selectedId, setSelectedId] = useState(spaceId);
 
-  function handleClickSpace(data) {
-    if (data.space.id !== spaceData?.space.id) {
-      let action = {
-        type: "spaceimages",
-        method: "get",
-        data: {
-          id: data.space.id,
-        },
-      };
-      useEntry(action);
-      console.log("data >> ", data);
-      setSpaceData(() => data);
+  function handleClickSpace(clickedData) {
+    if (clickedData.id !== selectedId) {
+      setSelectedId(clickedData.id);
     }
   }
+  const foundSpace = data.find((curr) => curr.id === selectedId);
+
+  const isLoggedIn = isAdminLoggedIn();
+
+  const foundRatings = ratings?.filter((curr) => curr.spaceId === selectedId);
 
   return (
     <div className="md:w-[90rem] sm:w-[44rem] mx-auto bg-white rounded-lg mt-10 flex flex-col items-center justify-center p-6">
@@ -42,8 +38,7 @@ export default function SpacesTable({ data }) {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[150px]">Name</TableHead>
-            {JSON.parse(localStorage.getItem("isLoggedIn")).role ===
-              "admin" && (
+            {isLoggedIn && (
               <>
                 <TableHead className="text-center">Sort</TableHead>
                 <TableHead className="text-center">Set In Order</TableHead>
@@ -56,12 +51,12 @@ export default function SpacesTable({ data }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((data) => {
+          {data?.map((currData) => {
             let statusCss = "w-fit rounded-xl py-2 px-4";
             let statusCaption = "not viewed";
             if (
-              checkMonth(data.space.viewedDate) &&
-              checkMonth(data.space.assessedDate)
+              checkMonth(currData.viewedDate) &&
+              checkMonth(currData.assessedDate)
             ) {
               statusCaption = "viewed";
               statusCss += " bg-purple-500 text-white  ";
@@ -69,52 +64,41 @@ export default function SpacesTable({ data }) {
               statusCss += " bg-neutral-300 text-white  ";
             }
 
+            const currRatings = sortDate(ratings);
+            // console.log(ratings);
             const viewedDate =
-              data?.space?.viewedDate && data?.space?.assessedDate
-                ? new Date(data?.space?.viewedDate).toLocaleDateString(
-                    "en-US",
-                    {
-                      day: "numeric",
-                      month: "short",
-                      hour: "numeric",
-                      minute: "numeric",
-                      hour12: true,
-                    }
-                  )
+              currData?.viewedDate && currData?.assessedDate
+                ? getDateString(currData?.viewedDate)
                 : "----";
 
-            const assessedDate = data?.space?.assessedDate
-              ? new Date(data?.space?.assessedDate).toLocaleDateString(
-                  "en-US",
-                  {
-                    day: "numeric",
-                    month: "short",
-                    hour: "numeric",
-                    minute: "numeric",
-                    hour12: true,
-                  }
-                )
+            const assessedDate = currData?.assessedDate
+              ? getDateString(currData?.assessedDate)
               : "----";
             return (
               <TableRow
-                key={data.space.id}
-                onClick={() => handleClickSpace(data)}
+                key={currData.id}
+                onClick={() => handleClickSpace(currData)}
                 className={`hover:cursor-pointer ${
-                  data.space.id === spaceData?.space?.id && "bg-neutral-50"
+                  currData.id === selectedId && "bg-neutral-50"
                 }`}
               >
-                <TableCell className="font-medium">{data.space.name}</TableCell>
-                {JSON.parse(localStorage.getItem("isLoggedIn")).role ===
-                  "admin" && (
+                <TableCell className="font-medium">{currData?.name}</TableCell>
+                {isLoggedIn && (
                   <>
                     <TableCell className="text-center">
-                      {data.rating[0] ? data.rating[0]?.sort : 0}
+                      {currRatings && currRatings.length > 0
+                        ? currRatings[0]?.sort
+                        : 0}
                     </TableCell>
                     <TableCell className="text-center ">
-                      {data.rating[0] ? data.rating[0]?.setInOrder : 0}
+                      {currRatings && currRatings.length > 0
+                        ? currRatings[0]?.setInOrder
+                        : 0}
                     </TableCell>
                     <TableCell className="text-center">
-                      {data.rating[0] ? data.rating[0]?.shine : 0}
+                      {currRatings && currRatings.length > 0
+                        ? currRatings[0]?.shine
+                        : 0}
                     </TableCell>
                   </>
                 )}
@@ -135,7 +119,7 @@ export default function SpacesTable({ data }) {
           </TableRow>
         </TableFooter> */}
       </Table>
-      {spaceData && <Space data={spaceData} />}
+      <Space data={foundSpace} spaceId={selectedId} ratings={foundRatings} />
     </div>
   );
 }

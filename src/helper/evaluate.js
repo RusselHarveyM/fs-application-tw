@@ -1,5 +1,6 @@
 import axios from "axios";
 import { c_evaluation } from "./checklist";
+import { isEmpty } from "./string";
 
 const API_KEY = "7kfXkOSEwHiflj4IHiHI";
 // const API_KEY = "FGmG3dRIEifT1HLzdCRS";
@@ -204,7 +205,12 @@ function score(data) {
   );
 }
 
-export default async function evaluate(images, spacename, standard) {
+export default async function evaluate(
+  images,
+  spacename,
+  standard,
+  isCalibrate
+) {
   let result = {
     scores: {
       sort: {
@@ -458,7 +464,7 @@ export default async function evaluate(images, spacename, standard) {
   console.log("before", objects);
   console.log("standard", standard);
 
-  if (standard !== "" && standard !== null) {
+  if (!isEmpty(standard)) {
     const c_result = await c_evaluation(objects, spacename, standard);
     console.log("c_result >>> ", c_result);
 
@@ -475,9 +481,8 @@ export default async function evaluate(images, spacename, standard) {
 
     console.log("result >>> ", result);
     score(result);
-  } else {
-    result.standard = JSON.stringify(objects);
   }
+  if (isCalibrate) result.standard = JSON.stringify(objects);
 
   return result;
 }
