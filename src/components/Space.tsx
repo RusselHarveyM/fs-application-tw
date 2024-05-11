@@ -221,21 +221,29 @@ export default function Space({
         };
 
         useEntry(action);
+        let updatedImages = [];
 
         for (let i = 0; i < newImages.length; i++) {
-          let pictureData = {
-            type: "spaceimages",
-            method: "put",
-            data: {
-              id: images[i].id,
-              spaceId: images[i].spaceId,
-              image: images[i].image,
-              forType: images[i].forType,
-              prediction: JSON.stringify(raw5s.predictions[i]),
-            },
+          const data = {
+            id: images[i].id,
+            spaceId: images[i].spaceId,
+            image: images[i].image,
+            forType: images[i].forType,
+            prediction: JSON.stringify(raw5s.predictions[i]),
           };
-          useEntry(pictureData);
+          updatedImages.push(data);
         }
+
+        let pictureData = {
+          type: "spaceimages",
+          method: "puts",
+          data: {
+            spaceId: updatedImages[0].spaceId,
+            spaceImages: updatedImages,
+          },
+        };
+
+        useEntry(pictureData);
 
         const roomId = params.id;
         const foundRoom = rooms.find((obj) => obj.id === roomId);

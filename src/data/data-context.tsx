@@ -416,7 +416,7 @@ export default function DataContextProvider({ children }) {
     }
   }
 
-  async function updateSpaceImages(data) {
+  async function updateSpaceImage(data) {
     return axios
       .put(`${endpoint}/api/spaceimage/${data.id}`, data)
       .then(() => success("Updated the space image successfully."))
@@ -424,6 +424,18 @@ export default function DataContextProvider({ children }) {
         console.log(error);
         somethingWentWrong(
           "It looks like there's a problem updating the space image."
+        );
+      });
+  }
+
+  async function updateSpaceImages(data) {
+    return axios
+      .put(`${endpoint}/api/spaceimages/${data.id}`, data)
+      .then(() => success("Updated the space images successfully."))
+      .catch((error) => {
+        console.log(error);
+        somethingWentWrong(
+          "It looks like there's a problem updating the space images."
         );
       });
   }
@@ -585,7 +597,11 @@ export default function DataContextProvider({ children }) {
           prediction: action.data.prediction,
           image: action.data.image,
         };
-        await updateSpaceImages(newData);
+        await updateSpaceImage(newData);
+        await getSpaceImagesBySpaceId(action.data.spaceId);
+      }
+      if (action.method === "puts") {
+        await updateSpaceImages(action.data.spaceImages);
         await getSpaceImagesBySpaceId(action.data.spaceId);
       }
       if (action.method === "delete") {
