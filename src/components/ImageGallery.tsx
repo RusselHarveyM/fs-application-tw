@@ -1,4 +1,6 @@
+import { Circle } from "rc-progress";
 import { Skeleton } from "./ui/skeleton";
+import { Images } from "lucide-react";
 
 export default function ImageGallery({
   images,
@@ -11,7 +13,9 @@ export default function ImageGallery({
 
   return (
     <div
-      className={`grid md:grid-cols-4 md:grid-rows-5 sm:grid-cols-7 sm:grid-rows-2 md:w-1/3 sm:w-full md:h-[30rem] sm:h-[10rem] bg-neutral-100 ${
+      className={`grid md:grid-cols-4 md:grid-rows-5 sm:grid-cols-7 sm:grid-rows-2 md:w-1/3 sm:w-full shadow-inner md:h-[30rem] sm:h-[10rem] ${
+        isLoad ? "bg-neutral-400 " : "bg-neutral-100"
+      }  ${
         (images && images?.length > 0) || isLoad ? undefined : cssLoad
       } relative`} // Add relative here to position the child absolute elements
     >
@@ -22,7 +26,7 @@ export default function ImageGallery({
       ) : (
         <Skeleton className="absolute m-2 bottom-2 right-2 w-20 h-6 z-40 bg-neutral-200" />
       )} */}
-
+      <Images className="absolute w-40 h-40 top-40 left-32 text-neutral-200 opacity-50" />
       {isLoad && (
         <div className="absolute top-0 left-0 flex justify-center items-center  w-[27rem] h-[30rem] bg-neutral-50 opacity-90">
           <h3 className="text-neutral-600 ">
@@ -59,6 +63,18 @@ export default function ImageGallery({
                     : " hover:cursor-pointer hover:scale-105"
                 }  `}
               >
+                {isLoad && (
+                  <Circle
+                    percent={50}
+                    trailWidth={18}
+                    strokeWidth={18}
+                    strokeLinecap="butt"
+                    trailColor={"#fff"}
+                    strokeColor={"#000"}
+                    className="animate-spin absolute w-5 h-5 left-1 top-1"
+                  />
+                )}
+
                 <img
                   src={`data:image/jpeg;base64,${imageObject.image}`}
                   alt="gallery-image"

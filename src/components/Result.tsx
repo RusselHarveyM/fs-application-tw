@@ -9,7 +9,7 @@ import ScoreCard from "./ScoreCard";
 import Comment from "./Comment";
 
 export default function Result({
-  isLoading,
+  isLoading = false,
   handleResultSelect,
   handleScoreClick,
   selectedScore,

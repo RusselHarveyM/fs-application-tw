@@ -1,5 +1,7 @@
 import { createContext, useEffect, useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
+import { ToastAction } from "@radix-ui/react-toast";
 
 export const DataContext = createContext({
   users: undefined,
@@ -17,6 +19,7 @@ export const DataContext = createContext({
 const endpoint = "https://localhost:7124";
 
 export default function DataContextProvider({ children }) {
+  const { toast } = useToast();
   const [data, setData] = useState({
     users: undefined,
     buildings: undefined,
@@ -28,14 +31,11 @@ export default function DataContextProvider({ children }) {
   });
 
   async function fetchAllData() {
-    // try {
     const newData = {
       users: [],
       buildings: [],
       rooms: [],
       spaces: [],
-      // ratings: [],
-      // comments: [],
     };
     newData.users = (await axios.get(`${endpoint}/api/user`)).data.map(
       (user) => ({
@@ -61,15 +61,25 @@ export default function DataContextProvider({ children }) {
     } catch (error) {
       newData.spaces = [];
     }
-
-    // newData.ratings = (await axios.get(`${endpoint}/api/ratings`)).data || [];
-    // newData.comments =
-    //   (await axios.get(`${endpoint}/api/comment`)).data || [];
-    console.log(newData);
     setData(newData);
-    // } catch (error) {
-    // console.log(error);
-    // }
+  }
+
+  function somethingWentWrong(message) {
+    toast({
+      title: "Something went wrong!",
+      variant: "destructive",
+      description: message,
+      action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
+    });
+  }
+
+  function success(message) {
+    toast({
+      title: "Success",
+      variant: "success",
+      description: message,
+      action: <ToastAction altText="dismiss">Dismiss</ToastAction>,
+    });
   }
 
   async function getSpaceImagesById(id) {
@@ -77,6 +87,7 @@ export default function DataContextProvider({ children }) {
       const spaceImages = (
         await axios.get(`${endpoint}/api/spaceImage/get/${id}`)
       ).data;
+      // success("Fetched Data Successfully.");
       setData((prev) => {
         return {
           ...prev,
@@ -84,6 +95,9 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (error) {
+      somethingWentWrong(
+        "It looks like there's a problem fetching the Space Images."
+      );
       setData((prev) => {
         return {
           ...prev,
@@ -98,6 +112,7 @@ export default function DataContextProvider({ children }) {
       const spaceImages = (
         await axios.get(`${endpoint}/api/spaceImage/get/spaces`)
       ).data;
+      // success("Fetched Data Successfully.");
       setData((prev) => {
         return {
           ...prev,
@@ -105,6 +120,10 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (error) {
+      somethingWentWrong(
+        "It looks like there's a problem fetching the Space Images."
+      );
+
       setData((prev) => {
         return {
           ...prev,
@@ -119,7 +138,8 @@ export default function DataContextProvider({ children }) {
       const spaceImages = (
         await axios.get(`${endpoint}/api/spaceImage/get/${id}`)
       ).data;
-      console.log("space images {} ", spaceImages);
+
+      // success("Fetched Data Successfully.");
       setData((prev) => {
         return {
           ...prev,
@@ -127,7 +147,9 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (error) {
-      console.log(error);
+      somethingWentWrong(
+        "It looks like there's a problem fetching the Space Images."
+      );
       setData((prev) => {
         return {
           ...prev,
@@ -142,18 +164,38 @@ export default function DataContextProvider({ children }) {
     formData.append("file", data.image);
     formData.append("forType", data.forType);
 
-    await axios.post(`${endpoint}/api/spaceImage/upload/${id}`, formData);
+    await axios
+      .post(`${endpoint}/api/spaceImage/upload/${id}`, formData)
+      .then(() => {
+        success("Added Space Image Successfully.");
+      })
+      .catch(() => {
+        somethingWentWrong(
+          "It looks like there's a problem adding the Space Image."
+        );
+      });
   }
 
   async function deleteSpaceImage(id) {
-    await axios.delete(`${endpoint}/api/spaceImage/delete/${id}`);
+    await axios
+      .delete(`${endpoint}/api/spaceImage/delete/${id}`)
+      .then(() => {
+        success("Deleted Space Image Successfully.");
+      })
+      .catch(() => {
+        somethingWentWrong(
+          "It looks like there's a problem deleting the Space Image."
+        );
+      });
   }
 
   async function addNewUser(userData) {
     try {
       // Make the POST request to add a new user
-      const response = await axios.post(`${endpoint}/api/user`, userData);
+      await axios.post(`${endpoint}/api/user`, userData);
+      success("Added new user successfully.");
     } catch (error) {
+      somethingWentWrong("It looks like there's a problem adding a new user.");
       console.error("Error adding new user:", error);
     }
   }
@@ -161,12 +203,23 @@ export default function DataContextProvider({ children }) {
   async function updateUser(userId, updatedUserData) {
     return axios
       .put(`${endpoint}/api/user/${userId}`, updatedUserData)
-      .then(() => console.log(`User with ID ${userId} updated successfully`))
-      .catch((error) => console.error("Error updating user:", error));
+      .then(() => success(`Updated the user ${userId} successfully.`))
+      .catch((error) =>
+        somethingWentWrong("It looks like there's a problem updating the user.")
+      );
   }
 
   async function deleteUser(userId) {
-    await axios.delete(`${endpoint}/api/user/${userId}`);
+    await axios
+      .delete(`${endpoint}/api/user/${userId}`)
+      .then(() => {
+        success(`Deleted the user ${userId} successfully.`);
+      })
+      .catch(() => {
+        somethingWentWrong(
+          "It looks like there's a problem deleting the user."
+        );
+      });
   }
 
   async function addBuilding(buildingData) {
@@ -176,11 +229,14 @@ export default function DataContextProvider({ children }) {
         `${endpoint}/api/buildings`,
         buildingData
       );
-
+      success(`Added a new building successfully.`);
       // Return the newly created building object from the response
       return response.data;
     } catch (error) {
       // Handle any errors that occur during the request
+      somethingWentWrong(
+        "It looks like there's a problem adding a new building."
+      );
       console.error("Error adding building:", error);
       throw error; // Optional: rethrow the error to be handled elsewhere
     }
@@ -189,14 +245,25 @@ export default function DataContextProvider({ children }) {
   async function updateBuilding(buildingId, updatedBuildingData) {
     return axios
       .put(`${endpoint}/api/buildings/${buildingId}`, updatedBuildingData)
-      .then(() =>
-        console.log(`Building with ID ${buildingId} updated successfully`)
-      )
-      .catch((error) => console.error("Error updating building:", error));
+      .then(() => success(`Updated the building ${buildingId} successfully.`))
+      .catch((error) =>
+        somethingWentWrong(
+          "It looks like there's a problem updating the building."
+        )
+      );
   }
 
   async function deleteBuilding(buildingName) {
-    await axios.delete(`${endpoint}/api/buildings/${buildingName}`);
+    await axios
+      .delete(`${endpoint}/api/buildings/${buildingName}`)
+      .then(() => {
+        success(`Deleted the building ${buildingName} successfully.`);
+      })
+      .catch(() => {
+        somethingWentWrong(
+          "It looks like there's a problem deleting the building."
+        );
+      });
   }
 
   //create room add and edit here
@@ -206,9 +273,11 @@ export default function DataContextProvider({ children }) {
       const response = await axios.post(`${endpoint}/api/rooms`, roomData);
 
       // Return the newly created room object from the response
+      success(`Added a new room successfully.`);
       return response.data;
     } catch (error) {
       // Handle any errors that occur during the request
+      somethingWentWrong("It looks like there's a problem adding a new room.");
       console.error("Error adding room:", error);
       throw error; // Optional: rethrow the error to be handled elsewhere
     }
@@ -217,14 +286,23 @@ export default function DataContextProvider({ children }) {
   async function updateRoom(roomId, updatedRoomData) {
     return axios
       .put(`${endpoint}/api/rooms/${roomId}`, updatedRoomData)
-      .then(() => console.log(`Room with ID ${roomId} updated successfully`))
-      .catch((error) => console.error("Error updating room:", error));
+      .then(() => success(`Updated the room ${roomId} successfully.`))
+      .catch((error) =>
+        somethingWentWrong("It looks like there's a problem updating the room.")
+      );
   }
 
   async function deleteRoom(roomNumber, buildingId) {
-    await axios.delete(
-      `${endpoint}/api/rooms/${buildingId}?roomNumber=${roomNumber}`
-    );
+    await axios
+      .delete(`${endpoint}/api/rooms/${buildingId}?roomNumber=${roomNumber}`)
+      .then(() => {
+        success(`Deleted the room ${roomNumber} successfully.`);
+      })
+      .catch(() => {
+        somethingWentWrong(
+          "It looks like there's a problem deleting the room."
+        );
+      });
   }
 
   async function addSpace(spaceData) {
@@ -233,10 +311,11 @@ export default function DataContextProvider({ children }) {
       const response = await axios.post(`${endpoint}/api/space`, spaceData);
 
       // Return the newly created room object from the response
+      success(`Added a new space successfully.`);
       return response.data;
     } catch (error) {
       // Handle any errors that occur during the request
-      console.error("Error adding space:", error);
+      somethingWentWrong("It looks like there's a problem adding a new space.");
       throw error; // Optional: rethrow the error to be handled elsewhere
     }
   }
@@ -245,72 +324,165 @@ export default function DataContextProvider({ children }) {
     console.log(updatedSpaceData);
     return axios
       .put(`${endpoint}/api/space/${spaceId}`, updatedSpaceData)
-      .then(() => console.log(`Space with ID ${spaceId} updated successfully`))
-      .catch((error) => console.error("Error updating space:", error));
+      .then(() => success(`Updated the space ${spaceId} successfully.`))
+      .catch((error) =>
+        somethingWentWrong(
+          "It looks like there's a problem updating the space."
+        )
+      );
   }
 
   async function deleteSpace(spaceId) {
-    await axios.delete(`${endpoint}/api/space/${spaceId}`);
+    await axios
+      .delete(`${endpoint}/api/space/${spaceId}`)
+      .then(() => {
+        success(`Deleted the space ${spaceId} successfully.`);
+      })
+      .catch(() => {
+        somethingWentWrong(
+          "It looks like there's a problem deleting the space."
+        );
+      });
   }
 
   async function getSpaces() {
-    const spaces = (await axios.get(`${endpoint}/api/space`)).data;
+    try {
+      const spaces = (await axios.get(`${endpoint}/api/space`)).data;
 
-    setData((prev) => {
-      return {
-        ...prev,
-        spaces,
-      };
-    });
+      setData((prev) => {
+        return {
+          ...prev,
+          spaces,
+        };
+      });
+
+      // success("Fetched Data Successfully.");
+    } catch (error) {
+      somethingWentWrong(
+        "It looks like there's a problem fetching the space data."
+      );
+      setData((prev) => {
+        return {
+          ...prev,
+          spaces: [],
+        };
+      });
+    }
   }
 
   async function getRooms() {
-    const rooms = (await axios.get(`${endpoint}/api/rooms`)).data;
-
-    setData((prev) => {
-      return {
-        ...prev,
-        rooms,
-      };
-    });
+    try {
+      const rooms = (await axios.get(`${endpoint}/api/rooms`)).data;
+      // success("Fetched Data Successfully.");
+      setData((prev) => {
+        return {
+          ...prev,
+          rooms,
+        };
+      });
+    } catch (error) {
+      somethingWentWrong(
+        "It looks like there's a problem fetching the room data."
+      );
+      setData((prev) => {
+        return {
+          ...prev,
+          rooms: [],
+        };
+      });
+    }
   }
 
   async function getBuildings() {
-    const buildings = (await axios.get(`${endpoint}/api/buildings`)).data;
-    setData((prev) => {
-      return {
-        ...prev,
-        buildings,
-      };
-    });
+    try {
+      const buildings = (await axios.get(`${endpoint}/api/buildings`)).data;
+      setData((prev) => {
+        return {
+          ...prev,
+          buildings,
+        };
+      });
+      // success("Fetched Data Successfully.");
+    } catch (error) {
+      somethingWentWrong(
+        "It looks like there's a problem fetching the building data."
+      );
+      setData((prev) => {
+        return {
+          ...prev,
+          buildings: [],
+        };
+      });
+    }
   }
 
   async function updateSpaceImages(data) {
     return axios
       .put(`${endpoint}/api/spaceimage/${data.id}`, data)
-      .then(() =>
-        console.log(`SpaceImage with ID ${data.id} updated successfully`)
-      )
-      .catch((error) => console.error("Error updating space:", error));
+      .then(() => success("Updated the space image successfully."))
+      .catch((error) => {
+        console.log(error);
+        somethingWentWrong(
+          "It looks like there's a problem updating the space image."
+        );
+      });
   }
 
   async function updateSpaceViewedDate(id) {
     console.log("viewed date id", id);
-    return (await axios.put(`${endpoint}/api/space/${id}/vieweddate`)).data;
+    let result;
+    await axios
+      .put(`${endpoint}/api/space/${id}/vieweddate`)
+      .then((data) => {
+        result = data;
+        success("Updated the space viewed date successfully.");
+      })
+      .catch(() =>
+        somethingWentWrong(
+          "It looks like there's a problem updating the space viewed date."
+        )
+      );
+    return result;
   }
 
   async function updateSpaceAssessedDate(id) {
-    return (await axios.put(`${endpoint}/api/space/${id}/assesseddate`)).data;
+    let result;
+
+    await axios
+      .put(`${endpoint}/api/space/${id}/assesseddate`)
+      .then((data) => {
+        result = data;
+        success("Updated the space assessed date successfully.");
+      })
+      .catch(() =>
+        somethingWentWrong(
+          "It looks like there's a problem updating the space assessed date."
+        )
+      );
+
+    return result;
   }
 
   async function updateSpaceCalibrationDate(id) {
-    return (await axios.put(`${endpoint}/api/space/${id}/calibrationdate`))
-      .data;
+    let result;
+    await axios
+      .put(`${endpoint}/api/space/${id}/calibrationdate`)
+      .then((data) => {
+        result = data;
+        success("Updated the space calibration date successfully.");
+      })
+      .catch(() =>
+        somethingWentWrong(
+          "It looks like there's a problem updating the space calibration date."
+        )
+      );
+    return result;
   }
 
   async function getRatings() {
     try {
       const ratings = (await axios.get(`${endpoint}/api/ratings`)).data;
+      // success("Fetched the data successfully.");
       setData((prev) => {
         return {
           ...prev,
@@ -318,6 +490,9 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (e) {
+      somethingWentWrong(
+        "It looks like there's a problem fetching the ratings data."
+      );
       setData((prev) => {
         return {
           ...prev,
@@ -338,6 +513,9 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (e) {
+      somethingWentWrong(
+        "It looks like there's a problem fetching the ratings data by id."
+      );
       setData((prev) => {
         return {
           ...prev,
@@ -350,6 +528,7 @@ export default function DataContextProvider({ children }) {
   async function getComments() {
     try {
       const comments = (await axios.get(`${endpoint}/api/comments`)).data;
+      success("Fetched the data successfully.");
       setData((prev) => {
         return {
           ...prev,
@@ -357,6 +536,9 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (e) {
+      somethingWentWrong(
+        "It looks like there's a problem fetching the comments data."
+      );
       setData((prev) => {
         return {
           ...prev,
@@ -379,16 +561,11 @@ export default function DataContextProvider({ children }) {
     //..
     if (action.type === "spaceimages") {
       if (action.method === "get") {
-        // await getSpaceImagesBySpaceId(action.data.id);
         await getSpaceImages();
       }
       if (action.method === "getById") {
-        // await getSpaceImagesBySpaceId(action.data.id);
         await getSpaceImagesById(action.data.id);
       }
-      // if (action.method === "getAll") {
-      //   await getSpaceImages();
-      // }
       if (action.method === "post") {
         const image = action.data.file;
         const newData = {
@@ -690,7 +867,6 @@ export default function DataContextProvider({ children }) {
       if (action.method === "put") {
         const updatedSpaceData = action.data;
         const spaceId = action.data.id;
-        console.log("update space data:", updatedSpaceData);
         try {
           await updateSpace(spaceId, updatedSpaceData);
           await getSpaces();

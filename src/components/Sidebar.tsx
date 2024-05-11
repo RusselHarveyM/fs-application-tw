@@ -22,7 +22,7 @@ export default function Sidebar({
 }) {
   const [isCollapse, setIsCollapse] = useState(false);
   const highlightNavClass =
-    "font-bold border-red-500 text-red-500 rounded-none";
+    "font-bold border-rose-500 text-rose-500 rounded-none";
 
   function handleCollapsiblePress() {
     setIsCollapse(!isCollapse);
@@ -31,11 +31,11 @@ export default function Sidebar({
   return (
     <div className="flex relative">
       {!isCollapse && (
-        <aside className="flex flex-col py-8 px-2 gap-4 items-center md:w-[19rem] h-screen bg-white shadow-md sm:absolute md:static sm:z-50 sm:w-[13rem]">
+        <aside className="flex flex-col py-8 px-2 gap-4 items-center md:w-[15rem] h-screen bg-white shadow-md sm:absolute md:static sm:z-50 sm:w-[13rem]">
           <NavLink
             to={`/home/${buildingData?.id}`}
             className={
-              "justify-start md:w-[90%] sm:text-sm  md:text-base flex gap-2 hover:text-red-500"
+              "justify-start md:w-[90%] sm:text-sm  md:text-base flex gap-2 hover:text-rose-500"
             }
           >
             <ArrowLeft />

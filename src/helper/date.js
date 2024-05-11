@@ -24,6 +24,21 @@ export function getDateString(date) {
   });
 }
 
+export function getDateNow() {
+  const newDate = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    new Date().getDate(),
+    new Date().getHours(),
+    new Date().getMinutes(),
+    new Date().getSeconds(),
+    new Date().getMilliseconds()
+  );
+  console.log("newDate >>>>> ", newDate);
+
+  return newDate;
+}
+
 export function sortDate(object) {
   if (!object) return [];
   const latestRating = object.sort(

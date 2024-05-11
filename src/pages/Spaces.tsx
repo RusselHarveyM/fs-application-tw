@@ -21,11 +21,18 @@ export default function Spaces() {
       spaces: [],
     },
   });
+  const [isLoad, setIsLoad] = useState();
+
+  useEffect(() => {
+    setIsLoad(false);
+  }, [ratings]);
+
   useEffect(() => {
     let action = {
       type: "ratings",
       method: "get",
     };
+    setIsLoad(true);
     useEntry(action);
   }, []);
 
@@ -69,7 +76,15 @@ export default function Spaces() {
         onSelectTab={handleSelectTab}
         selectedTab={content.selectedTab}
       />
-      <div className="w-full overflow-y-auto h-screen">{display}</div>
+
+      <div className="w-full overflow-y-auto h-screen">
+        {isLoad && (
+          <div className=" w-32 h-fit text-center m-auto pt-2 mt-16">
+            <p className="text-neutral-600 animate-bounce">Loading data...</p>
+          </div>
+        )}
+        {display}
+      </div>
     </div>
   );
 }

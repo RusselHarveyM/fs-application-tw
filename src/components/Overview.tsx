@@ -4,7 +4,7 @@ import Card from "./Card";
 import { BarChartCustom } from "./BarChart";
 import UserItem from "./UserItem";
 
-export default function Overview({ data }) {
+export default function Overview({ data, ratings }) {
   const { users } = useContext(DataContext);
   const [scores, setScores] = useState();
   const [recentUsers, setRecentUsers] = useState({

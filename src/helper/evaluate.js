@@ -288,6 +288,7 @@ export default async function evaluate(
           );
           models = model1.predictions.concat(model3.predictions);
         }
+
         for (const [index, prediction] of models.entries()) {
           if (prediction.confidence >= 0.5) {
             const class_name = prediction.class;
@@ -308,15 +309,18 @@ export default async function evaluate(
         }
         // structure object hierarchy
         // objects_temp.forEach((first_object, outerIndex) =>
+        const commonParents = ["table", "chair", "basket"];
+        const commonChildrens = ["basket", "lamp", "personal belongings"];
+        const commonAbstracts = ["pot", "litter", "sofa"];
         for (const [outerIndex, first_object] of objects_temp.entries()) {
           objects_temp.forEach((second_object, innerIndex) => {
             const first_key = first_object.class;
             const second_key = second_object.class;
-            const notObjects = ["chair", "sofa", "pot"];
+            // const notObjects = ["chair", "sofa", "pot"];
             if (
               first_key === second_key ||
-              notObjects.includes(first_key) ||
-              notObjects.includes(second_key)
+              commonAbstracts.includes(first_key) ||
+              commonAbstracts.includes(second_key)
             )
               return;
             if (first_object && second_object) {
@@ -327,6 +331,11 @@ export default async function evaluate(
 
               if (result.overlap) {
                 if (result.bigger === "first") {
+                  if (
+                    !commonParents.includes(first_key) ||
+                    !commonChildrens.includes(second_key)
+                  )
+                    return;
                   if (second_object.indexFrom === undefined) {
                     second_object.indexFrom = outerIndex;
                     const object = { ...second_object, result };
@@ -340,7 +349,8 @@ export default async function evaluate(
                     );
                     let childObject_result = ParentObject.children[foundIndex];
                     if (
-                      result.overlapArea > childObject_result.result.overlapArea
+                      result.overlapArea >
+                      childObject_result?.result.overlapArea
                     ) {
                       second_object.indexFrom = outerIndex;
                       let object = { ...second_object, result };
@@ -363,6 +373,11 @@ export default async function evaluate(
                   }
                 }
                 if (result.bigger === "second") {
+                  if (
+                    !commonParents.includes(second_key) ||
+                    !commonChildrens.includes(first_key)
+                  )
+                    return;
                   if (first_object.indexFrom === undefined) {
                     objects_temp[outerIndex].indexFrom = innerIndex;
                     const object = { ...first_object, result };
@@ -401,6 +416,7 @@ export default async function evaluate(
         // remove the items with indexFrom
         // objects_temp.forEach((object, index) => {
         for (const [index, object] of objects_temp.entries()) {
+          console.log("object 11", object);
           if (object.indexFrom !== undefined) {
             objects_temp.splice(index, 1);
           }

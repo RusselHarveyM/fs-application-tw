@@ -18,7 +18,7 @@ export default function Home() {
         <Popup>
           <p>
             Welcome back,{" "}
-            <span className="text-red-500 font-bold text-sm md:text-xl">
+            <span className="text-rose-500 font-bold text-sm md:text-xl">
               Cebu Institute of Technology
             </span>{" "}
             !
