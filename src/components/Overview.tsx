@@ -61,33 +61,31 @@ export default function Overview({ ratings }) {
 
   useEffect(() => {
     if (rooms && spaces) {
-      const monthlyAverages = {};
+      // const monthlyAverages = {};
       console.log("spaces 111", spaces);
 
-      for (const space of data) {
-        console.log("space 011", space);
-
-        const rating = space?.ratings[0];
-        if (rating) {
-          const date = new Date(rating.dateModified);
-          const month = `${date.toLocaleDateString("en-US", {
-            month: "short",
-          })} ${date.getFullYear()}`;
-          if (!monthlyAverages[month]) {
-            monthlyAverages[month] = {
+      const monthlyAverages = data.reduce((acc, space) => {
+        space.ratings.forEach((rating) => {
+          if (rating) {
+            const date = new Date(rating.dateModified);
+            const month = `${date.toLocaleDateString("en-US", {
+              month: "short",
+            })} ${date.getFullYear()}`;
+            acc[month] = acc[month] || {
               date: month,
               Sort: 0,
               "Set In Order": 0,
               Shine: 0,
               count: 0,
             };
+            acc[month].Sort += rating.sort;
+            acc[month]["Set In Order"] += rating.setInOrder;
+            acc[month].Shine += rating.shine;
+            acc[month].count++;
           }
-          monthlyAverages[month].Sort += rating.sort;
-          monthlyAverages[month]["Set In Order"] += rating.setInOrder;
-          monthlyAverages[month].Shine += rating.shine;
-          monthlyAverages[month].count++;
-        }
-      }
+        });
+        return acc;
+      }, {});
 
       const averageScores = Object.values(monthlyAverages).map((average) => {
         let sort = (average.Sort / average.count).toFixed(1);
@@ -145,11 +143,11 @@ export default function Overview({ ratings }) {
   }, [rooms, spaces, ratings]);
 
   return (
-    <div className="flex flex-col mt-4 rounded-xl p-6 md:w-[97rem] sm:w-[45rem] mx-auto gap-4">
-      <h2 className="md:text-2xl sm:text-3xl sm:text-center text-neutral-700 font-bold mt-2">
+    <div className="flex flex-col bg-neutral-50 shadow-sm mt-4 rounded-xl p-6 md:w-[97rem] sm:w-[45rem] mx-auto gap-4">
+      {/* <h2 className="md:text-2xl sm:text-3xl bg-rose-500 py-4 rounded-lg sm:text-center text-white font-bold mt-2">
         Overview
-      </h2>
-      <div className="flex w-full justify-around mt-4 mx-auto">
+      </h2> */}
+      <div className="flex  w-full justify-around mt-4 mx-auto">
         <Card
           score={scores?.average?.Average ?? 0}
           title={"Overall"}

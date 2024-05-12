@@ -33,8 +33,8 @@ export default function SpaceHeading({
           <h2 className="text-rose-500 text-2xl font-semibold pb-2">
             Calibration Result
           </h2>
-          <div className="overflow-auto h-[100%]">
-            <pre className="text-xs bg-neutral-100  py-4 pl-8 shadow-inner text-neutral-700">
+          <div className="overflow-auto h-[30rem]">
+            <pre className="text-xs bg-neutral-100 h-[30rem]  py-4 pl-8 shadow-inner text-neutral-700">
               <p className="border-l-4 border-rose-300 pl-2">
                 {JSON.stringify(
                   removeProperties(JSON.parse(standard), [
