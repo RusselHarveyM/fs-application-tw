@@ -138,7 +138,7 @@ export default function Overview({ ratings }) {
   }, [room, spaces, ratings, id]);
 
   return (
-    <div className="flex flex-col mt-4 rounded-xl p-6 h-full md:w-[97rem] sm:w-[45rem] xs:w-[24rem] mx-auto gap-4">
+    <div className="flex flex-col mt-4 bg-neutral-50 shadow-sm rounded-xl p-6 h-full md:w-[97rem] sm:w-[45rem] xs:w-[24rem] mx-auto gap-4">
       <div className="flex xs:flex-row sm:flex-row md:flex-row lg:flex-row xl:flex-row w-full justify-around mt-4 mx-auto xs:-mb-8 sm:mb-0">
         <Card
           score={scores?.average?.Average ?? 0}
