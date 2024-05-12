@@ -26,7 +26,7 @@ export default function ImageGallery({
       ) : (
         <Skeleton className="absolute m-2 bottom-2 right-2 w-20 h-6 z-40 bg-neutral-200" />
       )} */}
-      <Images className="absolute w-40 h-40 top-40 left-32 text-neutral-200 opacity-50" />
+      <Images className="absolute sm:w-28 sm:h-28 w-40 h-40 sm:top-5 sm:left-56 top-40 left-32 text-neutral-200 opacity-50" />
       {isLoad && (
         <div className="absolute top-0 left-0 flex justify-center items-center  w-[27rem] h-[30rem] bg-neutral-50 opacity-90">
           <h3 className="text-neutral-600 ">

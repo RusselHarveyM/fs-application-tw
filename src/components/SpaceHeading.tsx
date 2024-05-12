@@ -50,7 +50,7 @@ export default function SpaceHeading({
           </div>
         </div>
       </Modal>
-      <div className="flex flex-col bg-rose-500 md:w-full sm:w-[40rem] gap-8 shadow py-8 md:px-16 sm:px-8 rounded-lg">
+      <div className="flex flex-col bg-rose-500 md:w-full sm:w-[42rem] gap-8 shadow py-8 md:px-16 sm:px-8 rounded-lg">
         <div className="flex justify-between">
           <div className="flex items-center gap-4 text-white text-2xl">
             <h2 className="uppercase">{name ? name : "Space"}</h2>

@@ -12,7 +12,11 @@ export default function Details({ title, text, isLoad, list = false }) {
           <Skeleton className="h-6 w-[900px] mb-2 bg-neutral-200" />
         </>
       ) : (
-        <code className={`${list && "grid grid-cols-2"} text-neutral-600 `}>
+        <code
+          className={`${
+            list && "grid md:grid-cols-2 sm:grid-cols-1"
+          } text-neutral-600 sm:text-xs`}
+        >
           {list ? (
             <ul className="list-disc">
               {text.map((item, index) => {
