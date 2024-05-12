@@ -15,7 +15,7 @@ const AddSpaceModal = forwardRef(function AddSpaceModal(
   ref
 ) {
   const dialog = useRef();
-  const { rooms } = useContext(DataContext);
+  const { rooms, buildings } = useContext(DataContext);
   const [newSpace, setNewSpace] = useState(initialValues);
 
   useImperativeHandle(ref, () => ({
@@ -85,7 +85,7 @@ const AddSpaceModal = forwardRef(function AddSpaceModal(
                 <option value="">Select a room number</option>
                 {rooms.map((room) => (
                   <option key={room.id} value={room.id}>
-                    {room.roomNumber}
+                    {buildings.find((building) => building.id === room.buildingId)?.buildingName} - {room.roomNumber}
                   </option>
                 ))}
               </select>

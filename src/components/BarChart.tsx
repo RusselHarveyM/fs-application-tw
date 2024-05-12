@@ -21,7 +21,7 @@ export function BarChartCustom({ scores }) {
   }, [selectedYear, monthly]);
 
   return (
-    <div className="relative md:w-3/4 sm:w-full">
+    <div className="relative md:w-3/4 sm:w-full xs:w-full mt-0 -pt-4">
       <div className="flex absolute top-4 left-8 justify-center items-center mb-4">
         <label htmlFor="year" className="mr-2 text-neutral-500">
           Select Year:
@@ -40,7 +40,7 @@ export function BarChartCustom({ scores }) {
         </select>
       </div>
       <BarChart
-        className="rounded-2xl shadow w-full bg-white p-8 md:h-full sm:h-[30rem]"
+        className="rounded-2xl shadow w-full bg-white p-8 md:h-full sm:h-[30rem] xs:h-[20rem] xs:mt-1 xs:pt-12"
         data={chartData}
         index="date"
         categories={["Sort", "Set In Order", "Shine"]}

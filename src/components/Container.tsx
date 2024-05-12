@@ -8,13 +8,13 @@ export default function Container({
   return (
     <button
       {...props}
-      className="flex transition ease-in delay-50 hover:scale-105 hover:brightness-105 rounded-xl justify-start gap-4 items-center shadow-sm border-2 border-neutral-200 bg-white py-2 px-4 md:w-80 md:h-32  sm:w-44 sm:h-20"
+      className="flex transition ease-in delay-50 hover:scale-105 hover:brightness-105 rounded-xl justify-start gap-4 items-center shadow-sm border-2 border-neutral-200 bg-white py-2 px-4 md:w-80 md:h-32 sm:w-60 sm:h-30 xs:w-40 xs:h-25 hover:cursor-pointer"
     >
       {img ? (
         <img
           src={`data:image/jpeg;base64,${img}`}
           alt={`${title}-image`}
-          className="md:w-24 md:h-24 sm:w-16 sm:h-16 rounded-xl bg-white"
+          className="md:w-24 md:h-24 sm:w-16 sm:h-16 xs:w-16 xs:h-16 rounded-xl bg-white"
         />
       ) : (
         <div className="md:w-24 md:h-24 sm:w-16 sm:h-16 object-contain rounded-xl bg-neutral-200 animate-pulse"></div>
@@ -23,7 +23,7 @@ export default function Container({
       <div className="flex flex-col md:gap-4 sm:gap-2">
         <div>
           {title ? (
-            <h2 className="w-fit md:text-base sm:text-xs">{title}</h2>
+            <h2 className="w-fit md:text-base sm:text-xs xs:text-xs">{title}</h2>
           ) : (
             <h2 className="bg-neutral-200 rounded-xl animate-pulse md:w-36 sm:16 h-4" />
           )}

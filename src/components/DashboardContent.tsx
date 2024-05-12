@@ -75,7 +75,7 @@ export default function DashboardContent() {
   }
   return (
     <div className="flex flex-col w-full m-auto py-6 px-8 mb-18">
-      <div className="flex justify-center items-center sm:w-[30rem] md:w-full m-auto md:gap-56 sm:gap-28 mt-8 mb-16 ">
+      <div className="flex gap-8 mt-4 mb-8 lg:flex-row lg:justify-center lg:gap-56 md:gap-50 md:justify-center md:flex-row md:gap-16 sm:flex-row sm:justify-center sm:gap-26">
         <CircularProgress
           percent={10}
           title="overall"
@@ -90,7 +90,7 @@ export default function DashboardContent() {
         />
       </div>
       <div className="flex flex-col gap-8 items-center justify-center h-1/6 my-8 ">
-        <menu className="flex bg-stone-100 rounded-full py-2 px-4 md:w-[288px] md:h-[160px] sm:w-[190] sm:h-[90]">
+        <menu className="flex justify-center items-center bg-stone-100 rounded-full py-2 px-4 md:w-[288px] md:h-[160px] sm:w-[190] sm:h-[90] xs:w-[190] xs:h-[90]">
           <NavLink
             to="/home"
             className={`flex justify-center flex-col items-center sm:w-[96px] md:w-[123.2px] ${
@@ -104,7 +104,7 @@ export default function DashboardContent() {
               isSelected={content.selectedTab === "buildings"}
               isDisabled={false}
             />
-            <h3 className="text-neutral-600 md:text-base sm:text-sm ">
+            <h3 className="text-neutral-600 md:text-base sm:text-sm xs:text-xs">
               Buildings
             </h3>
           </NavLink>
@@ -136,7 +136,7 @@ export default function DashboardContent() {
           </span>
         </p>
       </div>
-      <div className="flex flex-wrap justify-center pt-8 m-auto gap-4 sm:w-full sm:h-[20rem] md:w-[95rem] md:h-[40rem] rounded-[2rem] hover:cursor-pointer">
+      <div className="flex flex-wrap justify-center pt-4 m-auto gap-4 xs:w-[22rem] xs:h-[10rem] sm:w-full sm:h-[20rem] md:w-[95rem] md:h-[40rem] rounded-[2rem] hover:cursor-pointer">
         {content.data?.length > 0 ? (
           content.data.map((item, index) => (
             <div

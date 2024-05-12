@@ -110,7 +110,7 @@ export default function SpacesTable({ data, ratings }) {
           <CircleHelp />
         </div>
       </Modal>
-      <div className="md:w-[90rem] sm:w-[44rem] mx-auto bg-white shadow-sm rounded-lg mt-10 flex flex-col items-center justify-center p-6">
+      <div className="md:w-[90rem] sm:w-[44rem] xs:w-[24.5rem] mx-auto bg-white shadow-sm rounded-lg mt-10 flex flex-col items-center justify-center p-6">
         <Table>
           <TableCaption>A list of your recent spaces.</TableCaption>
           <TableHeader>

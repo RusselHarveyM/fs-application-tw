@@ -60,7 +60,7 @@ export default function ImageDisplay({
 
   return (
     <div
-      className={`relative grid grid-cols-1 grid-rows-1 shadow-inner sm:w-full bg-neutral-100 h-[26rem] ${
+      className={`relative grid grid-cols-1 grid-rows-1 shadow-inner sm:w-full bg-neutral-100 md:h-[26rem] sm:h-[20rem] xs:h-[12rem] ${
         isLoad && "animate-pulse"
       }`}
     >
@@ -175,11 +175,11 @@ export default function ImageDisplay({
           onLoad={handleImageLoad}
           src={`data:image/jpeg;base64,${selectedImage.image}`}
           alt="space-image"
-          className="h-[26rem] w-full rounded-lg"
+          className="md:h-[26rem] sm:h-[20rem] xs:h-[12rem] w-full rounded-lg"
         />
       ) : (
         <div className="animate-pulse bg-neutral-100 rounded-lg ">
-          <p className="text-neutral-600 w-fit mx-auto my-44 rounded-lg">
+          <p className="text-neutral-600 w-fit mx-auto my-44 rounded-lg md:mt-48 sm:mt-40 xs:mt-20">
             Click an image from the gallery
           </p>
         </div>

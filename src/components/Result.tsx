@@ -51,7 +51,7 @@ export default function Result({
         </Select>
       </div>
 
-      <div className="flex flex-col gap-4 justify-center">
+      <div className="flex flex-col gap-4 justify-center mt-5 xs:-mr-14 sm:mr-0">
         <ScoreCard
           isLoad={isLoading}
           score={selectedRating?.sort}
