@@ -5,6 +5,7 @@ import Button from "./Button";
 const Modal = forwardRef(function Modal(
   {
     children,
+    toggleClose = true,
     buttonVariant = undefined,
     buttonCaption,
     onSubmit = () => {},
@@ -29,13 +30,17 @@ const Modal = forwardRef(function Modal(
   return createPortal(
     <dialog
       ref={dialog}
-      className="backdrop:bg-stone-900/90 p-4 rounded-md shadow-md"
+      className="backdrop:bg-stone-900/90 pb-8 rounded-md shadow-md"
     >
       {children}
-      <form method="dialog" action="post" className="flex flex-col gap-4 ">
+      <form
+        method="dialog"
+        action="post"
+        className="flex pt-4 px-10 flex-col gap-4 "
+      >
         {input}
-        <div className="flex justify-end gap-4">
-          <Button onClick={onClose}>Close</Button>
+        <div className="flex justify-end gap-4 relative">
+          {toggleClose && <Button onClick={onClose}>Close</Button>}
           <Button variant={buttonVariant} onClick={onSubmit}>
             {buttonCaption}
           </Button>

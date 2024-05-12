@@ -22,7 +22,7 @@ export default function Sidebar({
 }) {
   const [isCollapse, setIsCollapse] = useState(false);
   const highlightNavClass =
-    "font-bold border-red-500 text-red-500 rounded-none";
+    "font-bold border-rose-500 text-rose-500 rounded-none";
 
   function handleCollapsiblePress() {
     setIsCollapse(!isCollapse);
@@ -31,19 +31,15 @@ export default function Sidebar({
   return (
     <div className="flex relative">
       {!isCollapse && (
-        <aside className="flex flex-col py-8 px-2 gap-4 items-center md:w-[19rem] h-screen bg-white shadow-md sm:absolute md:static sm:z-50 sm:w-[13rem]">
+        <aside className="flex flex-col py-8 px-2 gap-4 items-center md:w-[15rem] h-screen bg-white shadow-md sm:absolute md:static sm:z-50 sm:w-[13rem]">
           <NavLink
             to={`/home/${buildingData?.id}`}
             className={
-              "justify-start md:w-[90%] sm:text-sm  md:text-base flex gap-2 hover:text-red-500"
+              "justify-start md:w-[90%] sm:text-sm  md:text-base flex gap-2 hover:text-rose-500"
             }
           >
             <ArrowLeft />
-            {isLoad ? (
-              <h2 className="animate-pulse md:w-40 sm:w-28 rounded h-5 bg-neutral-300 text-xl text-neutral-600" />
-            ) : (
-              buildingData?.buildingName
-            )}
+            {buildingData?.buildingName}
           </NavLink>
           <div className="flex gap-4 items-center w-[90%] h-24 mb-4 mt-4 ">
             {isLoad ? (
@@ -85,7 +81,7 @@ export default function Sidebar({
               <Box />
               Spaces
             </Button>
-            <Button
+            {/* <Button
               cssAdOns={`flex gap-2 ${
                 selectedTab === "redtags" ? highlightNavClass : undefined
               }`}
@@ -94,7 +90,7 @@ export default function Sidebar({
             >
               <Tag />
               Red Tags
-            </Button>
+            </Button> */}
           </menu>
         </aside>
       )}

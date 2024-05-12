@@ -6,7 +6,7 @@ import Settings from "../assets/Settings.png";
 export default function TopNavigation() {
   const location = useLocation();
   const highlightNavClass =
-    "border-b-4 font-bold border-red-500 text-red-500 rounded-none";
+    "border-b-4 font-bold border-rose-500 text-rose-500 rounded-none";
   return (
     <nav className="py-6 px-8 mb-4 w-[100vw] ">
       <ul className="flex w-full justify-between">

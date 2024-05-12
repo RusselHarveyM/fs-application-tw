@@ -11,6 +11,7 @@ export function getAuthToken() {
 
 export function isAdminLoggedIn() {
   const loggedIn = getAuthToken();
+  if (!loggedIn) return false;
   if (loggedIn.role === "admin") return true;
   return false;
 }

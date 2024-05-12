@@ -1,6 +1,13 @@
 import { Trash } from "lucide-react";
 import TargetBox from "./TargetBox";
 import { useRef, useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ImageDisplayProps {
   onDelete: () => void;
@@ -8,16 +15,18 @@ interface ImageDisplayProps {
     prediction: any[];
     image: string;
   };
+  isLoad: boolean;
 }
 
 export default function ImageDisplay({
   onDelete,
   selectedImage,
-  model = undefined,
+  isLoad,
 }: ImageDisplayProps) {
   const imageRef = useRef<HTMLImageElement>(null);
 
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+  const [selectedModel, setSelectedModel] = useState(undefined);
 
   const prediction = selectedImage && JSON.parse(selectedImage?.prediction);
 
@@ -28,15 +37,68 @@ export default function ImageDisplay({
     });
   };
 
+  function handleModelSelect(value) {
+    let num;
+    switch (value) {
+      case "model1":
+        num = 0;
+        break;
+      case "model2":
+        num = 1;
+        break;
+      case "model3":
+        num = 2;
+        break;
+      case "model4":
+        num = 4;
+        break;
+      default:
+        num = undefined;
+    }
+    setSelectedModel(num);
+  }
+
   return (
-    <div className="relative grid grid-cols-1 grid-rows-1 sm:w-full bg-neutral-100 h-[26rem]">
-      {selectedImage && (
-        <div className="z-50 m-4 w-5 h-5 relative p-4 rounded-full bg-neutral-200 bg-opacity-30 ">
-          <Trash
-            className=" absolute w-5 h-5 top-[6px] left-[6px] hover:cursor-pointer hover:text-red-500"
-            onClick={onDelete}
-          />
-        </div>
+    <div
+      className={`relative grid grid-cols-1 grid-rows-1 shadow-inner sm:w-full bg-neutral-100 h-[26rem] ${
+        isLoad && "animate-pulse"
+      }`}
+    >
+      {selectedImage && !isLoad && (
+        <>
+          <div
+            className={`z-50 m-4 w-5 h-5 relative p-4 rounded-full bg-white  `}
+          >
+            <Trash
+              className=" absolute w-5 h-5 top-[6px] left-[6px] hover:cursor-pointer hover:text-red-500"
+              onClick={onDelete}
+            />
+          </div>
+          <div className={"absolute bottom-1 left-1 z-50"}>
+            <Select onValueChange={(val) => handleModelSelect(val)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="All" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="hover:cursor-pointer">
+                  All
+                </SelectItem>
+                <SelectItem value="model1" className="hover:cursor-pointer">
+                  General
+                </SelectItem>
+                <SelectItem value="model2" className="hover:cursor-pointer">
+                  Order
+                </SelectItem>
+                <SelectItem value="model3" className="hover:cursor-pointer">
+                  Belongings
+                </SelectItem>
+                <SelectItem value="model4" className="hover:cursor-pointer">
+                  Tidiness
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </>
       )}
       {prediction && (
         <TargetBox>
@@ -58,19 +120,6 @@ export default function ImageDisplay({
                     ? "border-purple-400 bg-purple-300"
                     : innerPrediction.class === "organized"
                     ? "border-neutral-400 bg-neutral-300"
-                    : undefined;
-
-                let selectedModel =
-                  model === "model1"
-                    ? 0
-                    : model === "model2"
-                    ? 1
-                    : model === "model3"
-                    ? 2
-                    : model === "model4"
-                    ? 3
-                    : model === "model5"
-                    ? 4
                     : undefined;
 
                 if (
@@ -101,7 +150,10 @@ export default function ImageDisplay({
                         width: `${width}px`,
                         height: `${height}px`,
                       }}
-                      className={`absolute rounded-sm border-4 ${style} opacity-60 hover:scale-105 hover:z-40 hover:cursor-pointer hover:brightness-105 hover:text-white `}
+                      className={`absolute rounded-sm border-4 ${style} opacity-60 ${
+                        !isLoad &&
+                        "hover:scale-105 hover:z-40 hover:cursor-pointer hover:brightness-105 hover:text-white"
+                      }   `}
                     >
                       <p className={``}>{innerPrediction.class}</p>
                     </div>

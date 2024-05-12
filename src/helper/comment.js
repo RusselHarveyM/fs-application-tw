@@ -4,40 +4,69 @@ export default function commentFormatter(data) {
     set: "Summary: The model found ",
     shine: "Summary: The model found ",
   };
+
   const count = data.count;
   const scores = data.scores;
-  console.log(data);
+
   for (let key in scores) {
     const obj = scores[key];
     let objectsFound = {};
+
     for (let prop in obj) {
       if (prop === "score") continue;
+
       if (Array.isArray(obj[prop])) {
-        obj[prop].forEach((obj) => {
-          if (Object.hasOwn(objectsFound, obj.class)) {
-            objectsFound[obj.class].qty++;
-          } else {
-            objectsFound[obj.class] = {
-              qty: 1,
-              class: obj.class,
-              type: prop,
-            };
+        obj[prop].forEach((item) => {
+          const id = item.id;
+          const itemName = item.class;
+          const itemType = prop;
+          const itemChildren = item.children;
+          const itemQty = objectsFound[itemName]
+            ? objectsFound[itemName].qty + 1
+            : 1;
+
+          objectsFound[itemName] = {
+            id,
+            qty: itemQty,
+            class: itemName,
+            type: itemType,
+            children: itemChildren,
+          };
+
+          // Check if the item has children
+          if (item.children && item.children.length > 0) {
+            item.children.forEach((child) => {
+              const id = child.id;
+              const childName = child.class;
+              const childType = itemType;
+              const childQty = objectsFound[childName]
+                ? objectsFound[childName].qty + 1
+                : 1;
+
+              objectsFound[childName] = {
+                id,
+                qty: childQty,
+                class: childName,
+                type: childType,
+              };
+            });
           }
         });
       } else if (typeof obj[prop] === "object") {
-        const innerObj = obj[prop];
-        for (let innerProp in innerObj) {
-          if (!Object.hasOwn(objectsFound, innerProp)) {
+        for (let innerProp in obj[prop]) {
+          if (!objectsFound[innerProp]) {
             objectsFound[innerProp] = {
-              qty: obj[innerProp],
+              id: obj[prop].id,
+              qty: obj[prop][innerProp],
               class: innerProp,
               type: innerProp,
             };
           }
         }
       } else {
-        if (!Object.hasOwn(objectsFound, prop)) {
+        if (!objectsFound[prop]) {
           objectsFound[prop] = {
+            id: obj.id,
             qty: obj[prop],
             class: prop,
             type: prop,
@@ -46,7 +75,6 @@ export default function commentFormatter(data) {
       }
     }
 
-    console.log(objectsFound);
     if (key === "set") {
       let endComment = ". Things to improve: ";
       for (const [countKey, value] of Object.entries(count)) {
@@ -58,45 +86,52 @@ export default function commentFormatter(data) {
       } else {
         comments[key] = "Summary: The space is in order.";
       }
-      // if(!data.airsystem){
-      //   comments[key] += ` no air system found`;
-      //   endComment += ` * make sure there are proper air systems installed.\n`;
-      // }
       comments[key] += endComment;
     }
+
     if (key === "sort") {
       let endComment = ". Things to improve: ";
-      let missingFlag = -1;
-      let unwantedFlag = -1;
-      for (const [prop, value] of Object.entries(objectsFound)) {
+      let missingFlag = false;
+      let unwantedFlag = false;
+      let foundChildrens = [];
+      for (const [itemName, item] of Object.entries(objectsFound)) {
         if (
-          objectsFound[prop].type === "unwanted" ||
-          objectsFound[prop].type === "missing"
+          (item.type === "unwanted" || item.type === "missing") &&
+          !foundChildrens.includes(item.id)
         ) {
-          comments[
-            key
-          ] += ` ${objectsFound[prop].qty} ${objectsFound[prop].type} ${objectsFound[prop].class}/s,`;
-          if (objectsFound[prop].type === "unwanted") {
-            unwantedFlag = 1;
+          comments[key] += ` ${item.qty} ${item.type} ${item.class}/s,`;
+
+          if (item.children && item.children.length > 0) {
+            item.children.forEach((child) => {
+              comments[key] += ` ${child.class} is found on the ${item.class},`;
+              foundChildrens.push(child.id);
+            });
           }
-          if (objectsFound[prop].type === "missing") {
-            missingFlag = 1;
+
+          if (item.type === "unwanted") {
+            unwantedFlag = true;
+          }
+          if (item.type === "missing") {
+            missingFlag = true;
           }
         }
       }
+
       if (!missingFlag && !unwantedFlag) {
         comments[key] = "Summary: The space is well kept.";
       }
-      if (missingFlag === 1) {
-        endComment += ` * make sure all items are in their correct positions.\n`;
-        endComment += ` * make sure all necessary areas are captured.\n`;
+
+      if (missingFlag) {
+        endComment += ` * make sure all items are in their correct positions.`;
+        endComment += ` * make sure all necessary areas are captured.`;
       }
-      if (unwantedFlag === 1) {
-        endComment += ` * remove unecessary items.\n`;
+      if (unwantedFlag) {
+        endComment += ` * remove unnecessary items.`;
       }
 
       comments[key] += endComment;
     }
+
     if (key === "shine") {
       let endComment = ". Things to improve: ";
       const shine = scores.shine;
@@ -129,5 +164,7 @@ export default function commentFormatter(data) {
       comments[key] += endComment;
     }
   }
+
+  console.log("comments >>> ", comments);
   return comments;
 }

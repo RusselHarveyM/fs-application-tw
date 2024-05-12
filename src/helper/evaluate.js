@@ -1,5 +1,6 @@
 import axios from "axios";
 import { c_evaluation } from "./checklist";
+import { isEmpty } from "./string";
 
 const API_KEY = "7kfXkOSEwHiflj4IHiHI";
 // const API_KEY = "FGmG3dRIEifT1HLzdCRS";
@@ -150,15 +151,21 @@ function calculateOverlap(prediction1, prediction2) {
   // Calculate the area of intersection
   let overlapArea = x_overlap * y_overlap;
 
+  // Calculate the total area minus the overlapping area
+  let totalArea = area1 + area2 - overlapArea;
+
   // Determine which prediction is bigger
   let bigger = area1 > area2 ? "first" : "second";
 
-  let smallerArea = area1 < area2 ? area1 : area2;
-  let overlap = overlapArea >= smallerArea * 0.1;
+  // Determine the smaller area
+  let smallerArea = Math.min(area1, area2);
+
+  // Calculate the overlap ratio
+  let overlap = overlapArea / smallerArea;
 
   return {
     overlap,
-    overlapArea,
+    overlapArea: totalArea,
     bigger,
   };
 }
@@ -204,7 +211,12 @@ function score(data) {
   );
 }
 
-export default async function evaluate(images, spacename, standard) {
+export default async function evaluate(
+  images,
+  spacename,
+  standard,
+  isCalibrate
+) {
   let result = {
     scores: {
       sort: {
@@ -239,12 +251,12 @@ export default async function evaluate(images, spacename, standard) {
   let model1 = undefined;
   let model2 = undefined;
   let model3 = undefined;
-  let model4 = undefined;
+  // let model4 = undefined;
   let model5 = undefined;
   let prevModel1 = model1;
   let prevModel2 = model2;
   let prevModel3 = model3;
-  let prevModel4 = model4;
+  // let prevModel4 = model4;
   let prevModel5 = model5;
   let allFlag = 0;
   let objectId = 0;
@@ -282,6 +294,7 @@ export default async function evaluate(images, spacename, standard) {
           );
           models = model1.predictions.concat(model3.predictions);
         }
+
         for (const [index, prediction] of models.entries()) {
           if (prediction.confidence >= 0.5) {
             const class_name = prediction.class;
@@ -302,15 +315,24 @@ export default async function evaluate(images, spacename, standard) {
         }
         // structure object hierarchy
         // objects_temp.forEach((first_object, outerIndex) =>
+        const commonParents = ["table", "chair", "sofa"];
+        const commonChildrens = ["basket", "lamp", "personal belongings"];
+        const commonAbstracts = ["pot", "litter"];
         for (const [outerIndex, first_object] of objects_temp.entries()) {
           objects_temp.forEach((second_object, innerIndex) => {
             const first_key = first_object.class;
             const second_key = second_object.class;
-            const notObjects = ["chair", "sofa", "pot"];
+            // const notObjects = ["chair", "sofa", "pot"];
             if (
               first_key === second_key ||
-              notObjects.includes(first_key) ||
-              notObjects.includes(second_key)
+              commonAbstracts.includes(first_key) ||
+              commonAbstracts.includes(second_key) ||
+              (commonParents.includes(first_key) &&
+                commonParents.includes(second_key)) ||
+              (commonChildrens.includes(first_key) &&
+                commonChildrens.includes(second_key)) ||
+              first_object.indexFrom === second_object.id ||
+              second_object.indexFrom === first_object.id
             )
               return;
             if (first_object && second_object) {
@@ -318,9 +340,13 @@ export default async function evaluate(images, spacename, standard) {
                 first_object.prediction, // outer
                 second_object.prediction // inner
               );
-
               if (result.overlap) {
                 if (result.bigger === "first") {
+                  if (
+                    !commonParents.includes(first_key) &&
+                    !commonChildrens.includes(second_key)
+                  )
+                    return;
                   if (second_object.indexFrom === undefined) {
                     second_object.indexFrom = outerIndex;
                     const object = { ...second_object, result };
@@ -334,7 +360,8 @@ export default async function evaluate(images, spacename, standard) {
                     );
                     let childObject_result = ParentObject.children[foundIndex];
                     if (
-                      result.overlapArea > childObject_result.result.overlapArea
+                      result.overlapArea >
+                      childObject_result?.result.overlapArea
                     ) {
                       second_object.indexFrom = outerIndex;
                       let object = { ...second_object, result };
@@ -357,8 +384,13 @@ export default async function evaluate(images, spacename, standard) {
                   }
                 }
                 if (result.bigger === "second") {
+                  if (
+                    !commonParents.includes(second_key) &&
+                    !commonChildrens.includes(first_key)
+                  )
+                    return;
                   if (first_object.indexFrom === undefined) {
-                    objects_temp[outerIndex].indexFrom = innerIndex;
+                    first_object.indexFrom = innerIndex;
                     const object = { ...first_object, result };
                     second_object.children.push(object);
                   } else {
@@ -385,7 +417,11 @@ export default async function evaluate(images, spacename, standard) {
                     let foundIndex = ParentObject.children.findIndex(
                       (ch) => ch.id === childObject_raw.id
                     );
-                    ParentObject.splice(foundIndex, 1, childObject_raw);
+                    ParentObject.children.splice(
+                      foundIndex,
+                      1,
+                      childObject_raw
+                    );
                   }
                 }
               }
@@ -395,6 +431,7 @@ export default async function evaluate(images, spacename, standard) {
         // remove the items with indexFrom
         // objects_temp.forEach((object, index) => {
         for (const [index, object] of objects_temp.entries()) {
+          console.log("object 11", object);
           if (object.indexFrom !== undefined) {
             objects_temp.splice(index, 1);
           }
@@ -443,13 +480,13 @@ export default async function evaluate(images, spacename, standard) {
 
     predictions.push(prevModel2 !== model2 ? model2?.predictions : []);
     predictions.push(prevModel3 !== model3 ? model3?.predictions : []);
-    predictions.push(prevModel4 !== model4 ? model4?.predictions : []);
+    // predictions.push(prevModel4 !== model4 ? model4?.predictions : []);
     predictions.push(prevModel5 !== model5 ? model5?.predictions : []);
     result.predictions.push(predictions);
     prevModel1 = model1;
     prevModel2 = model2;
     prevModel3 = model3;
-    prevModel4 = model4;
+    // prevModel4 = model4;
     prevModel5 = model5;
 
     if (imageObject.forType === "all" && allFlag === 0) allFlag = 1;
@@ -458,7 +495,7 @@ export default async function evaluate(images, spacename, standard) {
   console.log("before", objects);
   console.log("standard", standard);
 
-  if (standard !== "" && standard !== null) {
+  if (!isEmpty(standard)) {
     const c_result = await c_evaluation(objects, spacename, standard);
     console.log("c_result >>> ", c_result);
 
@@ -475,9 +512,8 @@ export default async function evaluate(images, spacename, standard) {
 
     console.log("result >>> ", result);
     score(result);
-  } else {
-    result.standard = JSON.stringify(objects);
   }
+  if (isCalibrate) result.standard = JSON.stringify(objects);
 
   return result;
 }

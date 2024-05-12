@@ -1,4 +1,10 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState, useContext } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+  useContext,
+} from "react";
 import { createPortal } from "react-dom";
 import Button from "./Button";
 import { Label } from "@radix-ui/react-dropdown-menu";
@@ -49,6 +55,7 @@ const EditSpaceModal = forwardRef(function EditSpaceModal(
       standard: null,
       viewedDate: null,
       assessedDate: null,
+      calibrationDate: null,
     };
 
     try {

@@ -6,13 +6,13 @@ export default function ScoreCard({
 }) {
   let cssContainerHighlight = " bg-white";
   let cssTextHighlight = " text-neutral-400";
-  if (score > 3 && score < 8) {
+  if (score > 3 && score < 8 && !isLoad) {
     cssContainerHighlight = " bg-orange-300";
     cssTextHighlight = " text-white";
-  } else if (score > 0 && score < 4) {
+  } else if (score > 0 && score < 4 && !isLoad) {
     cssContainerHighlight = " bg-red-400";
     cssTextHighlight = " text-white";
-  } else if (score > 7 && score <= 10) {
+  } else if (score > 7 && score <= 10 && !isLoad) {
     cssContainerHighlight = " bg-green-400";
     cssTextHighlight = " text-white";
   }
@@ -20,8 +20,10 @@ export default function ScoreCard({
   return (
     <button
       className={
-        "relative flex flex-col gap-4 md:w-64 sm:w-48 h-32 shadow-md px-4 py-2 rounded-lg hover:cursor-pointer transition delay-150 ease-in-out hover:scale-105 hover:brightness-110" +
-        cssContainerHighlight
+        `relative flex flex-col gap-4 md:w-64 sm:w-48 h-32 shadow-md px-4 py-2 rounded-lg  ${
+          !isLoad &&
+          " hover:cursor-pointer hover:scale-105 hover:brightness-110"
+        } transition delay-150 ease-in-out ` + cssContainerHighlight
       }
       {...props}
     >
@@ -41,7 +43,7 @@ export default function ScoreCard({
       <code
         className={"md:text-6xl sm:text-5xl font-semibold" + cssTextHighlight}
       >
-        {score}
+        {!isLoad ? score : "-"}
       </code>
     </button>
   );

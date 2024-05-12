@@ -1,10 +1,27 @@
 import Details from "./Details";
 import { Skeleton } from "./ui/skeleton";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { DataContext } from "@/data/data-context";
 
-export default function Comment({ isLoad = false, selected, ratingId }) {
-  const { comments } = useContext(DataContext);
+export default function Comment({ selected, ratingId }) {
+  const { comments, useEntry } = useContext(DataContext);
+  const [isLoad, setIsLoad] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsLoad(false);
+  }, [comments]);
+
+  useEffect(() => {
+    setIsLoad(true);
+    let action = {
+      type: "comments",
+      method: "getById",
+      data: {
+        id: ratingId,
+      },
+    };
+    useEntry(action);
+  }, [ratingId]);
 
   let thingsToImprove = [];
   let summary;
@@ -22,7 +39,7 @@ export default function Comment({ isLoad = false, selected, ratingId }) {
           : selected === "shine"
           ? filteredComments[0].shine
           : undefined;
-
+      console.log("comment on comp", comment);
       if (comment) {
         // Extract summary and things to improve
         const summaryRegex = /Summary:\s*(.*)\s*Things to improve:\s*(.*)/;
@@ -39,6 +56,8 @@ export default function Comment({ isLoad = false, selected, ratingId }) {
         ); // Apply the replace and trim to each item in the array
       }
     }
+    console.log("summary > ", summary);
+    console.log("thingsToImprove > ", thingsToImprove);
   }
 
   return (
