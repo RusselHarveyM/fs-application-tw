@@ -11,7 +11,7 @@ import ImageDisplay from "./ImageDisplay";
 import evaluate from "../helper/evaluate";
 import comment from "../helper/comment";
 
-import { checkMonth, getDateString, getDateNow } from "@/helper/date.js";
+import { checkMonth, getDateNow } from "@/helper/date.js";
 import Result from "./Result";
 import { isAdminLoggedIn } from "@/helper/auth";
 import { Circle } from "rc-progress";
@@ -216,7 +216,7 @@ export default function Space({
           },
         };
 
-        if (isCalibrate) {
+        if (!isCalibrate) {
           let action = {
             type: "ratings",
             method: "post",
@@ -443,7 +443,7 @@ export default function Space({
                     <menu className=" flex gap-5">
                       <Button
                         onClick={() => handleAssessBtn(true)}
-                        disabled={isFetch || isEvaluate}
+                        disabled={isFetch || isEvaluate || !images}
                       >
                         Calibrate
                       </Button>
@@ -454,7 +454,8 @@ export default function Space({
                           isFetch ||
                           isEvaluate ||
                           !checkMonth(data.calibrationDate) ||
-                          checkMonth(data.assessedDate)
+                          checkMonth(data.assessedDate) ||
+                          !images
                         }
                       >
                         Assess
