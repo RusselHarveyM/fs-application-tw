@@ -1,10 +1,27 @@
 import Details from "./Details";
 import { Skeleton } from "./ui/skeleton";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { DataContext } from "@/data/data-context";
 
-export default function Comment({ isLoad = false, selected, ratingId }) {
-  const { comments } = useContext(DataContext);
+export default function Comment({ selected, ratingId }) {
+  const { comments, useEntry } = useContext(DataContext);
+  const [isLoad, setIsLoad] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsLoad(false);
+  }, [comments]);
+
+  useEffect(() => {
+    setIsLoad(true);
+    let action = {
+      type: "comments",
+      method: "getById",
+      data: {
+        id: ratingId,
+      },
+    };
+    useEntry(action);
+  }, [ratingId]);
 
   let thingsToImprove = [];
   let summary;

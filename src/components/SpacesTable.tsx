@@ -56,19 +56,21 @@ export default function SpacesTable({ data, ratings }) {
   }
 
   async function handleImageStore(id, images) {
-    const foundData = imagesBySpace.find((curr) => curr.id === id);
-    setImagesBySpace((prev) => {
-      let data = {
-        id: id,
-        images,
-      };
-      if (foundData) {
-        const filteredData = imagesBySpace.filter((curr) => curr.id !== id);
-        return [data, ...filteredData];
-      }
-      return [data, ...prev];
-    });
-    setIsLoad(true);
+    if (images[0].spaceId === id || images.length === 0) {
+      const foundData = imagesBySpace.find((curr) => curr.id === id);
+      setImagesBySpace((prev) => {
+        let data = {
+          id: id,
+          images,
+        };
+        if (foundData) {
+          const filteredData = imagesBySpace.filter((curr) => curr.id !== id);
+          return [data, ...filteredData];
+        }
+        return [data, ...prev];
+      });
+      setIsLoad(true);
+    }
   }
 
   function handleLoading(value) {
@@ -78,16 +80,19 @@ export default function SpacesTable({ data, ratings }) {
   async function handleImageDelete(id, spaceImageId) {
     const newData = [...imagesBySpace.filter((curr) => curr.id !== id)];
     const foundData = imagesBySpace.find((curr) => curr.id === id);
-    setImagesBySpace(() => {
-      const images = foundData?.images?.filter(
-        (curr) => curr.id !== spaceImageId
-      );
-      const data = {
-        ...foundData,
-        images,
-      };
-      return [data, ...newData];
-    });
+    if (foundData) {
+      setIsLoad(true);
+      setImagesBySpace(() => {
+        const images = foundData?.images?.filter(
+          (curr) => curr.id !== spaceImageId
+        );
+        const data = {
+          ...foundData,
+          images,
+        };
+        return [data, ...newData];
+      });
+    }
   }
   const foundSpace = data.find((curr) => curr.id === selectedId);
 
@@ -170,30 +175,34 @@ export default function SpacesTable({ data, ratings }) {
                     currData.id === selectedId && "bg-rose-50 hover:bg-rose-50"
                   }`}
                 >
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium text-neutral-600">
                     {currData?.name}
                   </TableCell>
                   {isLoggedIn && (
                     <>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center text-neutral-700 font-bold">
                         {foundRatingsByCurr ? foundRatingsByCurr?.sort : "-"}
                       </TableCell>
-                      <TableCell className="text-center ">
+                      <TableCell className="text-center text-neutral-700 font-bold">
                         {foundRatingsByCurr
                           ? foundRatingsByCurr?.setInOrder
                           : "-"}
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center text-neutral-700 font-bold">
                         {foundRatingsByCurr ? foundRatingsByCurr?.shine : "-"}
                       </TableCell>
                     </>
                   )}
 
-                  <TableCell className="text-center flex items-center justify-center">
+                  <TableCell className="text-center text-neutral-600 flex items-center justify-center">
                     <p className={`${statusCss}`}>{statusCaption}</p>
                   </TableCell>
-                  <TableCell className="text-right">{viewedDate}</TableCell>
-                  <TableCell className="text-right">{assessedDate}</TableCell>
+                  <TableCell className="text-right text-neutral-600">
+                    {viewedDate}
+                  </TableCell>
+                  <TableCell className="text-right text-neutral-600">
+                    {assessedDate}
+                  </TableCell>
                 </TableRow>
               );
             })}

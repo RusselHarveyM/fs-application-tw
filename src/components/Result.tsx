@@ -77,11 +77,7 @@ export default function Result({
           }}
         />
       </div>
-      <Comment
-        isLoad={isLoading}
-        selected={selectedScore}
-        ratingId={selectedRating?.id}
-      />
+      <Comment selected={selectedScore} ratingId={selectedRating?.id} />
     </div>
   );
 }

@@ -15,6 +15,7 @@ import { checkMonth, getDateString, getDateNow } from "@/helper/date.js";
 import Result from "./Result";
 import { isAdminLoggedIn } from "@/helper/auth";
 import { Circle } from "rc-progress";
+import SpaceHeading from "./SpaceHeading";
 
 export default function Space({
   data,
@@ -36,11 +37,12 @@ export default function Space({
   const [selectedImage, setSelectedImage] = useState(undefined);
   const [selectedScore, setSelectedScore] = useState(undefined);
   const [selectedRating, setSelectedRating] = useState(undefined);
-  const [prevSpaceId, setPrevSpaceId] = useState(undefined);
+  // const [prevSpaceId, setPrevSpaceId] = useState(undefined);
   const [isFetch, setIsFetch] = useState<Boolean>(false);
   const [isEvaluate, setIsEvaluate] = useState<Boolean>(false);
 
   console.log("loaded  000 ", loaded);
+  console.log("data  000 ", data);
   const spaceImageData = loaded?.find((curr) => curr.id === spaceId);
   const images = spaceImageData?.images;
 
@@ -63,14 +65,16 @@ export default function Space({
 
   useEffect(() => {
     setIsFetch(false);
-    if (spaceImages) {
-      onStore(prevSpaceId ?? spaceId, spaceImages);
-      setPrevSpaceId(undefined);
+    console.log("spaceImages [][]", spaceImages);
+    if (spaceImages || spaceImages?.length === 0) {
+      onStore(spaceId, spaceImages);
+      // setPrevSpaceId(undefined);getSpaceImages();
     }
   }, [spaceImages]);
 
   useEffect(() => {
-    if (!spaceImageData) {
+    console.log("??spaceImageData ", spaceImageData);
+    if (!spaceImageData || spaceImageData.length === 0) {
       // setLoadingCaption("Fetching data...");
       getSpaceImages();
       setIsFetch(true);
@@ -121,11 +125,10 @@ export default function Space({
           file: selectedUploadImages.current,
         },
       };
-      setPrevSpaceId(spaceId);
       useEntry(action);
-      // setLoadingCaption("Uploading...");
+      onLoad(true);
     },
-    [selectedImage]
+    [spaceId, selectedImage]
   );
 
   const showModal = useCallback((type) => {
@@ -144,13 +147,14 @@ export default function Space({
       method: "delete",
       data: {
         imageId: selectedImage?.id,
-        spaceId: data.id,
+        spaceId,
       },
     };
     useEntry(action);
     onDelete(spaceId, selectedImage?.id);
+    // getSpaceImages();
     setSelectedImage(undefined);
-  }, [selectedImage]);
+  }, [spaceId, selectedImage]);
 
   const handleAssessBtn = useCallback(
     async (isCalibrate: boolean) => {
@@ -212,15 +216,17 @@ export default function Space({
           },
         };
 
-        let action = {
-          type: "ratings",
-          method: "post",
-          data: {
-            scores,
-          },
-        };
+        if (isCalibrate) {
+          let action = {
+            type: "ratings",
+            method: "post",
+            data: {
+              scores,
+            },
+          };
+          useEntry(action);
+        }
 
-        useEntry(action);
         let updatedImages = [];
 
         for (let i = 0; i < newImages.length; i++) {
@@ -366,7 +372,7 @@ export default function Space({
       buttonVariant="red"
       onSubmit={handleImageDelete}
     >
-      <h2 className="text-neutral-500 text-xl mb-4">
+      <h2 className="text-white text-xl mb-4 p-4 bg-rose-500">
         Are you sure you want to delete this image?
       </h2>
     </Modal>
@@ -388,7 +394,7 @@ export default function Space({
   return (
     <>
       {isFetch && (
-        <div className="absolute bottom-14 right-14">
+        <div className="absolute bottom-14 z-50 right-14">
           <Circle
             percent={50}
             trailWidth={18}
@@ -404,51 +410,15 @@ export default function Space({
       {renderImageUploadModal}
       {renderImageDeleteModal}
       <div className="flex flex-col gap-4 md:p-6 sm:p-0 md:w-[90rem] sm:w-[44rem] mx-auto bg-white rounded-lg mt-10 mb-20">
-        <div className="flex flex-col bg-rose-500 md:w-full sm:w-[40rem] gap-8 shadow py-8 md:px-16 sm:px-8 rounded-lg">
-          <div className="flex justify-between">
-            <div className="flex items-center gap-4 text-white text-2xl">
-              <h2 className="uppercase">{data.name ? data.name : "Space"}</h2>
-              {data.name ? (
-                <p
-                  className={`text-xs ${
-                    checkMonth(data?.calibrationDate)
-                      ? "bg-white"
-                      : "bg-neutral-200"
-                  } py-2 px-4 rounded-2xl text-rose-500 font-semibold opacity-60`}
-                >
-                  {checkMonth(data?.calibrationDate)
-                    ? "Calibrated"
-                    : "Not Calibrated"}
-                </p>
-              ) : (
-                ""
-              )}
-              <p className="text-xs text-white">
-                {data?.calibrationDate
-                  ? getDateString(data?.calibrationDate)
-                  : "---"}
-              </p>
-            </div>
-            {loggedIn && (
-              <Button
-                variant="rose"
-                onClick={handleSpaceCheck}
-                disabled={
-                  isFetch ||
-                  isEvaluate ||
-                  (data.viewedDate === null && data.assessedDate === null)
-                    ? true
-                    : checkMonth(data.assessedDate) === true &&
-                      checkMonth(data.viewedDate) === false
-                    ? false
-                    : true
-                }
-              >
-                Check
-              </Button>
-            )}
-          </div>
-        </div>
+        <SpaceHeading
+          name={data?.name}
+          calibrationDate={data?.calibrationDate}
+          viewedDate={data?.viewedDate}
+          assessedDate={data?.assessedDate}
+          onSpaceCheck={handleSpaceCheck}
+          isLoad={isFetch || isEvaluate}
+          standard={data?.standard}
+        />
 
         <div className="flex md:flex-row sm:flex-col bg-white md:w-full sm:w-[42rem] gap-8 shadow p-8 rounded-lg">
           <div className="flex flex-col justify-between md:w-2/3">
@@ -473,11 +443,7 @@ export default function Space({
                     <menu className=" flex gap-5">
                       <Button
                         onClick={() => handleAssessBtn(true)}
-                        disabled={
-                          isFetch ||
-                          isEvaluate ||
-                          checkMonth(data.calibrationDate)
-                        }
+                        disabled={isFetch || isEvaluate}
                       >
                         Calibrate
                       </Button>

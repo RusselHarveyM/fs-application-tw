@@ -430,7 +430,7 @@ export default function DataContextProvider({ children }) {
 
   async function updateSpaceImages(data) {
     return axios
-      .put(`${endpoint}/api/spaceimages/${data.id}`, data)
+      .put(`${endpoint}/api/spaceimage/${data[0].id}/all`, data)
       .then(() => success("Updated the space images successfully."))
       .catch((error) => {
         console.log(error);
@@ -559,6 +559,31 @@ export default function DataContextProvider({ children }) {
       });
     }
   }
+
+  async function getCommentsById(id) {
+    try {
+      const comments = (
+        await axios.get(`${endpoint}/api/comment/${id}/comments`)
+      ).data;
+      success("Fetched the data successfully.");
+      setData((prev) => {
+        return {
+          ...prev,
+          comments,
+        };
+      });
+    } catch (e) {
+      somethingWentWrong(
+        "It looks like there's a problem fetching the comments data."
+      );
+      setData((prev) => {
+        return {
+          ...prev,
+          comments: [],
+        };
+      });
+    }
+  }
   /*
   ------------------------
   function handleUseEntry
@@ -664,7 +689,11 @@ export default function DataContextProvider({ children }) {
       if (action.method === "get") {
         await getComments();
       }
+      if (action.method === "getById") {
+        await getCommentsById(action.data.id);
+      }
     }
+
     if (action.type === "users") {
       if (action.method === "post") {
         try {
