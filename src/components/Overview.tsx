@@ -142,7 +142,7 @@ export default function Overview({ ratings }) {
         }));
       }
     }
-  }, [rooms, spaces]);
+  }, [rooms, spaces, ratings]);
 
   return (
     <div className="flex flex-col mt-4 rounded-xl p-6 md:w-[97rem] sm:w-[45rem] mx-auto gap-4">
@@ -172,7 +172,7 @@ export default function Overview({ ratings }) {
         />
       </div>
       <div className="flex md:flex-row sm:flex-col gap-4 w-full h-[35rem] mt-8">
-        <BarChartCustom scores={scores} />
+        <BarChartCustom scores={scores ?? { monthly: [] }} />
         <RecentUsers users={recentUsers} numberOfAttendees={users?.length} />
       </div>
     </div>
