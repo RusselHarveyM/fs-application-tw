@@ -39,7 +39,7 @@ export default function Comment({ selected, ratingId }) {
           : selected === "shine"
           ? filteredComments[0].shine
           : undefined;
-
+      console.log("comment on comp", comment);
       if (comment) {
         // Extract summary and things to improve
         const summaryRegex = /Summary:\s*(.*)\s*Things to improve:\s*(.*)/;
@@ -56,6 +56,8 @@ export default function Comment({ selected, ratingId }) {
         ); // Apply the replace and trim to each item in the array
       }
     }
+    console.log("summary > ", summary);
+    console.log("thingsToImprove > ", thingsToImprove);
   }
 
   return (
