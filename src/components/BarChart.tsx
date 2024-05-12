@@ -46,68 +46,23 @@ const DUMMY_DATA = [
   },
 ];
 
-export function BarChartCustom({ data, scores }) {
+export function BarChartCustom({ scores }) {
   const [chartData, setChartData] = useState(scores);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
+  const { monthly } = scores;
+
+  console.log("scores >> ", scores);
+  console.log("monthly >> ", monthly);
+
   useEffect(() => {
-    if (data.length > 0) {
-      console.log(data);
-
-      const monthlyAverages = {};
-
-      // Calculate monthly averages for the selected year
-      data.forEach((space) => {
-        // space.ratings.forEach((rating) => {
-        const rating = space.rating[0];
-        if (rating) {
-          console.log(rating);
-          const date = new Date(rating.dateModified);
-          if (date.getFullYear() === selectedYear) {
-            const month = `${date.toLocaleDateString("en-US", {
-              month: "short",
-            })} ${date.getFullYear()}`;
-            if (!monthlyAverages[month]) {
-              monthlyAverages[month] = {
-                date: month,
-                Sort: 0,
-                "Set In Order": 0,
-                Shine: 0,
-                count: 0,
-              };
-            }
-            monthlyAverages[month].Sort += rating.sort;
-            monthlyAverages[month]["Set In Order"] += rating.setInOrder;
-            monthlyAverages[month].Shine += rating.shine;
-            monthlyAverages[month].count++;
-          }
-        }
-        // });
-      });
-
-      // Calculate average scores
-      const averageScores = Object.values(monthlyAverages).map((average) => ({
-        date: average.date,
-        Sort: (average.Sort / average.count).toFixed(1),
-        "Set In Order": (average["Set In Order"] / average.count).toFixed(1),
-        Shine: (average.Shine / average.count).toFixed(1),
-      }));
-
-      // Sort the data by date
-      averageScores.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-      setChartData(averageScores);
-    }
-  }, [data, selectedYear]);
+    setChartData(monthly);
+  }, [selectedYear]);
 
   // Extract available years from filteredRatings
   const availableYears = [
     ...new Set(
-      data.flatMap((space) =>
-        space.rating.map((rating) =>
-          new Date(rating.dateModified).getFullYear()
-        )
-      )
+      monthly.flatMap((rating) => new Date(rating.date).getFullYear())
     ),
   ].sort((a, b) => b - a);
 

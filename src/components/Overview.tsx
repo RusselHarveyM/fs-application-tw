@@ -1,25 +1,54 @@
 import { DataContext } from "@/data/data-context";
 import { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Card from "./Card";
 import { BarChartCustom } from "./BarChart";
-import UserItem from "./UserItem";
 
-export default function Overview({ data, ratings }) {
-  const { users } = useContext(DataContext);
+import { sortDate } from "@/helper/date.js";
+import RecentUsers from "./RecentUsers";
+
+export default function Overview({ ratings }) {
+  const { users, rooms, spaces } = useContext(DataContext);
   const [scores, setScores] = useState();
   const [recentUsers, setRecentUsers] = useState({
     totalLength: 0,
     users: [],
   });
+  const params = useParams();
+
+  let data = [];
+  const room = rooms.find((curr) => curr.id === params.id);
+
+  console.log("ratings >> ", ratings);
+  for (const space of spaces) {
+    const foundRatings = ratings?.filter((curr) => curr.spaceId === space.id);
+    const sortedRatings = sortDate(foundRatings);
+    let newData = {
+      ...space,
+      ratings: sortedRatings,
+    };
+    data.push(newData);
+  }
+
+  console.log("room 111", room);
+  console.log("data 111", data);
 
   useEffect(() => {
     let usersList = [];
     console.log("data overview >> ", data);
-    if (data?.room.modifiedBy?.length > 0) {
-      for (const userId of data?.room.modifiedBy) {
+    if (room.modifiedBy?.length > 0) {
+      for (
+        let i = room.modifiedBy.length - 1;
+        i >= 0 && usersList.length < 10;
+        i--
+      ) {
+        const userId = room.modifiedBy[i];
         const foundUser = users.find((obj) => obj.id === userId);
-        usersList.push(foundUser);
+        if (foundUser) {
+          usersList.push(foundUser);
+        }
       }
+
       setRecentUsers(() => {
         return {
           totalLength: usersList.length,
@@ -28,16 +57,19 @@ export default function Overview({ data, ratings }) {
       });
     }
     console.log("usersList overview >> ", usersList);
-  }, [data, users]);
+  }, [users]);
 
   useEffect(() => {
-    if (data) {
+    if (rooms && spaces) {
       const monthlyAverages = {};
+      console.log("spaces 111", spaces);
 
-      for (const space of data.spaces) {
-        const rating = space.rating[0];
+      for (const space of data) {
+        console.log("space 011", space);
+
+        const rating = space?.ratings[0];
         if (rating) {
-          const date = new Date(space.dateModified);
+          const date = new Date(rating.dateModified);
           const month = `${date.toLocaleDateString("en-US", {
             month: "short",
           })} ${date.getFullYear()}`;
@@ -96,6 +128,7 @@ export default function Overview({ data, ratings }) {
           100;
 
         setScores(() => ({
+          monthly: averageScores,
           average: currentMonth,
           sortDifference: sortDifference.toFixed(1),
           setDifference: setDifference.toFixed(1),
@@ -103,13 +136,16 @@ export default function Overview({ data, ratings }) {
           overallDifference: overallDifference.toFixed(1),
         }));
       } else {
-        setScores(() => ({ average: averageScores[0] }));
+        setScores(() => ({
+          monthly: averageScores,
+          average: averageScores[0],
+        }));
       }
     }
-  }, [data]);
+  }, [rooms, spaces]);
 
   return (
-    <div className="flex flex-col p-6 md:w-[97rem] sm:w-[45rem] mx-auto gap-4">
+    <div className="flex flex-col mt-4 rounded-xl p-6 md:w-[97rem] sm:w-[45rem] mx-auto gap-4">
       <h2 className="md:text-2xl sm:text-3xl sm:text-center text-neutral-700 font-bold mt-2">
         Overview
       </h2>
@@ -136,23 +172,8 @@ export default function Overview({ data, ratings }) {
         />
       </div>
       <div className="flex md:flex-row sm:flex-col gap-4 w-full h-[35rem] mt-8">
-        <BarChartCustom data={data.spaces} scores={scores} />
-        <div className="md:w-1/4 sm:full h-full bg-white shadow rounded-2xl p-8">
-          <h2 className="text-lg text-neutral-700 font-semibold">
-            Recent Users
-          </h2>
-          <p className="text-neutral-400 text-sm">
-            {recentUsers.totalLength} users attended to this room.
-          </p>
-          {recentUsers.users.map((user, index) => {
-            return (
-              <UserItem
-                key={index}
-                name={`${user?.firstName} ${user?.lastName}`}
-              />
-            );
-          })}
-        </div>
+        <BarChartCustom scores={scores} />
+        <RecentUsers users={recentUsers} numberOfAttendees={users?.length} />
       </div>
     </div>
   );

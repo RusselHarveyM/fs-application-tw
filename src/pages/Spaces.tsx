@@ -13,18 +13,14 @@ export default function Spaces() {
   const { rooms, spaces, buildings, ratings, useEntry } =
     useContext(DataContext);
   const param = useParams();
-  const [content, setContent] = useState({
-    selectedTab: isAdminLoggedIn() ? "overview" : "spaces",
-    selectedSpaceId: undefined,
-    data: {
-      room: [],
-      spaces: [],
-    },
-  });
+  const [selectedTab, setSelectedTab] = useState(
+    isAdminLoggedIn() ? "overview" : "spaces"
+  );
   const [isLoad, setIsLoad] = useState();
 
   useEffect(() => {
     setIsLoad(false);
+    param;
   }, [ratings]);
 
   useEffect(() => {
@@ -46,25 +42,20 @@ export default function Spaces() {
   console.log("test t", spacesByRoomId);
 
   function handleSelectTab(selected) {
-    setContent((prev) => {
-      return {
-        ...prev,
-        selectedTab: selected,
-      };
-    });
+    setSelectedTab(selected);
   }
 
   let display;
-  if (content.selectedTab === "spaces") {
+  if (selectedTab === "spaces") {
     if (spacesByRoomId.length === 0) {
       display = <NoSpace />;
     } else {
       display = <SpacesTable data={spacesByRoomId} ratings={ratings ?? []} />;
     }
-  } else if (content.selectedTab === "redtags") {
+  } else if (selectedTab === "redtags") {
     display = <RedTag />;
   } else {
-    display = <Overview data={content.data} ratings={ratings ?? []} />;
+    display = <Overview ratings={ratings ?? []} />;
   }
 
   return (
@@ -74,7 +65,7 @@ export default function Spaces() {
         buildingData={buildingsData}
         // isLoad={isLoading}
         onSelectTab={handleSelectTab}
-        selectedTab={content.selectedTab}
+        selectedTab={selectedTab}
       />
 
       <div className="w-full overflow-y-auto h-screen">
