@@ -15,7 +15,7 @@ export default function Details({ title, text, isLoad, list = false }) {
         <code
           className={`${
             list && "grid md:grid-cols-2 sm:grid-cols-1"
-          } text-neutral-600 sm:text-xs`}
+          } text-neutral-600 sm:text-xs md:text-base`}
         >
           {list ? (
             <ul className="list-disc">
