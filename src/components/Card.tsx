@@ -17,6 +17,8 @@ export default function Card({ title, score, percent = "20.1%" }) {
     circularCss = "#1dd75b";
     trailCss = "#b8f5cd";
   }
+  let percentInt = parseInt(percent);
+  let changeIndicator;
 
   return (
     <div className="relative  flex flex-col shadow gap-1 bg-white rounded-2xl md:w-[22%] sm:w-[24%] h-[10rem] px-6 py-8">
@@ -28,8 +30,8 @@ export default function Card({ title, score, percent = "20.1%" }) {
       >
         {score}/ 10
       </p>
-      <p className="text-neutral-400 md:text-base sm:text-sm sm:pt-2 ">
-        +{percent} from last month
+      <p className={` text-neutral-400 md:text-sm sm:text-xs sm:pt-2 `}>
+        <span className="font-bold">{percent}</span> from last month
       </p>
       <div className="absolute sm:-left-32 sm:bottom-16  sm:h-8 md:h-10 md:left-28 md:top-6 ">
         <CircularProgress
