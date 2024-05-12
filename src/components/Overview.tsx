@@ -14,28 +14,28 @@ export default function Overview({ ratings }) {
     totalLength: 0,
     users: [],
   });
-  const params = useParams();
+  const { id } = useParams();
 
   let data = [];
-  const room = rooms.find((curr) => curr.id === params.id);
+  const room = rooms.find((curr) => curr.id === id);
+  const spacesByRoomId = spaces?.filter((curr) => curr.roomId === id);
 
   console.log("ratings >> ", ratings);
-  for (const space of spaces) {
-    const foundRatings = ratings?.filter((curr) => curr.spaceId === space.id);
-    const sortedRatings = sortDate(foundRatings);
-    let newData = {
-      ...space,
-      ratings: sortedRatings,
-    };
-    data.push(newData);
+  if (spacesByRoomId) {
+    for (const space of spacesByRoomId) {
+      const foundRatings = ratings?.filter((curr) => curr.spaceId === space.id);
+      const sortedRatings = sortDate(foundRatings);
+      let newData = {
+        ...space,
+        ratings: sortedRatings,
+      };
+      data.push(newData);
+    }
   }
 
-  console.log("room 111", room);
-  console.log("data 111", data);
-
   useEffect(() => {
+    console.log("id >>", id);
     let usersList = [];
-    console.log("data overview >> ", data);
     if (room.modifiedBy?.length > 0) {
       for (
         let i = room.modifiedBy.length - 1;
@@ -51,19 +51,15 @@ export default function Overview({ ratings }) {
 
       setRecentUsers(() => {
         return {
-          totalLength: usersList.length,
+          totalLength: room.modifiedBy?.length,
           users: usersList.slice(0, 5),
         };
       });
     }
-    console.log("usersList overview >> ", usersList);
-  }, [users]);
+  }, [room]);
 
   useEffect(() => {
-    if (rooms && spaces) {
-      // const monthlyAverages = {};
-      console.log("spaces 111", spaces);
-
+    if (room && spaces) {
       const monthlyAverages = data.reduce((acc, space) => {
         space.ratings.forEach((rating) => {
           if (rating) {
@@ -104,7 +100,6 @@ export default function Overview({ ratings }) {
       });
 
       averageScores.sort((a, b) => new Date(a.date) - new Date(b.date));
-      console.log("average scores pppp", averageScores);
 
       if (averageScores.length > 1) {
         const currentMonth = averageScores[averageScores.length - 1];
@@ -140,13 +135,10 @@ export default function Overview({ ratings }) {
         }));
       }
     }
-  }, [rooms, spaces, ratings]);
+  }, [room, spaces, ratings, id]);
 
   return (
     <div className="flex flex-col bg-neutral-50 shadow-sm mt-4 rounded-xl p-6 md:w-[97rem] sm:w-[45rem] mx-auto gap-4">
-      {/* <h2 className="md:text-2xl sm:text-3xl bg-rose-500 py-4 rounded-lg sm:text-center text-white font-bold mt-2">
-        Overview
-      </h2> */}
       <div className="flex  w-full justify-around mt-4 mx-auto">
         <Card
           score={scores?.average?.Average ?? 0}
@@ -171,7 +163,10 @@ export default function Overview({ ratings }) {
       </div>
       <div className="flex md:flex-row sm:flex-col gap-4 w-full h-[35rem] mt-8">
         <BarChartCustom scores={scores ?? { monthly: [] }} />
-        <RecentUsers users={recentUsers} numberOfAttendees={users?.length} />
+        <RecentUsers
+          users={recentUsers}
+          numberOfAttendees={recentUsers.totalLength}
+        />
       </div>
     </div>
   );

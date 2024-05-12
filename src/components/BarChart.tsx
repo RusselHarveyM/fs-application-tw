@@ -9,8 +9,6 @@ export function BarChartCustom({ scores }) {
     new Set(monthly.map((rating) => new Date(rating.date).getFullYear()))
   ).sort((a, b) => b - a);
 
-  console.log(scores);
-
   const handleYearChange = (e) => {
     setSelectedYear(e.target.value);
   };
