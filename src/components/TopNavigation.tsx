@@ -8,14 +8,14 @@ export default function TopNavigation() {
   const highlightNavClass =
     "border-b-4 font-bold border-rose-500 text-rose-500 rounded-none";
   return (
-    <nav className="py-6 px-8 mb-4 w-[100vw] ">
+    <nav className="py-6 px-8 mb-4 w-full">
       <ul className="flex w-full justify-between">
         <li className="w-1/3">
           <NavLink to={"/home"}>
             <img
               src={Logo}
               alt="profile-logo"
-              className="md:w-16 md:h-16 sm:w-14 sm:h-14 object-contain hover:cursor-pointer"
+              className="md:w-30 md:h-30 sm:w-14 sm:h-14 xs:w-10 xs:h-10 object-contain hover:cursor-pointer"
             />
           </NavLink>
         </li>

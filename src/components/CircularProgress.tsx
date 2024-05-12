@@ -12,7 +12,7 @@ export default function CircularProgress({
   let loadCss = "animate-spin";
   return (
     <div
-      className={`flex flex-col items-center w-80 justify-center gap-4 object-contain  h-full relative ${
+      className={`flex flex-col items-center w-80 justify-center gap-4 object-contain h-full relative ${
         isLoad && loadCss
       }`}
     >

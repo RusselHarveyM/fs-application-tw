@@ -61,12 +61,12 @@ export default function Comment({ selected, ratingId }) {
   }
 
   return (
-    <article className="flex flex-col gap-4 w-full h-90 border-dashed border-4 rounded-lg  py-4 px-6">
-      {isLoad ? (
-        <Skeleton className="h-6 w-[100px] bg-neutral-200" />
+    <article className="flex flex-col gap-4 w-full h-90 border-dashed border-4 rounded-lg py-4 px-6 ">
+        {isLoad ? (
+        <Skeleton className="h-6 w-[100px] bg-neutral-200" /> 
       ) : (
         <h2
-          className={`text-neutral-600 text-xl font-semibol ${
+          className={`text-neutral-600 text-xl font-semibold ${
             selected === "" ? " animate-pulse" : "uppercase"
           }`}
         >
@@ -75,7 +75,7 @@ export default function Comment({ selected, ratingId }) {
       )}
       {(selected !== "" || isLoad) && (
         <>
-          <Details isLoad={isLoad} title="Summary" text={summary} />
+          <Details isLoad={isLoad} title="Summary" text={summary}/>
           <Details
             isLoad={isLoad}
             list={true}

@@ -138,8 +138,8 @@ export default function Overview({ ratings }) {
   }, [room, spaces, ratings, id]);
 
   return (
-    <div className="flex flex-col bg-neutral-50 shadow-sm mt-4 rounded-xl p-6 md:w-[97rem] sm:w-[45rem] mx-auto gap-4">
-      <div className="flex  w-full justify-around mt-4 mx-auto">
+    <div className="flex flex-col mt-4 rounded-xl p-6 h-full md:w-[97rem] sm:w-[45rem] xs:w-[24rem] mx-auto gap-4">
+      <div className="flex xs:flex-row sm:flex-row md:flex-row lg:flex-row xl:flex-row w-full justify-around mt-4 mx-auto xs:-mb-8 sm:mb-0">
         <Card
           score={scores?.average?.Average ?? 0}
           title={"Overall"}
@@ -161,7 +161,7 @@ export default function Overview({ ratings }) {
           percent={`${scores?.shineDifference ?? 0}%`}
         />
       </div>
-      <div className="flex md:flex-row sm:flex-col gap-4 w-full h-[35rem] mt-8">
+      <div className="flex md:flex-row sm:flex-col xs:flex-col gap-4 w-full h-[35rem] mt-4 -pt-8">
         <BarChartCustom scores={scores ?? { monthly: [] }} />
         <RecentUsers
           users={recentUsers}

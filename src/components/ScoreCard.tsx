@@ -20,7 +20,7 @@ export default function ScoreCard({
   return (
     <button
       className={
-        `relative flex flex-col gap-4 md:w-64 sm:w-48 h-32 shadow-md px-4 py-2 rounded-lg  ${
+        `relative flex flex-col gap-4 md:w-64 sm:w-48 h-32 xs:w-[130px] xs:h-[80px] sm:h-32 shadow-md px-4 py-2 rounded-lg  ${
           !isLoad &&
           " hover:cursor-pointer hover:scale-105 hover:brightness-110"
         } transition delay-150 ease-in-out ` + cssContainerHighlight
