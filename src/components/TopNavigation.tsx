@@ -44,7 +44,7 @@ export default function TopNavigation() {
             </NavLink>
             {isAdminLoggedIn() && (
               <NavLink
-                to="/manage"
+                to="manage"
                 className={({ isActive }) =>
                   isActive ? highlightNavClass : undefined
                 }

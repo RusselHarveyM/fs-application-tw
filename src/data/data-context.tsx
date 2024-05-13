@@ -16,7 +16,7 @@ export const DataContext = createContext({
 });
 
 // const endpoint = "https://fs-backend-copy-production.up.railway.app";
-const endpoint = "https://localhost:7124";
+const endpoint = "https://3s-backend-production.up.railway.app";
 
 export default function DataContextProvider({ children }) {
   const { toast } = useToast();
@@ -323,7 +323,7 @@ export default function DataContextProvider({ children }) {
   async function updateSpace(spaceId, updatedSpaceData) {
     console.log(updatedSpaceData);
     return axios
-      .put(`${endpoint}/api/space/${spaceId}`, updatedSpaceData)
+      .put(`${endpoint}/api/space/${spaceId}`, updatedSpaceData.data)
       .then(() => success(`Updated the space ${spaceId} successfully.`))
       .catch((error) =>
         somethingWentWrong(

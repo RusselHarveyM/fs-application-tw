@@ -29,7 +29,7 @@ export function Login() {
     setIsSubmit(true);
     let response = usersData;
     if (usersData === undefined) {
-      response = (await axios.get(`https://localhost:7124/api/user`)).data.map(
+      response = (await axios.get(`https://3s-backend-production.up.railway.app/api/user`)).data.map(
         (user) => ({
           ...user,
           Name: `${user.firstName} ${user.lastName}`, // Calculate fullname

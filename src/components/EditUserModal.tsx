@@ -52,7 +52,7 @@ const EditUserModal = forwardRef(function EditUserModal(
   return createPortal(
     <dialog
       ref={dialog}
-      className="backdrop:bg-stone-900/90 p-4 rounded-md shadow-md"
+      className="backdrop:bg-stone-900/90 px-10 rounded-md shadow-md"
     >
       <form
         onSubmit={handleSubmit}
