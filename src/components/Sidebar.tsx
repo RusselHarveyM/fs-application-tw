@@ -31,7 +31,10 @@ export default function Sidebar({
   return (
     <div className="flex relative">
       {!isCollapse && (
-        <aside className="flex flex-col py-8 px-2 gap-4 items-center md:w-[15rem] h-screen bg-white shadow-md sm:absolute md:static sm:z-50 sm:w-[13rem] xs:w-[13rem]" style={{ zIndex: 999 }}>
+        <aside
+          className="flex flex-col py-8 px-2 gap-4 items-center md:w-[15rem] h-screen bg-white shadow-md xs:absolute sm:absolute md:static sm:z-50 sm:w-[13rem] xs:w-[13rem]"
+          style={{ zIndex: 999 }}
+        >
           <NavLink
             to={`/home/${buildingData?.id}`}
             className={
@@ -52,7 +55,7 @@ export default function Sidebar({
                 <img
                   src={`data:image/jpeg;base64,${roomData?.image}`}
                   alt="room-image"
-                  className="xs:w-14 xs:w-14 sm:w-16 sm:h-16 md:w-20 md:h-20 object-fill rounded-md bg-stone-100"
+                  className="xs:w-14 sm:w-16 sm:h-16 md:w-20 md:h-20 object-fill rounded-md bg-stone-100"
                 />
                 <h2 className="sm:text-md md:text-xl text-neutral-600">
                   {roomData.roomNumber}
