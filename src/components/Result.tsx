@@ -18,8 +18,8 @@ export default function Result({
   ratings,
 }) {
   return (
-    <div className="relative flex bg-white md:w-full sm:w-[42rem] gap-8 shadow-sm p-8 pt-20  rounded-lg">
-      <div className="flex  w-full absolute top-5  ">
+    <div className="relative flex bg-white md:w-full sm:w-[42rem] xs:transform xs:scale-90 sm:scale-100 xs:-mt-16 xs:mb-0 sm:-mt-0 gap-8 shadow-sm p-8 pt-20 rounded-lg">
+      <div className="flex  w-full absolute top-5 xs:transform xs:scale-75 sm:scale-100 xs:left-0 sm:left-8">
         <Select
           onValueChange={(selectedDate) => handleResultSelect(selectedDate)}
           disabled={isLoading}
@@ -51,7 +51,7 @@ export default function Result({
         </Select>
       </div>
 
-      <div className="flex flex-col gap-4 justify-center mt-5 xs:-mr-14 sm:mr-0">
+      <div className="flex flex-col gap-4 justify-center mt-5 xs:-mr-14 sm:mr-0 xs:transform xs:scale-75 sm:scale-100 xs:mt-0">
         <ScoreCard
           isLoad={isLoading}
           score={selectedRating?.sort}
