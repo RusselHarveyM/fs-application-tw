@@ -460,8 +460,8 @@ export default function Space({
                         disabled={
                           isFetch ||
                           isEvaluate ||
-                          // !checkMonth(data.calibrationDate) ||
-                          // checkMonth(data.assessedDate) ||
+                          !checkMonth(data.calibrationDate) ||
+                          checkMonth(data.assessedDate) ||
                           !images
                         }
                       >
