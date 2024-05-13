@@ -17,7 +17,7 @@ export default function Container({
           className="md:w-20 md:h-20 sm:w-16 sm:h-16 xs:w-16 xs:h-16 rounded-xl bg-white"
         />
       ) : (
-        <div className="md:w-24 md:h-24 sm:w-16 sm:h-16 object-contain rounded-xl bg-neutral-200 animate-pulse"></div>
+        <div className="md:w-20 md:h-20 sm:w-16 sm:h-16 object-contain rounded-xl bg-neutral-200 animate-pulse"></div>
       )}
 
       <div className="flex flex-col md:gap-4 sm:gap-2">

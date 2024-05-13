@@ -81,69 +81,94 @@ export default function DashboardContent() {
         />
       </div> */}
 
-      <div className="flex flex-wrap justify-center items-center pt-4 m-auto gap-4 xs:w-[22rem] xs:h-[10rem] sm:w-full sm:h-[20rem] md:w-[95rem] md:h-[35rem] rounded-[2rem] hover:cursor-pointer">
+      <div className="flex flex-col gap-4 justify-center items-center mt-4  m-auto  xs:w-[22rem] xs:h-[10rem] sm:w-full sm:h-[20rem] md:w-[95rem] md:h-[30rem] rounded-[2rem]">
         {content.data?.length > 0 ? (
-          content.data.map((item, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                index % 2 === 0 ? "flex-row" : "flex-row-reverse"
-              } flex-wrap w-full justify-center gap-8`}
-            >
-              {Array.from({ length: index % 2 === 0 ? 3 : 4 }).map(
-                (_, columnIndex) => {
-                  const dataIndex = index * 3 + columnIndex;
-                  const dataItem = content.data[dataIndex];
-                  if (!dataItem) return null;
-                  const id = dataItem.id;
-                  const img = dataItem.image;
-                  const title =
-                    content.selectedTab === "buildings"
-                      ? dataItem.buildingName
-                      : dataItem.roomNumber;
-                  const code =
-                    content.selectedTab === "buildings"
-                      ? dataItem.buildingCode ?? ""
-                      : "";
-                  return (
-                    <Container
-                      key={id}
-                      img={img}
-                      title={title}
-                      code={code}
-                      onClick={() => handleContainerSelect(id)}
-                    />
-                  );
-                }
-              )}
-            </div>
-          ))
+          content.data.map((item, index) => {
+            let contentLength = content.data?.length;
+            let length =
+              contentLength <= 3
+                ? 1
+                : contentLength <= 7
+                ? 2
+                : contentLength <= 10
+                ? 3
+                : 4;
+            if (index < length)
+              return (
+                <div
+                  key={index}
+                  className={`flex ${
+                    index % 2 === 0 ? "flex-row" : "flex-row-reverse"
+                  } flex-wrap w-full justify-center gap-8`}
+                >
+                  {Array.from({ length: index % 2 === 0 ? 3 : 4 }).map(
+                    (_, columnIndex) => {
+                      const dataIndex = index * 3 + columnIndex;
+                      const dataItem = content.data[dataIndex];
+                      if (!dataItem) return null;
+                      const id = dataItem.id;
+                      const img = dataItem.image;
+                      const title =
+                        content.selectedTab === "buildings"
+                          ? dataItem.buildingName
+                          : dataItem.roomNumber;
+                      const code =
+                        content.selectedTab === "buildings"
+                          ? dataItem.buildingCode ?? ""
+                          : "";
+                      return (
+                        <Container
+                          key={id}
+                          img={img}
+                          title={title}
+                          code={code}
+                          onClick={() => handleContainerSelect(id)}
+                        />
+                      );
+                    }
+                  )}
+                </div>
+              );
+          })
         ) : content.data?.length === 0 ? (
           <p className="text-neutral-500">The building is empty</p>
         ) : (
           dummy &&
-          dummy.map((item, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                index % 2 === 0 ? "flex-row" : "flex-row-reverse"
-              } flex-wrap w-full justify-center gap-8`}
-            >
-              {Array.from({ length: index % 2 === 0 ? 3 : 4 }).map(
-                (_, columnIndex) => {
-                  const dataIndex = index * 4 + columnIndex;
-                  const dataItem = dummy[dataIndex];
-                  if (!dataItem) return null;
-                  const id = dataItem.id;
-                  return <Container key={id} />;
-                }
-              )}
-            </div>
-          ))
+          dummy.map((item, index) => {
+            let contentLength = content.data?.length;
+            let length =
+              contentLength <= 3
+                ? 1
+                : contentLength <= 7
+                ? 2
+                : contentLength <= 10
+                ? 3
+                : 4;
+            if (index < length)
+              return (
+                <div
+                  key={index}
+                  className={`flex ${
+                    index % 2 === 0 ? "flex-row" : "flex-row-reverse"
+                  } flex-wrap w-full justify-center gap-8`}
+                >
+                  {Array.from({ length: index % 2 === 0 ? 3 : 4 }).map(
+                    (_, columnIndex) => {
+                      const dataIndex = index * 4 + columnIndex;
+                      const dataItem = dummy[dataIndex];
+                      if (!dataItem) return null;
+                      const id = dataItem.id;
+                      return <Container key={id} />;
+                    }
+                  )}
+                </div>
+              );
+          })
         )}
       </div>
 
-      <div className="flex flex-col gap-8 items-center justify-center h-1/6 xs:py-60 sm:py-4 md:-mt-32 md:-mb-4">
+      {/* <div className="flex flex-col gap-8 items-center justify-center h-1/6  "> */}
+      <div className="flex flex-col gap-8 items-center justify-center h-1/6 xs:py-60 sm:py-10  md:-mb-4">
         <menu className="flex justify-center items-center bg-stone-100 rounded-full py-2 px-4 md:w-[250px] md:h-[120px] sm:w-[190] sm:h-[90] xs:w-[190] xs:h-[90]">
           <NavLink
             to="/home"
@@ -178,6 +203,7 @@ export default function DashboardContent() {
           </Button>
         </menu>
         <p className="text-neutral-500">
+          /{" "}
           <span className="text-neutral-600">
             {content.selectedTab === "rooms" &&
               buildings.find((building) => {
