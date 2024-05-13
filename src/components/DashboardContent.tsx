@@ -65,7 +65,7 @@ export default function DashboardContent() {
   }
 
   return (
-    <div className="flex flex-col w-full m-auto py-6 px-8 mb-18">
+    <div className="flex flex-col w-full m-auto xs:py-28 xs:px-4 sm:py-6 sm:px-8 mb-18">
       {/* <div className="flex gap-8 mt-4 mb-8 lg:flex-row lg:justify-center lg:gap-56 md:gap-50 md:justify-center md:flex-row md:gap-16 sm:flex-row sm:justify-center sm:gap-26">
         <CircularProgress
           percent={10}
@@ -168,7 +168,7 @@ export default function DashboardContent() {
       </div>
 
       {/* <div className="flex flex-col gap-8 items-center justify-center h-1/6  "> */}
-      <div className="flex flex-col gap-8 items-center justify-center h-1/6 xs:py-60 sm:py-10  md:-mb-4">
+      <div className="xs:fixed xs:bottom-28 xs:left-0 xs:right-0 sm:bottom-44 md:bottom-10 flex flex-col gap-8 items-center justify-center sm:py-10 md:-mb-4">
         <menu className="flex justify-center items-center bg-stone-100 rounded-full py-2 px-4 md:w-[250px] md:h-[120px] sm:w-[190] sm:h-[90] xs:w-[190] xs:h-[90]">
           <NavLink
             to="/home"
