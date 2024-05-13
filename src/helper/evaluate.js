@@ -298,11 +298,12 @@ export default async function evaluate(
       // structure
       if (model1 !== undefined && model3 !== undefined) {
         let models = model1.predictions;
-        if (standard !== "") {
+        if (!isEmpty(standard)) {
           model3.predictions = model3.predictions.filter(
             (pred) => pred.confidence >= 0.5
           );
           models = model1.predictions.concat(model3.predictions);
+          console.log("models ';';';'", models);
         }
 
         for (const [index, prediction] of models.entries()) {

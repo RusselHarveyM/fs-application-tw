@@ -25,7 +25,9 @@ export default function Result({
           disabled={isLoading}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={getDateString(ratings[0].dateModified)} />
+            <SelectValue
+              placeholder={getDateString(ratings[0]?.dateModified)}
+            />
           </SelectTrigger>
           <SelectContent>
             {ratings?.map((r) => {

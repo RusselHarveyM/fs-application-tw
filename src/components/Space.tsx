@@ -380,18 +380,22 @@ export default function Space({
       </h2>
     </Modal>
   );
-  console.log("selectedRating >>", selectedRating);
+  console.log("ratings  ratings>>", ratings);
   const renderAdminView =
     loggedIn || (!loggedIn && checkMonth(data?.viewedDate)) ? (
-      <Result
-        // data={data}
-        ratings={ratings}
-        // isLoading={isLoad}
-        handleResultSelect={handleResultSelect}
-        handleScoreClick={handleScoreClick}
-        selectedRating={selectedRating}
-        selectedScore={selectedScore}
-      />
+      ratings.length > 0 ? (
+        <Result
+          // data={data}
+          ratings={ratings}
+          // isLoading={isLoad}
+          handleResultSelect={handleResultSelect}
+          handleScoreClick={handleScoreClick}
+          selectedRating={selectedRating}
+          selectedScore={selectedScore}
+        />
+      ) : (
+        <p className="text-neutral-500 mx-auto">No Ratings yet...</p>
+      )
     ) : null;
 
   return (
