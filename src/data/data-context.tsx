@@ -323,7 +323,7 @@ export default function DataContextProvider({ children }) {
   async function updateSpace(spaceId, updatedSpaceData) {
     console.log(updatedSpaceData);
     return axios
-      .put(`${endpoint}/api/space/${spaceId}`, updatedSpaceData)
+      .put(`${endpoint}/api/space/${spaceId}`, updatedSpaceData.data)
       .then(() => success(`Updated the space ${spaceId} successfully.`))
       .catch((error) =>
         somethingWentWrong(
