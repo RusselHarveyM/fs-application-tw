@@ -94,7 +94,7 @@ export default function DataContextProvider({ children }) {
           spaceImages,
         };
       });
-    } catch (error) {
+    } catch (e) {
       if (e.response && e.response.status === 404) {
         setData((prev) => {
           return {
@@ -122,7 +122,7 @@ export default function DataContextProvider({ children }) {
           spaceImages,
         };
       });
-    } catch (error) {
+    } catch (e) {
       if (e.response && e.response.status === 404) {
         setData((prev) => {
           return {
@@ -151,7 +151,7 @@ export default function DataContextProvider({ children }) {
           spaceImages,
         };
       });
-    } catch (error) {
+    } catch (e) {
       if (e.response && e.response.status === 404) {
         setData((prev) => {
           return {
@@ -365,7 +365,7 @@ export default function DataContextProvider({ children }) {
       });
 
       // success("Fetched Data Successfully.");
-    } catch (error) {
+    } catch (e) {
       if (e.response && e.response.status === 404) {
         setData((prev) => {
           return {
@@ -391,7 +391,7 @@ export default function DataContextProvider({ children }) {
           rooms,
         };
       });
-    } catch (error) {
+    } catch (e) {
       if (e.response && e.response.status === 404) {
         setData((prev) => {
           return {
@@ -417,7 +417,7 @@ export default function DataContextProvider({ children }) {
         };
       });
       // success("Fetched Data Successfully.");
-    } catch (error) {
+    } catch (e) {
       if (e.response && e.response.status === 404) {
         setData((prev) => {
           return {

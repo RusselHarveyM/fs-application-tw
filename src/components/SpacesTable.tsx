@@ -56,7 +56,7 @@ export default function SpacesTable({ data, ratings }) {
   }
 
   async function handleImageStore(id, images) {
-    if (images[0].spaceId === id || images.length === 0) {
+    if (images.length === 0 || images[0]?.spaceId === id) {
       const foundData = imagesBySpace.find((curr) => curr.id === id);
       setImagesBySpace((prev) => {
         let data = {
