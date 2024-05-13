@@ -61,7 +61,7 @@ export default function Comment({ selected, ratingId }) {
   }
 
   return (
-    <article className="flex flex-col gap-4 w-full h-90 border-dashed border-4 rounded-lg py-4 px-6 ">
+    <article className="flex flex-col gap-4 w-full h-90 sm:w-full sm:h-90 xs:h-50 xs:w-[60rem] xs:transform xs:scale-75 sm:scale-100 border-dashed border-4 rounded-lg py-4 px-6 ">
         {isLoad ? (
         <Skeleton className="h-6 w-[100px] bg-neutral-200" /> 
       ) : (
@@ -74,7 +74,7 @@ export default function Comment({ selected, ratingId }) {
         </h2>
       )}
       {(selected !== "" || isLoad) && (
-        <>
+        <div className="xs:text-xs xs:transform xs:scale-100 sm:scale-100">
           <Details isLoad={isLoad} title="Summary" text={summary}/>
           <Details
             isLoad={isLoad}
@@ -82,7 +82,7 @@ export default function Comment({ selected, ratingId }) {
             title="Things to improve"
             text={thingsToImprove}
           />
-        </>
+        </div>
       )}
     </article>
   );
