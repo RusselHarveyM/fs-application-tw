@@ -95,15 +95,18 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (error) {
-      somethingWentWrong(
-        "It looks like there's a problem fetching the Space Images."
-      );
-      setData((prev) => {
-        return {
-          ...prev,
-          spaceImages: [],
-        };
-      });
+      if (e.response && e.response.status === 404) {
+        setData((prev) => {
+          return {
+            ...prev,
+            spaceImages: [],
+          };
+        });
+      } else {
+        somethingWentWrong(
+          "It looks like there's a problem fetching the Space Images."
+        );
+      }
     }
   }
 
@@ -120,16 +123,18 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (error) {
-      somethingWentWrong(
-        "It looks like there's a problem fetching the Space Images."
-      );
-
-      setData((prev) => {
-        return {
-          ...prev,
-          spaceImages: [],
-        };
-      });
+      if (e.response && e.response.status === 404) {
+        setData((prev) => {
+          return {
+            ...prev,
+            spaceImages: [],
+          };
+        });
+      } else {
+        somethingWentWrong(
+          "It looks like there's a problem fetching the Space Images."
+        );
+      }
     }
   }
 
@@ -147,15 +152,18 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (error) {
-      somethingWentWrong(
-        "It looks like there's a problem fetching the Space Images."
-      );
-      setData((prev) => {
-        return {
-          ...prev,
-          spaceImages: [],
-        };
-      });
+      if (e.response && e.response.status === 404) {
+        setData((prev) => {
+          return {
+            ...prev,
+            spaceImages: [],
+          };
+        });
+      } else {
+        somethingWentWrong(
+          "It looks like there's a problem fetching the Space Images."
+        );
+      }
     }
   }
 
@@ -358,15 +366,18 @@ export default function DataContextProvider({ children }) {
 
       // success("Fetched Data Successfully.");
     } catch (error) {
-      somethingWentWrong(
-        "It looks like there's a problem fetching the space data."
-      );
-      setData((prev) => {
-        return {
-          ...prev,
-          spaces: [],
-        };
-      });
+      if (e.response && e.response.status === 404) {
+        setData((prev) => {
+          return {
+            ...prev,
+            spaces: [],
+          };
+        });
+      } else {
+        somethingWentWrong(
+          "It looks like there's a problem fetching the space data."
+        );
+      }
     }
   }
 
@@ -381,15 +392,18 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (error) {
-      somethingWentWrong(
-        "It looks like there's a problem fetching the room data."
-      );
-      setData((prev) => {
-        return {
-          ...prev,
-          rooms: [],
-        };
-      });
+      if (e.response && e.response.status === 404) {
+        setData((prev) => {
+          return {
+            ...prev,
+            rooms: [],
+          };
+        });
+      } else {
+        somethingWentWrong(
+          "It looks like there's a problem fetching the room data."
+        );
+      }
     }
   }
 
@@ -404,15 +418,18 @@ export default function DataContextProvider({ children }) {
       });
       // success("Fetched Data Successfully.");
     } catch (error) {
-      somethingWentWrong(
-        "It looks like there's a problem fetching the building data."
-      );
-      setData((prev) => {
-        return {
-          ...prev,
-          buildings: [],
-        };
-      });
+      if (e.response && e.response.status === 404) {
+        setData((prev) => {
+          return {
+            ...prev,
+            buildings: [],
+          };
+        });
+      } else {
+        somethingWentWrong(
+          "It looks like there's a problem fetching the building data."
+        );
+      }
     }
   }
 
@@ -483,11 +500,11 @@ export default function DataContextProvider({ children }) {
         result = data;
         success("Updated the space calibration date successfully.");
       })
-      .catch(() =>
+      .catch(() => {
         somethingWentWrong(
           "It looks like there's a problem updating the space calibration date."
-        )
-      );
+        );
+      });
     return result;
   }
 
@@ -502,15 +519,18 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (e) {
-      somethingWentWrong(
-        "It looks like there's a problem fetching the ratings data."
-      );
-      setData((prev) => {
-        return {
-          ...prev,
-          ratings: [],
-        };
-      });
+      if (e.response && e.response.status === 404) {
+        setData((prev) => {
+          return {
+            ...prev,
+            ratings: [],
+          };
+        });
+      } else {
+        somethingWentWrong(
+          "It looks like there's a problem fetching the ratings data."
+        );
+      }
     }
   }
 
@@ -525,15 +545,18 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (e) {
-      somethingWentWrong(
-        "It looks like there's a problem fetching the ratings data by id."
-      );
-      setData((prev) => {
-        return {
-          ...prev,
-          ratings: [],
-        };
-      });
+      if (e.response && e.response.status === 404) {
+        setData((prev) => {
+          return {
+            ...prev,
+            ratings: [],
+          };
+        });
+      } else {
+        somethingWentWrong(
+          "It looks like there's a problem fetching the ratings data by id."
+        );
+      }
     }
   }
 
@@ -548,15 +571,18 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (e) {
-      somethingWentWrong(
-        "It looks like there's a problem fetching the comments data."
-      );
-      setData((prev) => {
-        return {
-          ...prev,
-          comments: [],
-        };
-      });
+      if (e.response && e.response.status === 404) {
+        setData((prev) => {
+          return {
+            ...prev,
+            comments: [],
+          };
+        });
+      } else {
+        somethingWentWrong(
+          "It looks like there's a problem fetching the comments data."
+        );
+      }
     }
   }
 
@@ -565,7 +591,7 @@ export default function DataContextProvider({ children }) {
       const comments = (
         await axios.get(`${endpoint}/api/comment/${id}/comments`)
       ).data;
-      success("Fetched the data successfully.");
+      // success("Fetched the data successfully.");
       setData((prev) => {
         return {
           ...prev,
@@ -573,15 +599,18 @@ export default function DataContextProvider({ children }) {
         };
       });
     } catch (e) {
-      somethingWentWrong(
-        "It looks like there's a problem fetching the comments data."
-      );
-      setData((prev) => {
-        return {
-          ...prev,
-          comments: [],
-        };
-      });
+      if (e.response && e.response.status === 404) {
+        setData((prev) => {
+          return {
+            ...prev,
+            comments: [],
+          };
+        });
+      } else {
+        somethingWentWrong(
+          "It looks like there's a problem fetching the comments data."
+        );
+      }
     }
   }
   /*
