@@ -36,7 +36,7 @@ export default function Space({
   const duration = useRef();
   const [selectedImage, setSelectedImage] = useState(undefined);
   const [selectedScore, setSelectedScore] = useState(undefined);
-  const [selectedRating, setSelectedRating] = useState(undefined);
+  const [selectedRating, setSelectedRating] = useState(ratings && ratings[0]);
   // const [prevSpaceId, setPrevSpaceId] = useState(undefined);
   const [isFetch, setIsFetch] = useState<Boolean>(false);
   const [isEvaluate, setIsEvaluate] = useState<Boolean>(false);
@@ -79,11 +79,14 @@ export default function Space({
       getSpaceImages();
       setIsFetch(true);
     }
+    setSelectedImage(undefined);
   }, [spaceId]);
 
   useEffect(() => {
-    setSelectedRating(ratings && ratings[0]);
-  }, [ratings]);
+    if (ratings) {
+      setSelectedRating(ratings[0]);
+    }
+  }, []);
 
   const handleImageSelect = useCallback((image) => {
     console.log("image >> ", image);
@@ -381,7 +384,7 @@ export default function Space({
   const renderAdminView =
     loggedIn || (!loggedIn && checkMonth(data?.viewedDate)) ? (
       <Result
-        data={data}
+        // data={data}
         ratings={ratings}
         // isLoading={isLoad}
         handleResultSelect={handleResultSelect}
@@ -453,8 +456,8 @@ export default function Space({
                         disabled={
                           isFetch ||
                           isEvaluate ||
-                          !checkMonth(data.calibrationDate) ||
-                          checkMonth(data.assessedDate) ||
+                          // !checkMonth(data.calibrationDate) ||
+                          // checkMonth(data.assessedDate) ||
                           !images
                         }
                       >
@@ -472,7 +475,6 @@ export default function Space({
             onSelectImage={handleImageSelect}
           />
         </div>
-
         {renderAdminView}
       </div>
     </>

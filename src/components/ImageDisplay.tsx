@@ -30,6 +30,8 @@ export default function ImageDisplay({
 
   const prediction = selectedImage && JSON.parse(selectedImage?.prediction);
 
+  console.log("prediction >> ", prediction);
+
   const handleImageLoad = (event) => {
     setImageSize({
       width: event.target.naturalWidth,
@@ -50,7 +52,7 @@ export default function ImageDisplay({
         num = 2;
         break;
       case "model4":
-        num = 4;
+        num = 3;
         break;
       default:
         num = undefined;
