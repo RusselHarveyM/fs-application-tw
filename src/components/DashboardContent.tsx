@@ -101,11 +101,17 @@ export default function DashboardContent() {
                         content.selectedTab === "buildings"
                           ? dataItem.buildingCode ?? ""
                           : "";
+
+                      const childrens = rooms.filter(
+                        (curr) => curr.buildingId === id
+                      );
+
                       return (
                         <Container
                           key={id}
                           img={img}
                           title={title}
+                          noOfChildren={childrens.length}
                           code={code}
                           onClick={() => handleContainerSelect(id)}
                         />

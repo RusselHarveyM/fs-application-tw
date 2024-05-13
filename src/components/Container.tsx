@@ -20,10 +20,10 @@ export default function Container({
         <div className="w-16 h-16 md:w-20 md:h-20 sm:w-14 sm:h-14 xs:w-10 xs:h-10 rounded-xl bg-neutral-200 animate-pulse"></div>
       )}
 
-      <div className="flex flex-col md:gap-4 sm:gap-2">
-        <div className="flex flex-col md:gap-4 sm:gap-2 items-start">
+      <div className="flex items-start flex-col gap-2">
+        <div className="flex flex-col gap-2 items-start">
           {title ? (
-            <h2 className="text-sm md:text-base sm:text-sm xs:text-xs truncate w-24 md:w-auto">
+            <h2 className="text-sm md:text-base sm:text-sm xs:text-xs truncate  md:w-auto">
               {title}
             </h2>
           ) : (
@@ -38,7 +38,7 @@ export default function Container({
           )}
         </div>
         {noOfChildren ? (
-          <p className="text-xs">{noOfChildren}</p>
+          <p className="text-xs">{noOfChildren} rooms</p>
         ) : (
           <div className="bg-neutral-200 rounded-xl animate-pulse w-6 md:w-8 sm:w-6 xs:w-4 h-4" />
         )}
