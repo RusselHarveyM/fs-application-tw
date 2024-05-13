@@ -172,7 +172,7 @@ export const userColumns: ColumnDef<User>[] = [
             ref={deleteModal}
             onSubmit={handleUserDelete}
           >
-            <p>Are you sure you want to delete?</p>
+            <p className="px-3 py-4">Are you sure you want to delete?</p>
           </Modal>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
