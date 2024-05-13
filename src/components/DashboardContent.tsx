@@ -178,7 +178,6 @@ export default function DashboardContent() {
           </Button>
         </menu>
         <p className="text-neutral-500">
-          /{" "}
           <span className="text-neutral-600">
             {content.selectedTab === "rooms" &&
               buildings.find((building) => {

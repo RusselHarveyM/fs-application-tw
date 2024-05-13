@@ -29,12 +29,12 @@ export default function SpaceHeading({
         buttonCaption="Confirm"
         toggleClose={false}
       >
-        <div className="p-8 px-12 w-[40rem] h-[35rem]">
+        <div className="p-8 px-12 w-[40rem] h-fit">
           <h2 className="text-rose-500 text-2xl font-semibold pb-2">
             Calibration Result
           </h2>
           <div className="overflow-auto h-[30rem]">
-            <pre className="text-xs bg-neutral-100 h-[30rem]  py-4 pl-8 shadow-inner text-neutral-700">
+            <pre className="text-xs bg-neutral-100 h-fit  py-4 pl-8 shadow-inner text-neutral-700">
               <p className="border-l-4 border-rose-300 pl-2">
                 {JSON.stringify(
                   removeProperties(JSON.parse(standard), [

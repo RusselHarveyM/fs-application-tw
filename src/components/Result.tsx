@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/select";
 import ScoreCard from "./ScoreCard";
 import Comment from "./Comment";
+import { getDateString } from "@/helper/date.js";
 
 export default function Result({
   isLoading = false,
@@ -14,7 +15,6 @@ export default function Result({
   handleScoreClick,
   selectedScore,
   selectedRating,
-  data,
   ratings,
 }) {
   return (
@@ -25,22 +25,16 @@ export default function Result({
           disabled={isLoading}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Most Recent" />
+            <SelectValue placeholder={getDateString(ratings[0].dateModified)} />
           </SelectTrigger>
           <SelectContent>
             {ratings?.map((r) => {
-              const date = new Date(r.dateModified);
-              const formattedDate = date.toLocaleDateString("en-US", {
-                day: "numeric",
-                month: "short",
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true,
-              });
+              const date = r.dateModified;
+              const formattedDate = getDateString(date);
               return (
                 <SelectItem
                   key={r.id}
-                  value={r.dateModified}
+                  value={date}
                   className="hover:cursor-pointer"
                 >
                   {formattedDate}

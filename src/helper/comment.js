@@ -35,6 +35,7 @@ export default function commentFormatter(data) {
 
           // Check if the item has children
           if (item.children && item.children.length > 0) {
+            let childrenObjects = [];
             item.children.forEach((child) => {
               const id = child.id;
               const childName = child.class;
@@ -43,13 +44,15 @@ export default function commentFormatter(data) {
                 ? objectsFound[childName].qty + 1
                 : 1;
 
-              objectsFound[childName] = {
+              let object = {
                 id,
                 qty: childQty,
                 class: childName,
                 type: childType,
               };
+              childrenObjects.push(object);
             });
+            objectsFound[itemName].children = childrenObjects;
           }
         });
       } else if (typeof obj[prop] === "object") {
@@ -103,7 +106,14 @@ export default function commentFormatter(data) {
 
           if (item.children && item.children.length > 0) {
             item.children.forEach((child) => {
-              comments[key] += ` ${child.class} is found on the ${item.class},`;
+              if (child.type === "missing" || child.type === "c_missing")
+                comments[
+                  key
+                ] += ` missing ${child.class} on the ${item.class},`;
+              if (child.type === "extra" || child.type === "c_extra")
+                comments[
+                  key
+                ] += ` unwanted ${child.class} on the ${item.class},`;
               foundChildrens.push(child.id);
             });
           }

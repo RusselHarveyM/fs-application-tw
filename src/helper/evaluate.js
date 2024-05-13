@@ -170,45 +170,55 @@ function calculateOverlap(prediction1, prediction2) {
   };
 }
 
-function score(data) {
-  /**
-    let result = {
-      scores: {
-        sort: { ...SORT },
-        set: { ...SET },
-        shine: { ...SHINE },
-      },
-      predictions: [],
-    };
-   */
+function score(data, imagesLength) {
   const sort = data.scores.sort;
   const set = data.scores.set;
   const shine = data.scores.shine;
 
+  const decrementPercentageSort = 0.5; // Adjust this value to control the decrement severity of sort
+  const decrementPercentageSet = 2; // Adjust this value to control the decrement severity of set in order
+  const decrementPercentageShine = 1.5; // Adjust this value to control the decrement severity of shine
+
+  // Calculate sort score with decrement for unwanted/missing items
   sort.score = Math.min(
     10,
-    Math.max(10 - (sort.unwanted.length + sort.missing.length) / 2, 0)
+    10 -
+      (sort.unwanted.length + sort.missing.length) *
+        decrementPercentageSort *
+        imagesLength
   );
-  // Calculate the average air system
+
+  // Calculate air system score with penalty for missing elements
   const totalAS =
     set.airsystem.ventilation + set.airsystem.aircon + set.airsystem.exhaust;
-  const airSystemScore = totalAS === 1 ? 1 : totalAS >= 2 ? 0 : 5; // Default value if no air systems
+  const airSystemPenalty =
+    (3 - totalAS) * decrementPercentageSet * imagesLength; // Penalty increases with missing systems
 
-  // Calculate the final score
+  // Calculate set score with penalty for unorganized items and air system
   set.score = Math.min(
     10,
-    // Math.max(0, 10 - (airSystemScore + set.unorganized) / 2)
-    Math.max(0, 10 - set.unorganized)
+    10 - set.unorganized * decrementPercentageSet * imagesLength
   );
 
+  // Calculate shine score with decrement for damage, litter, etc.
   shine.score = Math.min(
     10,
-    Math.max(
-      10 -
-        (shine.damage * 2 + shine.litter + shine.smudge + shine.adhesive) / 4,
-      0
-    )
+    10 -
+      ((shine.damage * 2 * decrementPercentageShine +
+        shine.litter +
+        shine.smudge +
+        shine.adhesive) *
+        decrementPercentageShine *
+        imagesLength) /
+        4
   );
+
+  return {
+    // Assuming you want to return the final scores
+    sort: sort.score,
+    set: set.score,
+    shine: shine.score,
+  };
 }
 
 export default async function evaluate(
@@ -313,16 +323,19 @@ export default async function evaluate(
             objectId++;
           }
         }
-        // structure object hierarchy
-        // objects_temp.forEach((first_object, outerIndex) =>
         const commonParents = ["table", "chair", "sofa"];
-        const commonChildrens = ["basket", "lamp", "personal belongings"];
+        let commonChildrens;
+        if (isCalibrate) {
+          commonChildrens = ["basket", "lamp"];
+        } else {
+          commonChildrens = ["basket", "lamp", "personal belongings"];
+        }
         const commonAbstracts = ["pot", "litter"];
+
         for (const [outerIndex, first_object] of objects_temp.entries()) {
           objects_temp.forEach((second_object, innerIndex) => {
             const first_key = first_object.class;
             const second_key = second_object.class;
-            // const notObjects = ["chair", "sofa", "pot"];
             if (
               first_key === second_key ||
               commonAbstracts.includes(first_key) ||
@@ -429,7 +442,6 @@ export default async function evaluate(
           });
         }
         // remove the items with indexFrom
-        // objects_temp.forEach((object, index) => {
         for (const [index, object] of objects_temp.entries()) {
           console.log("object 11", object);
           if (object.indexFrom !== undefined) {
@@ -443,20 +455,12 @@ export default async function evaluate(
       console.log(objects);
       // order/organization
       model2 = await orderModel(imageObject.image);
-      // model4 = await blueModel(imageObject.image);
       if (model2 !== undefined) {
         const filteredOrder = model2.predictions.filter(
           (obj) => obj.class === "disorganized"
         );
         if (filteredOrder.length > 0)
           result.scores.set.unorganized += filteredOrder.length;
-        // for (const obj of model4.predictions) {
-        //   const airwaysSystems = ["ventilation", "aircon", "exhaust"];
-        //   if (obj.class in airwaysSystems) {
-        //     result.scores.set.airsystem[obj.class]++;
-        //     result.airsystem = true;
-        //   }
-        // }
       }
     }
 
@@ -464,7 +468,6 @@ export default async function evaluate(
     if (imageObject.forType === "all" || imageObject.forType === "std") {
       model5 = await yellowModel(imageObject.image);
       if (model5 !== undefined) {
-        // const yellowClasses = ["damage", "litter", "smudge", "adhesives"];
         for (const obj of model5.predictions) {
           if (obj.class === "score") continue;
           result.scores.shine[obj.class]++;
@@ -495,7 +498,7 @@ export default async function evaluate(
   console.log("before", objects);
   console.log("standard", standard);
 
-  if (!isEmpty(standard)) {
+  if (!isEmpty(standard) && !isCalibrate) {
     const c_result = await c_evaluation(objects, spacename, standard);
     console.log("c_result >>> ", c_result);
 
@@ -511,7 +514,7 @@ export default async function evaluate(
     );
 
     console.log("result >>> ", result);
-    score(result);
+    score(result, images.length);
   }
   if (isCalibrate) result.standard = JSON.stringify(objects);
 
