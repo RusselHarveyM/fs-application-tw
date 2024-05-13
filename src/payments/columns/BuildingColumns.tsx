@@ -163,7 +163,7 @@ export const buildingColumns: ColumnDef<Building>[] = [
             ref={deleteModal}
             onSubmit={handleBuildingDelete}
           >
-            <p>Are you sure you want to delete?</p>
+            <p className="px-3 py-4">Are you sure you want to delete?</p>
           </Modal>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
