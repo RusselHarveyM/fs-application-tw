@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { isAdminLoggedIn } from "@/helper/auth";
+import { isAdminLoggedIn, logout } from "@/helper/auth";
 import Logo from "../assets/citu_logo.png";
 import Button from "./Button";
 import { AlignJustify } from "lucide-react";
@@ -18,6 +18,7 @@ export default function TopNavigation() {
 
   function handleLogout() {
     navigate("/");
+    logout();
   }
 
   return (

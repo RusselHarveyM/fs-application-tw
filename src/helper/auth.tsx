@@ -27,6 +27,10 @@ export function checkAuthLoaderSpecial() {
   return null;
 }
 
+export function logout() {
+  localStorage.removeItem("isLoggedIn");
+}
+
 export function checkAuthLoader() {
   const isLoggedIn = getAuthToken();
   console.log("test");
