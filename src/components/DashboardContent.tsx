@@ -65,23 +65,8 @@ export default function DashboardContent() {
   }
 
   return (
-    <div className="flex flex-col w-full m-auto xs:py-28 xs:px-4 sm:py-6 sm:px-8 mb-18">
-      {/* <div className="flex gap-8 mt-4 mb-8 lg:flex-row lg:justify-center lg:gap-56 md:gap-50 md:justify-center md:flex-row md:gap-16 sm:flex-row sm:justify-center sm:gap-26">
-        <CircularProgress
-          percent={10}
-          title="overall"
-          strokeColor="#1dd75b"
-          trailColor="#b8f5cd"
-        />
-        <CircularProgress
-          percent={10}
-          title="completion"
-          strokeColor="#4069e5"
-          trailColor="#c5d1f7"
-        />
-      </div> */}
-
-      <div className="flex flex-col gap-4 justify-center items-center mt-4  m-auto  xs:w-[22rem] xs:h-[10rem] sm:w-full sm:h-[20rem] md:w-[95rem] md:h-[30rem] rounded-[2rem]">
+    <div className="flex flex-col w-full m-auto xs:p-4 sm:p-6 md:p-8 lg:p-12">
+      <div className="flex flex-col gap-4 justify-center items-center mt-4 mx-auto w-full sm:w-[22rem] md:w-full lg:w-[95rem]">
         {content.data?.length > 0 ? (
           content.data.map((item, index) => {
             let contentLength = content.data?.length;
@@ -167,12 +152,11 @@ export default function DashboardContent() {
         )}
       </div>
 
-      {/* <div className="flex flex-col gap-8 items-center justify-center h-1/6  "> */}
-      <div className="xs:fixed xs:bottom-28 xs:left-0 xs:right-0 sm:bottom-44 md:bottom-10 flex flex-col gap-8 items-center justify-center sm:py-10 md:-mb-4">
-        <menu className="flex justify-center items-center bg-stone-100 rounded-full py-2 px-4 md:w-[250px] md:h-[120px] sm:w-[190] sm:h-[90] xs:w-[190] xs:h-[90]">
+      <div className="fixed bottom-4 left-0 right-0 flex flex-col items-center justify-center sm:bottom-8 md:bottom-4">
+        <menu className="flex justify-center items-center bg-stone-100 rounded-full py-2 px-4 w-full sm:w-[250px] md:w-[300px]">
           <NavLink
             to="/home"
-            className={`flex justify-center flex-col items-center sm:w-[96px] md:w-[123.2px] ${
+            className={`flex justify-center flex-col items-center w-[50%] ${
               content.selectedTab === "buildings" ? "font-bold" : ""
             }`}
             onClick={() => handleTabSelect("buildings")}
@@ -183,12 +167,10 @@ export default function DashboardContent() {
               isSelected={content.selectedTab === "buildings"}
               isDisabled={false}
             />
-            <h3 className="text-neutral-600 md:text-base sm:text-sm xs:text-xs">
-              Buildings
-            </h3>
+            <h3 className="text-neutral-600 text-sm">Buildings</h3>
           </NavLink>
           <Button
-            liCss="flex justify-center flex-col items-center"
+            liCss="flex justify-center flex-col items-center w-[50%]"
             onClick={() => handleTabSelect("rooms")}
             cssAdOns={content.selectedTab === "rooms" ? "font-bold" : undefined}
             disabled={content.selectedTab === "rooms" ? false : true}
@@ -199,7 +181,7 @@ export default function DashboardContent() {
               isSelected={content.selectedTab === "rooms"}
               isDisabled={content.selectedTab === "rooms" ? false : true}
             />
-            <h3 className="text-neutral-600  md:text-base sm:text-sm">Rooms</h3>
+            <h3 className="text-neutral-600 text-sm">Rooms</h3>
           </Button>
         </menu>
         <p className="text-neutral-500">

@@ -110,11 +110,11 @@ export default function SpacesTable({ data, ratings }) {
           <CircleHelp />
         </div>
       </Modal>
-      <div className="md:w-[90rem] sm:w-[44rem] xs:w-[24.5rem] mx-auto bg-white shadow-sm rounded-lg mt-10 flex flex-col items-center justify-center p-6">
+      <div className="md:w-[90rem] sm:w-[44rem] xs:w-[30rem] mx-auto bg-white shadow-sm rounded-lg mt-10 flex flex-col items-center justify-center p-6">
         <Table>
           <TableCaption>A list of your recent spaces.</TableCaption>
           <TableHeader>
-            <TableRow className="bg-rose-500 pointer-events-none ">
+            <TableRow className="bg-rose-500 pointer-events-none  md:text-base xs:text-xs">
               <TableHead className="w-[150px] text-white">Name</TableHead>
               {isLoggedIn && (
                 <>
@@ -167,7 +167,7 @@ export default function SpacesTable({ data, ratings }) {
                 <TableRow
                   key={currData.id}
                   onClick={() => handleClickSpace(currData)}
-                  className={` border-neutral-100 hover:bg-white${
+                  className={`  md:text-base xs:text-xs border-neutral-100 hover:bg-white${
                     isLoad
                       ? " animate-pulse cursor-wait"
                       : " hover:cursor-pointer hover:bg-rose-50"
