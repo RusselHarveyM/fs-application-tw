@@ -74,7 +74,7 @@ export default function Comment({ selected, ratingId }) {
         </h2>
       )}
       {(selected !== "" || isLoad) && (
-        <div className="xs:text-xs xs:transform xs:scale-100 sm:scale-100">
+        <div className="xs:text-xs xs:transform xs:scale-100 sm:scale-100 md:text-base">
           <Details isLoad={isLoad} title="Summary" text={summary} />
           <Details
             isLoad={isLoad}
