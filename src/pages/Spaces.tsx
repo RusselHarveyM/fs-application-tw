@@ -20,7 +20,6 @@ export default function Spaces() {
 
   useEffect(() => {
     setIsLoad(false);
-    param;
   }, [ratings]);
 
   useEffect(() => {

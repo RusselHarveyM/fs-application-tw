@@ -86,7 +86,7 @@ export default function Space({
     if (ratings) {
       setSelectedRating(ratings[0]);
     }
-  }, []);
+  }, [spaceId]);
 
   const handleImageSelect = useCallback((image) => {
     console.log("image >> ", image);

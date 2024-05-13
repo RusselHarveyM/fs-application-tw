@@ -16,7 +16,8 @@ export const DataContext = createContext({
 });
 
 // const endpoint = "https://fs-backend-copy-production.up.railway.app";
-const endpoint = "https://3s-backend-production.up.railway.app";
+// const endpoint = "https://3s-backend-production.up.railway.app";
+const endpoint = "https://localhost:7124";
 
 export default function DataContextProvider({ children }) {
   const { toast } = useToast();
@@ -331,13 +332,14 @@ export default function DataContextProvider({ children }) {
   async function updateSpace(spaceId, updatedSpaceData) {
     console.log(updatedSpaceData);
     return axios
-      .put(`${endpoint}/api/space/${spaceId}`, updatedSpaceData.data)
+      .put(`${endpoint}/api/space/${spaceId}`, updatedSpaceData)
       .then(() => success(`Updated the space ${spaceId} successfully.`))
-      .catch((error) =>
+      .catch((error) => {
+        console.log(error);
         somethingWentWrong(
           "It looks like there's a problem updating the space."
-        )
-      );
+        );
+      });
   }
 
   async function deleteSpace(spaceId) {
@@ -500,7 +502,8 @@ export default function DataContextProvider({ children }) {
         result = data;
         success("Updated the space calibration date successfully.");
       })
-      .catch(() => {
+      .catch((error) => {
+        console.log(error);
         somethingWentWrong(
           "It looks like there's a problem updating the space calibration date."
         );
