@@ -1,4 +1,3 @@
-import CircularProgress from "./CircularProgress";
 import Button from "./Button";
 import Container from "./Container";
 import { useEffect, useState, useContext } from "react";
@@ -67,7 +66,7 @@ export default function DashboardContent() {
 
   return (
     <div className="flex flex-col w-full m-auto my-auto xs:p-4 sm:p-6 md:p-8 lg:p-12">
-      <div className="flex flex-col gap-4 justify-center items-center mt-4 mx-auto w-full sm:w-[22rem] md:w-full lg:w-[95rem] md:h-[30rem]">
+      <div className="flex xs:flex-col xs:h-[20rem] xs:overflow-y-scroll md:overflow-x-hidden gap-4 justify-center items-center md:mt-4 mx-auto xs:w-full sm:w-[22rem] md:w-full lg:w-[95rem] md:h-[30rem]">
         {content.data?.length > 0 ? (
           content.data.map((item, index) => {
             let contentLength = content.data?.length;
@@ -85,7 +84,7 @@ export default function DashboardContent() {
                   key={index}
                   className={`flex ${
                     index % 2 === 0 ? "flex-row" : "flex-row-reverse"
-                  } flex-wrap w-full justify-center gap-8`}
+                  } w-full justify-center md:gap-8 xs:gap-1 flex-wrap `}
                 >
                   {Array.from({ length: index % 2 === 0 ? 3 : 4 }).map(
                     (_, columnIndex) => {
@@ -144,7 +143,7 @@ export default function DashboardContent() {
                   key={index}
                   className={`flex ${
                     index % 2 === 0 ? "flex-row" : "flex-row-reverse"
-                  } flex-wrap w-full justify-center gap-8`}
+                  } flex-wrap w-full justify-center md:gap-8 xs:gap-1`}
                 >
                   {Array.from({ length: index % 2 === 0 ? 3 : 4 }).map(
                     (_, columnIndex) => {

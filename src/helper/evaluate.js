@@ -35,7 +35,7 @@ async function orderModel(image) {
   await axios({
     method: "POST",
     url: "https://detect.roboflow.com/classroom-order-seg/17",
-    url: "https://detect.roboflow.com/classroom-order-seg/17",
+    // url: "https://detect.roboflow.com/classroom-order-seg/17",
     params: {
       api_key: API_KEY,
       confidence: 75,
@@ -60,7 +60,6 @@ async function pbModel(image) {
   await axios({
     method: "POST",
     url: "https://detect.roboflow.com/classroom-type-identification/20",
-    // url: "https://detect.roboflow.com/classroom-3igmn/11",
     params: {
       api_key: API_KEY,
       confidence: 75,
@@ -96,7 +95,6 @@ async function blueModel(image) {
     },
   })
     .then(function (res) {
-      // Log the response data for each request
       console.log("blue >>>", res.data);
       response = res.data;
     })

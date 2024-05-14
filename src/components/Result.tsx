@@ -18,8 +18,8 @@ export default function Result({
   ratings,
 }) {
   return (
-    <div className="relative flex bg-white md:w-full sm:w-[42rem] xs:transform xs:scale-90 sm:scale-100 xs:-mt-16 xs:mb-0 sm:-mt-0 gap-8 shadow-sm p-8 pt-20 rounded-lg">
-      <div className="flex  w-full absolute top-5 xs:transform xs:scale-75 sm:scale-100 xs:left-0 sm:left-8">
+    <div className="relative flex bg-white md:w-full sm:w-[42rem] xs:transform xs:scale-90 sm:scale-100 xs:-mt-16 xs:mb-0 sm:-mt-0 gap-8 shadow-sm xs:pt-10 md:p-8 md:pt-20 rounded-lg">
+      <div className="flex  w-full absolute top-5 xs:transform xs:scale-75 sm:scale-100 xs:-left-8 sm:left-8">
         <Select
           onValueChange={(selectedDate) => handleResultSelect(selectedDate)}
           disabled={isLoading}

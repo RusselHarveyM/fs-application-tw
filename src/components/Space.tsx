@@ -427,7 +427,7 @@ export default function Space({
 
       {renderImageUploadModal}
       {renderImageDeleteModal}
-      <div className="flex flex-col gap-4 md:w-[90rem] sm:w-[44rem] xs:w-[30rem] mx-auto bg-white rounded-lg mt-10 mb-20">
+      <div className="flex flex-col gap-4 md:w-[90rem] sm:w-[44rem] xs:w-[22rem] mx-auto bg-white rounded-lg mt-10 mb-20">
         <SpaceHeading
           name={data?.name}
           calibrationDate={data?.calibrationDate}
@@ -438,7 +438,7 @@ export default function Space({
           standard={data?.standard}
         />
 
-        <div className="flex md:flex-row sm:flex-col xs:flex-col bg-white md:w-full md:w-[90rem] sm:w-[44rem] xs:w-[30rem] xs:mb-10 gap-8 shadow p-8 rounded-lg">
+        <div className="flex md:flex-row sm:flex-col xs:flex-col bg-white md:w-full  sm:w-[44rem] xs:mb-10 gap-8 shadow p-8 rounded-lg">
           <div className="flex flex-col justify-between md:w-2/3">
             <ImageDisplay
               isLoad={isEvaluate}

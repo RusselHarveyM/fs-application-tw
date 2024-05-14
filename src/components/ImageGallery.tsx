@@ -19,13 +19,6 @@ export default function ImageGallery({
         (images && images?.length > 0) || isLoad ? undefined : cssLoad
       } relative`} // Add relative here to position the child absolute elements
     >
-      {/* {!isLoad ? (
-        <p className="absolute m-2 bottom-2 right-2 text-neutral-600 text-xs">
-          {duration.toFixed(2)}s
-        </p>
-      ) : (
-        <Skeleton className="absolute m-2 bottom-2 right-2 w-20 h-6 z-40 bg-neutral-200" />
-      )} */}
       <Images className="absolute sm:w-28 sm:h-28 w-40 h-40 xs:w-28 xs:h-28 xs:left-24 xs:top-2 sm:top-5 sm:left-60 md:left-40 md:top-40 top-40 left-32 text-neutral-200 opacity-50" />
       {isLoad && (
         <div className="absolute top-0 left-0 flex justify-center items-center w-[27rem] h-[30rem] sm:w-full sm:h-full xs:w-full xs:h-full bg-neutral-50 opacity-90">
@@ -83,7 +76,7 @@ export default function ImageGallery({
                 />
                 <sup
                   className={
-                    "absolute md:top-16 sm:top-14 xs:top-3 right-1 h-6 w-fit py-1 px-1 flex justify-center items-center rounded-lg border-4 uppercase font-bold text-md " +
+                    "absolute md:top-16 sm:top-14 xs:top-3 right-1 md:h-6 xs:h-2 xs:w-6 xs:text-[0.6] w-fit py-1 px-1 flex justify-center items-center rounded-lg border-4 uppercase font-bold md:text-md " +
                     css
                   }
                 >

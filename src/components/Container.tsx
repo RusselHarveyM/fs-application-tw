@@ -21,7 +21,7 @@ export default function Container({
   return (
     <button
       {...props}
-      className={`flex transition ease-in delay-50 hover:scale-105 hover:brightness-105 rounded-xl justify-start gap-4 items-center shadow-sm border-2 ${containerStatusCss}  py-2 px-4 w-full md:max-w-[20rem] md:h-28 sm:max-w-[15rem] sm:h-30 xs:max-w-[10rem] xs:h-25 hover:cursor-pointer`}
+      className={`flex transition ease-in delay-50 hover:scale-105 hover:brightness-105 rounded-xl justify-start gap-4 items-center shadow-sm border-2 ${containerStatusCss} py-2 px-4 w-full md:w-[20rem] md:h-[7rem] sm:w-[15rem] sm:h-[8rem] xs:w-[10rem] xs:h-[5rem] hover:cursor-pointer`}
     >
       {img ? (
         <img
@@ -33,21 +33,29 @@ export default function Container({
         <div className="w-16 h-16 md:w-20 md:h-20 sm:w-14 sm:h-14 xs:w-10 xs:h-10 rounded-xl bg-neutral-200 animate-pulse"></div>
       )}
 
-      <div className="flex items-start flex-col gap-2 ">
+      <div className="flex items-start flex-col gap-2">
         <div className="flex flex-col gap-2 items-start">
           {title ? (
-            <h2 className="xs:hidden sm:block text-sm md:text-base sm:text-sm xs:text-xs truncate md:w-auto">
+            <h2
+              className={`${
+                selectedTab === "buildings" && "xs:hidden"
+              } sm:block text-sm md:text-base sm:text-sm xs:text-xs truncate md:w-auto`}
+            >
               {title}
             </h2>
           ) : (
-            <div className="bg-neutral-200 rounded-xl animate-pulse w-16 md:w-20 sm:w-16 xs:w-10 h-4" />
+            <div className="bg-neutral-200 rounded-xl animate-pulse w-16 md:w-20 sm:w-14 xs:w-10 h-4" />
           )}
           {code ? (
-            <p className="font-bold text-xs md:text-sm sm:text-xs xs:text-xs truncate">
+            <p
+              className={`${
+                selectedTab === "rooms" && "xs:hidden"
+              } font-bold text-xs md:text-sm sm:text-xs xs:text-xs truncate`}
+            >
               {code}
             </p>
           ) : (
-            <div className="bg-neutral-200 rounded-xl animate-pulse w-8 md:w-12 sm:w-8 xs:w-6 h-4" />
+            <div className="bg-neutral-200 rounded-xl animate-pulse w-8 md:w-10 sm:w-8 xs:w-6 h-4" />
           )}
         </div>
         {noOfChildren ? (
