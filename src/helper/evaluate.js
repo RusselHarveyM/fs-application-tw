@@ -35,6 +35,7 @@ async function orderModel(image) {
   await axios({
     method: "POST",
     url: "https://detect.roboflow.com/classroom-order-seg/17",
+    url: "https://detect.roboflow.com/classroom-order-seg/17",
     params: {
       api_key: API_KEY,
       confidence: 75,

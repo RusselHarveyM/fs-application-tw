@@ -16,8 +16,8 @@ export const DataContext = createContext({
 });
 
 // const endpoint = "https://fs-backend-copy-production.up.railway.app";
-// const endpoint = "https://3s-backend-production.up.railway.app";
-const endpoint = "https://localhost:7124";
+const endpoint = "https://3s-backend-production.up.railway.app";
+// const endpoint = "https://localhost:7124";
 
 export default function DataContextProvider({ children }) {
   const { toast } = useToast();

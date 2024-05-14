@@ -84,6 +84,7 @@ export const buildingColumns: ColumnDef<Building>[] = [
       <img
         src={`data:image/png;base64,${row.original.image}`}
         alt="Building Image"
+        style={{ width: "100px", height: "auto" }}
       />
     ),
   },

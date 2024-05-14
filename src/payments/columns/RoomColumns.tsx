@@ -74,7 +74,7 @@ export const roomColumns: ColumnDef<Room>[] = [
     accessorKey: "image",
     header: "Image",
     cell: ({ row }) => (
-      <img src={`data:image/jpeg;base64,${row.original.image}`} alt="Room Image" />
+      <img src={`data:image/jpeg;base64,${row.original.image}`} alt="Room Image" style={{ width: "100px", height: "auto" }}/>
     ),
   },
   {
