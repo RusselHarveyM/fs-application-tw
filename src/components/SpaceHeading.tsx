@@ -1,6 +1,6 @@
 import { checkMonth, getDateString } from "@/helper/date.js";
 import { removeProperties } from "@/helper/object.js";
-import { getColor } from "@/helper/string.js";
+import { getColor, isEmpty } from "@/helper/string.js";
 import { isAdminLoggedIn } from "@/helper/auth";
 import Button from "./Button";
 import Modal from "./Modal";
@@ -24,36 +24,46 @@ export default function SpaceHeading({
 
   // Count items per class
   const itemCounts = useMemo(() => {
-    const parsedStandard = JSON.parse(standard);
-    const counts = {};
+    if (!isEmpty(standard)) {
+      const parsedStandard = JSON.parse(standard);
+      const counts = {};
 
-    parsedStandard.forEach((item) => {
-      const itemClass = item.class; // Adjust according to the actual key name for class
-      if (counts[itemClass]) {
-        counts[itemClass] += 1;
-      } else {
-        counts[itemClass] = 1;
-      }
-    });
+      parsedStandard.forEach((item) => {
+        const itemClass = item.class; // Adjust according to the actual key name for class
+        if (counts[itemClass]) {
+          counts[itemClass] += 1;
+        } else {
+          counts[itemClass] = 1;
+        }
+      });
 
-    return counts;
+      return counts;
+    }
+    return {};
   }, [standard]);
 
   const styledStandard = useMemo(() => {
-    const parsedStandard = JSON.parse(standard);
-    return parsedStandard.map((item, index) => {
-      const itemClass = item.class; // Adjust according to the actual key name for class
-      const style = getColor(itemClass);
-      return (
-        <div key={index} className={`text-${style}-500`}>
-          {JSON.stringify(
-            removeProperties(item, ["prediction", "result", "indexFrom", "id"]),
-            null,
-            2
-          )}
-        </div>
-      );
-    });
+    if (!isEmpty(standard)) {
+      const parsedStandard = JSON.parse(standard);
+      return parsedStandard.map((item, index) => {
+        const itemClass = item.class; // Adjust according to the actual key name for class
+        const style = getColor(itemClass);
+        return (
+          <div key={index} className={`text-${style}-500`}>
+            {JSON.stringify(
+              removeProperties(item, [
+                "prediction",
+                "result",
+                "indexFrom",
+                "id",
+              ]),
+              null,
+              2
+            )}
+          </div>
+        );
+      });
+    }
   }, [standard]);
 
   return (
@@ -86,16 +96,20 @@ export default function SpaceHeading({
                   );
                 })}
               </div>
-              {"["}
-              <div className="pl-4">
-                {styledStandard.map((item, index) => (
-                  <div key={index}>
-                    {item}
-                    {index < styledStandard.length - 1 ? "," : ""}
+              {!isEmpty(standard) && (
+                <>
+                  {"["}
+                  <div className="pl-4">
+                    {styledStandard.map((item, index) => (
+                      <div key={index}>
+                        {item}
+                        {index < styledStandard.length - 1 ? "," : ""}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              {"]"}
+                  {"]"}
+                </>
+              )}
             </pre>
           </div>
         </div>
