@@ -66,7 +66,7 @@ export default function DashboardContent() {
 
   return (
     <div className="flex flex-col w-full m-auto my-auto xs:p-4 sm:p-6 md:p-8 lg:p-12">
-      <div className="flex xs:flex-col xs:h-[20rem] xs:overflow-y-scroll md:overflow-x-hidden gap-4 justify-center items-center md:mt-4 mx-auto xs:w-full sm:w-[22rem] md:w-full lg:w-[95rem] md:h-[30rem]">
+      <div className="flex xs:flex-col xs:h-[20rem] xs:overflow-y-scroll md:overflow-x-hidden md:overflow-y-hidden gap-4 justify-center items-center md:mt-4 mx-auto xs:w-full sm:w-[22rem] md:w-full lg:w-[95rem] md:h-[30rem]">
         {content.data?.length > 0 ? (
           content.data.map((item, index) => {
             let contentLength = content.data?.length;
