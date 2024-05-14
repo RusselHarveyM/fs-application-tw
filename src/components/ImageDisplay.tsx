@@ -9,6 +9,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { getColor } from "@/helper/string.js";
+
 interface ImageDisplayProps {
   onDelete: () => void;
   selectedImage: {
@@ -107,41 +109,7 @@ export default function ImageDisplay({
           {prediction.map((pred: any[], outerIndex: number) => {
             if (pred && pred.length > 0) {
               return pred.map((innerPrediction: any[], index: number) => {
-                const pb = [
-                  "bag",
-                  "cap",
-                  "cloth",
-                  "earphones",
-                  "headset",
-                  "laptop",
-                  "personal belongings",
-                  "paper",
-                  "phone",
-                  "sling",
-                  "wallet",
-                ];
-
-                const yellow = ["litter", "smudges"];
-
-                let style =
-                  innerPrediction.class === "chair"
-                    ? "purple"
-                    : innerPrediction.class === "sofa"
-                    ? "pink"
-                    : innerPrediction.class === "table"
-                    ? "purple"
-                    : yellow.includes(innerPrediction.class)
-                    ? "yellow"
-                    : innerPrediction.class === "basket" ||
-                      innerPrediction.class === "pot"
-                    ? "neutral"
-                    : pb.includes(innerPrediction.class)
-                    ? "blue"
-                    : innerPrediction.class === "disorganized"
-                    ? "red"
-                    : innerPrediction.class === "organized"
-                    ? "green"
-                    : undefined;
+                let style = getColor(innerPrediction.class);
 
                 if (
                   outerIndex === selectedModel ||

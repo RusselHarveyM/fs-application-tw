@@ -1,9 +1,10 @@
 import { checkMonth, getDateString } from "@/helper/date.js";
 import { removeProperties } from "@/helper/object.js";
+import { getColor } from "@/helper/string.js";
 import { isAdminLoggedIn } from "@/helper/auth";
 import Button from "./Button";
 import Modal from "./Modal";
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 
 export default function SpaceHeading({
   name,
@@ -21,6 +22,40 @@ export default function SpaceHeading({
     calibrationGuideRef.current.open();
   }
 
+  // Count items per class
+  const itemCounts = useMemo(() => {
+    const parsedStandard = JSON.parse(standard);
+    const counts = {};
+
+    parsedStandard.forEach((item) => {
+      const itemClass = item.class; // Adjust according to the actual key name for class
+      if (counts[itemClass]) {
+        counts[itemClass] += 1;
+      } else {
+        counts[itemClass] = 1;
+      }
+    });
+
+    return counts;
+  }, [standard]);
+
+  const styledStandard = useMemo(() => {
+    const parsedStandard = JSON.parse(standard);
+    return parsedStandard.map((item, index) => {
+      const itemClass = item.class; // Adjust according to the actual key name for class
+      const style = getColor(itemClass);
+      return (
+        <div key={index} className={`text-${style}-500`}>
+          {JSON.stringify(
+            removeProperties(item, ["prediction", "result", "indexFrom", "id"]),
+            null,
+            2
+          )}
+        </div>
+      );
+    });
+  }, [standard]);
+
   return (
     <>
       <Modal
@@ -33,24 +68,39 @@ export default function SpaceHeading({
           <h2 className="text-rose-500 text-2xl font-semibold pb-2">
             Calibration Result
           </h2>
-          <div className="overflow-auto h-[30rem]">
-            <pre className="text-xs bg-neutral-100 h-fit  py-4 pl-8 shadow-inner text-neutral-700">
-              <p className="border-l-4 border-rose-300 pl-2">
-                {JSON.stringify(
-                  removeProperties(JSON.parse(standard), [
-                    "prediction",
-                    "result",
-                    "indexFrom",
-                  ]),
-                  null,
-                  2
-                )}
-              </p>
+          <div className="overflow-auto h-[30rem] relative">
+            <pre className="text-xs bg-neutral-100 h-fit py-4 pl-8 shadow-inner text-neutral-700">
+              <div className="absolute right-0 p-4 bg-white rounded-lg text-sm">
+                {Object.entries(itemCounts).map(([itemClass, count]) => {
+                  const style = getColor(itemClass);
+                  return (
+                    <div
+                      key={itemClass}
+                      className={`flex items-center text-${style}-500`}
+                    >
+                      <span className="mr-2 scale-125" style={{ color: style }}>
+                        •
+                      </span>
+                      {itemClass}: {count}
+                    </div>
+                  );
+                })}
+              </div>
+              {"["}
+              <div className="pl-4">
+                {styledStandard.map((item, index) => (
+                  <div key={index}>
+                    {item}
+                    {index < styledStandard.length - 1 ? "," : ""}
+                  </div>
+                ))}
+              </div>
+              {"]"}
             </pre>
           </div>
         </div>
       </Modal>
-      <div className="flex flex-col bg-rose-500 md:w-full  gap-8 shadow py-8 md:px-16 sm:px-8 rounded-lg">
+      <div className="flex flex-col bg-rose-500 md:w-full gap-8 shadow py-8 md:px-16 sm:px-8 rounded-lg">
         <div className="flex justify-between">
           <div className="flex items-center gap-4 text-white text-2xl xs:ml-4 xs:text-xs">
             <h2 className="uppercase">{name ? name : "Space"}</h2>
@@ -71,6 +121,7 @@ export default function SpaceHeading({
               {calibrationDate ? getDateString(calibrationDate) : "---"}
             </p>
           </div>
+
           {loggedIn && (
             <Button
               variant="rose"

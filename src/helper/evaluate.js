@@ -14,7 +14,7 @@ async function countModel(image) {
     params: {
       api_key: API_KEY,
       confidence: 70,
-      overlap: 57,
+      overlap: 70,
     },
     data: image,
     headers: {
