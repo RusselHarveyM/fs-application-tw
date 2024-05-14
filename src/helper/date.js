@@ -47,3 +47,49 @@ export function sortDate(object) {
   );
   return latestRating;
 }
+
+export function calculateMonthlyAverages(data) {
+  console.log("calculateMonthlyAverages", data);
+  const monthlyAverages = data.reduce((acc, space) => {
+    space.ratings.forEach((rating) => {
+      if (rating) {
+        const date = new Date(rating.dateModified);
+        const month = `${date.toLocaleDateString("en-US", {
+          month: "short",
+        })} ${date.getFullYear()}`;
+        acc[month] = acc[month] || {
+          date: month,
+          Sort: 0,
+          "Set In Order": 0,
+          Shine: 0,
+          count: 0,
+        };
+        acc[month].Sort += rating.sort;
+        acc[month]["Set In Order"] += rating.setInOrder;
+        acc[month].Shine += rating.shine;
+        acc[month].count++;
+      }
+    });
+    return acc;
+  }, {});
+
+  const averageScores = Object.values(monthlyAverages).map((average) => {
+    let sort = (average.Sort / average.count).toFixed(1);
+    let set = (average["Set In Order"] / average.count).toFixed(1);
+    let shine = (average.Shine / average.count).toFixed(1);
+    return {
+      date: average.date,
+      Sort: sort,
+      "Set In Order": set,
+      Shine: shine,
+      Average: (
+        (parseFloat(sort) + parseFloat(set) + parseFloat(shine)) /
+        3
+      ).toFixed(1),
+    };
+  });
+
+  averageScores.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  return averageScores;
+}

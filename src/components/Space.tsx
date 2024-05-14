@@ -11,7 +11,11 @@ import ImageDisplay from "./ImageDisplay";
 import evaluate from "../helper/evaluate";
 import comment from "../helper/comment";
 
-import { checkMonth, getDateNow } from "@/helper/date.js";
+import {
+  checkMonth,
+  getDateNow,
+  calculateMonthlyAverages,
+} from "@/helper/date.js";
 import Result from "./Result";
 import { isAdminLoggedIn } from "@/helper/auth";
 import { Circle } from "rc-progress";
@@ -19,6 +23,7 @@ import SpaceHeading from "./SpaceHeading";
 
 export default function Space({
   data,
+  dataByRoom,
   ratings,
   spaceId,
   onStore,
@@ -257,16 +262,32 @@ export default function Space({
         const roomId = params.id;
         const foundRoom = rooms.find((obj) => obj.id === roomId);
 
-        const totalAvgFixed =
-          (sortScoreFixed + setScoreFixed + shineScoreFixed) / 3;
+        const roomData = [...dataByRoom.data];
+
+        roomData.push({
+          ratings: [
+            {
+              dateModified: getDateNow(),
+              spaceId: data?.id,
+              sort: sortScoreFixed,
+              setInOrder: setScoreFixed,
+              shine: shineScoreFixed,
+            },
+          ],
+        });
+
+        const roomDataResult = calculateMonthlyAverages(roomData);
+        const currentMonth = roomDataResult[roomDataResult.length - 1];
+
         let status =
-          totalAvgFixed < 4
+          currentMonth.Average < 4
             ? "critical"
-            : totalAvgFixed < 8
+            : currentMonth.Average < 8
             ? "warning"
             : "healthy";
 
-        console.log("average 0000 ", ratings);
+        console.log("currentMonth 0000 ", currentMonth);
+        console.log("status 0000 ", status);
 
         let newAction = {
           type: "rooms",

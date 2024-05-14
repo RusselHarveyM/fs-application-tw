@@ -8,6 +8,7 @@ import NoSpace from "../components/NoSpace";
 
 import { DataContext } from "@/data/data-context";
 import { isAdminLoggedIn } from "@/helper/auth";
+import { sortDate } from "@/helper/date.js";
 import { Circle } from "rc-progress";
 
 export default function Spaces() {
@@ -45,17 +46,45 @@ export default function Spaces() {
     setSelectedTab(selected);
   }
 
+  let data = [];
+  // const room = rooms.find((curr) => curr.id === id);
+  // const spacesByRoomId = spaces?.filter((curr) => curr.roomId === id);
+
+  console.log("ratings >> ", ratings);
+  if (spacesByRoomId) {
+    for (const space of spacesByRoomId) {
+      const foundRatings = ratings?.filter((curr) => curr.spaceId === space.id);
+      const sortedRatings = sortDate(foundRatings);
+      let newData = {
+        ...space,
+        ratings: sortedRatings,
+      };
+      data.push(newData);
+    }
+  }
+
+  let newData = {
+    data,
+    room,
+  };
+
   let display;
   if (selectedTab === "spaces") {
     if (spacesByRoomId.length === 0) {
       display = <NoSpace />;
     } else {
-      display = <SpacesTable data={spacesByRoomId} ratings={ratings ?? []} />;
+      display = (
+        <SpacesTable
+          data={spacesByRoomId}
+          ratings={ratings ?? []}
+          dataByRoom={newData}
+        />
+      );
     }
   } else if (selectedTab === "redtags") {
     display = <RedTag />;
   } else {
-    display = <Overview ratings={ratings ?? []} />;
+    display = <Overview ratings={ratings ?? []} dataByRoom={newData} />;
   }
 
   return (

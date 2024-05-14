@@ -30,7 +30,7 @@ type SpaceImagesBySpace = {
   pictures: SpaceImage[];
 };
 
-export default function SpacesTable({ data, ratings }) {
+export default function SpacesTable({ data, ratings, dataByRoom }) {
   const { spaceImages } = useContext(DataContext);
   const [selectedId, setSelectedId] = useState(undefined);
   const [imagesBySpace, setImagesBySpace] = useState<SpaceImagesBySpace[]>([]);
@@ -214,6 +214,7 @@ export default function SpacesTable({ data, ratings }) {
       {selectedId && (
         <Space
           data={foundSpace}
+          dataByRoom={dataByRoom}
           spaceId={selectedId}
           ratings={foundRatings}
           onStore={handleImageStore}

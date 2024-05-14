@@ -4,10 +4,11 @@ import { useParams } from "react-router-dom";
 import Card from "./Card";
 import { BarChartCustom } from "./BarChart";
 
-import { sortDate } from "@/helper/date.js";
 import RecentUsers from "./RecentUsers";
 
-export default function Overview({ ratings }) {
+import { calculateMonthlyAverages } from "@/helper/date.js";
+
+export default function Overview({ ratings, dataByRoom }) {
   const { users, rooms, spaces } = useContext(DataContext);
   const [scores, setScores] = useState();
   const [recentUsers, setRecentUsers] = useState({
@@ -16,25 +17,11 @@ export default function Overview({ ratings }) {
   });
   const { id } = useParams();
 
-  let data = [];
-  const room = rooms.find((curr) => curr.id === id);
-  const spacesByRoomId = spaces?.filter((curr) => curr.roomId === id);
-
-  console.log("ratings >> ", ratings);
-  if (spacesByRoomId) {
-    for (const space of spacesByRoomId) {
-      const foundRatings = ratings?.filter((curr) => curr.spaceId === space.id);
-      const sortedRatings = sortDate(foundRatings);
-      let newData = {
-        ...space,
-        ratings: sortedRatings,
-      };
-      data.push(newData);
-    }
-  }
+  const data = dataByRoom.data;
+  console.log("[][data]", data);
+  const room = dataByRoom.room;
 
   useEffect(() => {
-    console.log("id >>", id);
     let usersList = [];
     if (room.modifiedBy?.length > 0) {
       for (
@@ -60,46 +47,7 @@ export default function Overview({ ratings }) {
 
   useEffect(() => {
     if (room && spaces) {
-      const monthlyAverages = data.reduce((acc, space) => {
-        space.ratings.forEach((rating) => {
-          if (rating) {
-            const date = new Date(rating.dateModified);
-            const month = `${date.toLocaleDateString("en-US", {
-              month: "short",
-            })} ${date.getFullYear()}`;
-            acc[month] = acc[month] || {
-              date: month,
-              Sort: 0,
-              "Set In Order": 0,
-              Shine: 0,
-              count: 0,
-            };
-            acc[month].Sort += rating.sort;
-            acc[month]["Set In Order"] += rating.setInOrder;
-            acc[month].Shine += rating.shine;
-            acc[month].count++;
-          }
-        });
-        return acc;
-      }, {});
-
-      const averageScores = Object.values(monthlyAverages).map((average) => {
-        let sort = (average.Sort / average.count).toFixed(1);
-        let set = (average["Set In Order"] / average.count).toFixed(1);
-        let shine = (average.Shine / average.count).toFixed(1);
-        return {
-          date: average.date,
-          Sort: sort,
-          "Set In Order": set,
-          Shine: shine,
-          Average: (
-            (parseFloat(sort) + parseFloat(set) + parseFloat(shine)) /
-            3
-          ).toFixed(1),
-        };
-      });
-
-      averageScores.sort((a, b) => new Date(a.date) - new Date(b.date));
+      const averageScores = calculateMonthlyAverages(data);
 
       if (averageScores.length > 1) {
         const currentMonth = averageScores[averageScores.length - 1];
@@ -135,7 +83,7 @@ export default function Overview({ ratings }) {
         }));
       }
     }
-  }, [room, spaces, ratings, id]);
+  }, [room, spaces, data, ratings, id]);
 
   return (
     <div className="flex flex-col mt-4 bg-neutral-50 shadow-sm rounded-xl p-6 h-full md:w-[97rem] sm:w-[45rem] xs:w-[22rem] mx-auto gap-4">
