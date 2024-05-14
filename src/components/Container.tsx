@@ -20,10 +20,10 @@ export default function Container({
         <div className="w-16 h-16 md:w-20 md:h-20 sm:w-14 sm:h-14 xs:w-10 xs:h-10 rounded-xl bg-neutral-200 animate-pulse"></div>
       )}
 
-      <div className="flex items-start flex-col gap-2">
+      <div className="flex items-start flex-col gap-2 ">
         <div className="flex flex-col gap-2 items-start">
           {title ? (
-            <h2 className="text-sm md:text-base sm:text-sm xs:text-xs truncate  md:w-auto">
+            <h2 className="xs:hidden sm:block text-sm md:text-base sm:text-sm xs:text-xs truncate md:w-auto">
               {title}
             </h2>
           ) : (

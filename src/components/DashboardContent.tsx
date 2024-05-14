@@ -159,7 +159,7 @@ export default function DashboardContent() {
       </div>
 
       <div className="fixed bottom-4 left-0 right-0 flex flex-col items-center justify-center sm:bottom-8 md:bottom-4">
-        <menu className="flex justify-center items-center bg-stone-100 rounded-full py-2 px-4 w-full sm:w-[250px] md:w-[300px]">
+        <menu className="flex justify-center items-center bg-stone-100 rounded-full py-2 px-4 w-full xs:w-[200px] sm:w-[250px] md:w-[300px]">
           <NavLink
             to="/home"
             className={`flex justify-center flex-col items-center w-[50%] ${
