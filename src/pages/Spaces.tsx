@@ -8,6 +8,7 @@ import NoSpace from "../components/NoSpace";
 
 import { DataContext } from "@/data/data-context";
 import { isAdminLoggedIn } from "@/helper/auth";
+import { Circle } from "rc-progress";
 
 export default function Spaces() {
   const { rooms, spaces, buildings, ratings, useEntry } =
@@ -69,8 +70,16 @@ export default function Spaces() {
 
       <div className="w-full overflow-y-auto h-screen">
         {isLoad && (
-          <div className=" w-32 h-fit text-center m-auto pt-2 mt-16">
-            <p className="text-neutral-600 animate-bounce">Loading data...</p>
+          <div className="absolute bottom-14 z-50 right-14">
+            <Circle
+              percent={50}
+              trailWidth={18}
+              strokeWidth={18}
+              strokeLinecap="butt"
+              trailColor={"#fff"}
+              strokeColor={"#000"}
+              className="animate-spin absolute w-7 h-7 left-1 top-1"
+            />
           </div>
         )}
         {display}

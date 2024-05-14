@@ -9,10 +9,11 @@ async function countModel(image) {
   let response;
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/new-count-model/4",
-    // url: "https://detect.roboflow.com/classroom-count-det/13",
+    url: "https://detect.roboflow.com/new-count-model/14",
     params: {
       api_key: API_KEY,
+      confidence: 70,
+      overlap: 57,
     },
     data: image,
     headers: {
@@ -33,9 +34,10 @@ async function orderModel(image) {
   let result;
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-order-seg/12",
+    url: "https://detect.roboflow.com/classroom-order-seg/17",
     params: {
       api_key: API_KEY,
+      confidence: 75,
     },
     data: image,
     headers: {
@@ -56,10 +58,11 @@ async function pbModel(image) {
   let response;
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-type-identification/11",
+    url: "https://detect.roboflow.com/classroom-type-identification/20",
     // url: "https://detect.roboflow.com/classroom-3igmn/11",
     params: {
       api_key: API_KEY,
+      confidence: 75,
     },
     data: image,
     headers: {
@@ -108,9 +111,10 @@ async function yellowModel(image) {
 
   await axios({
     method: "POST",
-    url: "https://detect.roboflow.com/classroom-yellow-seg/8",
+    url: "https://detect.roboflow.com/new_yellow_model/9",
     params: {
       api_key: API_KEY,
+      confidence: 75,
     },
     data: image,
     headers: {
@@ -128,11 +132,9 @@ async function yellowModel(image) {
 }
 
 function calculateOverlap(prediction1, prediction2) {
-  // Calculate the area of each prediction
   let area1 = prediction1.width * prediction1.height;
   let area2 = prediction2.width * prediction2.height;
 
-  // Calculate the x and y coordinates of the intersection rectangle
   let x_overlap = Math.max(
     0,
     Math.min(
@@ -148,19 +150,14 @@ function calculateOverlap(prediction1, prediction2) {
     ) - Math.max(prediction1.y, prediction2.y)
   );
 
-  // Calculate the area of intersection
   let overlapArea = x_overlap * y_overlap;
 
-  // Calculate the total area minus the overlapping area
   let totalArea = area1 + area2 - overlapArea;
 
-  // Determine which prediction is bigger
   let bigger = area1 > area2 ? "first" : "second";
 
-  // Determine the smaller area
   let smallerArea = Math.min(area1, area2);
 
-  // Calculate the overlap ratio
   let overlap = overlapArea / smallerArea;
 
   return {
@@ -180,37 +177,44 @@ function score(data, imagesLength) {
   const decrementPercentageShine = 1.5; // Adjust this value to control the decrement severity of shine
 
   // Calculate sort score with decrement for unwanted/missing items
-  sort.score = Math.min(
-    10,
-    10 -
-      (sort.unwanted.length + sort.missing.length) *
-        decrementPercentageSort *
-        imagesLength
+  sort.score = Math.max(
+    0,
+    Math.min(
+      10,
+      10 -
+        (sort.unwanted.length + sort.missing.length) *
+          decrementPercentageSort *
+          imagesLength
+    )
   );
 
   // Calculate air system score with penalty for missing elements
   const totalAS =
     set.airsystem.ventilation + set.airsystem.aircon + set.airsystem.exhaust;
-  const airSystemPenalty =
-    (3 - totalAS) * decrementPercentageSet * imagesLength; // Penalty increases with missing systems
+  // const airSystemPenalty =
+  //   (3 - totalAS) * decrementPercentageSet * imagesLength; // Penalty increases with missing systems
 
-  // Calculate set score with penalty for unorganized items and air system
-  set.score = Math.min(
-    10,
-    10 - set.unorganized * decrementPercentageSet * imagesLength
+  // // Calculate set score with penalty for unorganized items and air system
+
+  set.score = Math.max(
+    0,
+    Math.min(10, 10 - set.unorganized * decrementPercentageSet * imagesLength)
   );
 
   // Calculate shine score with decrement for damage, litter, etc.
-  shine.score = Math.min(
-    10,
-    10 -
-      ((shine.damage * 2 * decrementPercentageShine +
-        shine.litter +
-        shine.smudge +
-        shine.adhesive) *
-        decrementPercentageShine *
-        imagesLength) /
-        4
+  shine.score = Math.max(
+    0,
+    Math.min(
+      10,
+      10 -
+        ((shine.damage * 2 * decrementPercentageShine +
+          shine.litter +
+          shine.smudge +
+          shine.adhesive) *
+          decrementPercentageShine *
+          imagesLength) /
+          4
+    )
   );
 
   return {
@@ -282,16 +286,16 @@ export default async function evaluate(
     if (imageObject.forType === "std" || allFlag === 0) {
       model1 = await countModel(imageObject.image);
       for (const pred of model1.predictions) {
-        if (pred.confidence >= 0.5) {
-          if (!Object.hasOwn(result.count, pred.class)) {
-            result.count[pred.class] = {
-              qty: 1,
-              class: pred.class,
-            };
-          } else {
-            result.count[pred.class].qty++;
-          }
+        // if (pred.confidence >= 0.75) {
+        if (!Object.hasOwn(result.count, pred.class)) {
+          result.count[pred.class] = {
+            qty: 1,
+            class: pred.class,
+          };
+        } else {
+          result.count[pred.class].qty++;
         }
+        // }
       }
       model3 = await pbModel(imageObject.image);
 
@@ -299,39 +303,59 @@ export default async function evaluate(
       if (model1 !== undefined && model3 !== undefined) {
         let models = model1.predictions;
         if (!isEmpty(standard)) {
-          model3.predictions = model3.predictions.filter(
-            (pred) => pred.confidence >= 0.5
-          );
+          // model3.predictions = model3.predictions.filter(
+          //   (pred) => pred.confidence >= 0.75
+          // );
           models = model1.predictions.concat(model3.predictions);
           console.log("models ';';';'", models);
         }
 
         for (const [index, prediction] of models.entries()) {
-          if (prediction.confidence >= 0.5) {
-            const class_name = prediction.class;
-            objects_temp.push({
-              id: objectId,
-              class: class_name,
-              indexFrom: undefined,
-              prediction: {
-                height: prediction.height,
-                width: prediction.width,
-                x: prediction.x,
-                y: prediction.y,
-              },
-              children: [],
-            });
-            objectId++;
-          }
+          // if (prediction.confidence >= 0.5) {
+          const class_name = prediction.class;
+          objects_temp.push({
+            id: objectId,
+            class: class_name,
+            indexFrom: undefined,
+            prediction: {
+              height: prediction.height,
+              width: prediction.width,
+              x: prediction.x,
+              y: prediction.y,
+            },
+            children: [],
+          });
+          objectId++;
+          // }
         }
         const commonParents = ["table", "chair", "sofa"];
         let commonChildrens;
         if (isCalibrate) {
           commonChildrens = ["basket", "lamp"];
         } else {
-          commonChildrens = ["basket", "lamp", "personal belongings"];
+          commonChildrens = [
+            "basket",
+            "lamp",
+            "bag",
+            "cap",
+            "cloth",
+            "earphones",
+            "headset",
+            "laptop",
+            "personal belongings",
+            "paper",
+            "phone",
+            "sling",
+            "wallet",
+          ];
         }
-        const commonAbstracts = ["pot", "litter"];
+        const commonAbstracts = [
+          "pot",
+          "litter",
+          "aircon",
+          "ventilation",
+          "electronics",
+        ];
 
         for (const [outerIndex, first_object] of objects_temp.entries()) {
           objects_temp.forEach((second_object, innerIndex) => {
@@ -444,7 +468,7 @@ export default async function evaluate(
         }
         // remove the items with indexFrom
         for (const [index, object] of objects_temp.entries()) {
-          console.log("object 11", object);
+          // console.log("object 11", object);
           if (object.indexFrom !== undefined) {
             objects_temp.splice(index, 1);
           }
@@ -476,12 +500,7 @@ export default async function evaluate(
       }
     }
 
-    predictions.push(
-      prevModel1 !== model1
-        ? model1?.predictions.filter((obj) => obj.confidence >= 0.5)
-        : []
-    );
-
+    predictions.push(prevModel1 !== model1 ? model1?.predictions : []);
     predictions.push(prevModel2 !== model2 ? model2?.predictions : []);
     predictions.push(prevModel3 !== model3 ? model3?.predictions : []);
     // predictions.push(prevModel4 !== model4 ? model4?.predictions : []);

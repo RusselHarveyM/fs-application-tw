@@ -9,7 +9,7 @@ export default function ScoreCard({
   if (score > 3 && score < 8 && !isLoad) {
     cssContainerHighlight = " bg-orange-300";
     cssTextHighlight = " text-white";
-  } else if (score > 0 && score < 4 && !isLoad) {
+  } else if (score >= 0 && score < 4 && !isLoad) {
     cssContainerHighlight = " bg-red-400";
     cssTextHighlight = " text-white";
   } else if (score > 7 && score <= 10 && !isLoad) {

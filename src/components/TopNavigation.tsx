@@ -58,7 +58,7 @@ export default function TopNavigation() {
         <li className="w-1/3 flex items-center justify-end">
           <Popover>
             <PopoverTrigger>
-              <AlignJustify />
+              <AlignJustify className="text-rose-500" />
             </PopoverTrigger>
             <PopoverContent className="flex pt-8 mr-8 flex-col justify-center items-center h-fit w-[13rem]">
               <NavLink to="/settings">Settings</NavLink>

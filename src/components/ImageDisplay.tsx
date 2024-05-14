@@ -107,21 +107,40 @@ export default function ImageDisplay({
           {prediction.map((pred: any[], outerIndex: number) => {
             if (pred && pred.length > 0) {
               return pred.map((innerPrediction: any[], index: number) => {
+                const pb = [
+                  "bag",
+                  "cap",
+                  "cloth",
+                  "earphones",
+                  "headset",
+                  "laptop",
+                  "personal belongings",
+                  "paper",
+                  "phone",
+                  "sling",
+                  "wallet",
+                ];
+
+                const yellow = ["litter", "smudges"];
+
                 let style =
                   innerPrediction.class === "chair"
-                    ? "border-green-400 bg-green-300"
+                    ? "purple"
                     : innerPrediction.class === "sofa"
-                    ? "border-pink-400 bg-pink-300"
-                    : innerPrediction.class === "desk"
-                    ? "border-red-600 bg-red-500"
-                    : innerPrediction.class === "litter"
-                    ? "border-yellow-400 bg-yellow-300"
-                    : innerPrediction.class == "personal belongings"
-                    ? "border-blue-400 bg-blue-300"
+                    ? "pink"
+                    : innerPrediction.class === "table"
+                    ? "purple"
+                    : yellow.includes(innerPrediction.class)
+                    ? "yellow"
+                    : innerPrediction.class === "basket" ||
+                      innerPrediction.class === "pot"
+                    ? "neutral"
+                    : pb.includes(innerPrediction.class)
+                    ? "blue"
                     : innerPrediction.class === "disorganized"
-                    ? "border-purple-400 bg-purple-300"
+                    ? "red"
                     : innerPrediction.class === "organized"
-                    ? "border-neutral-400 bg-neutral-300"
+                    ? "green"
                     : undefined;
 
                 if (
@@ -152,12 +171,14 @@ export default function ImageDisplay({
                         width: `${width}px`,
                         height: `${height}px`,
                       }}
-                      className={`absolute rounded-sm border-4 ${style} opacity-60 ${
+                      className={`absolute rounded-sm border-2 border-${style}-500 bg-${style}-600 bg-opacity-20 ${
                         !isLoad &&
                         "hover:scale-105 hover:z-40 hover:cursor-pointer hover:brightness-105 hover:text-white"
                       }   `}
                     >
-                      <p className={``}>{innerPrediction.class}</p>
+                      <p className={`bg-${style}-500 text-sm w-fit `}>
+                        {innerPrediction.class}
+                      </p>
                     </div>
                   );
                 } else {

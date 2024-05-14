@@ -257,6 +257,17 @@ export default function Space({
         const roomId = params.id;
         const foundRoom = rooms.find((obj) => obj.id === roomId);
 
+        const totalAvgFixed =
+          (sortScoreFixed + setScoreFixed + shineScoreFixed) / 3;
+        let status =
+          totalAvgFixed < 4
+            ? "critical"
+            : totalAvgFixed < 8
+            ? "warning"
+            : "healthy";
+
+        console.log("average 0000 ", ratings);
+
         let newAction = {
           type: "rooms",
           method: "put",
@@ -265,7 +276,7 @@ export default function Space({
             buildingId: foundRoom.buildingId,
             roomNumber: foundRoom.roomNumber,
             image: foundRoom.image,
-            status: foundRoom.status,
+            status: status,
             modifiedBy: [loggedIn.id, ...foundRoom.modifiedBy],
           },
         };
@@ -460,8 +471,8 @@ export default function Space({
                         disabled={
                           isFetch ||
                           isEvaluate ||
-                          !checkMonth(data.calibrationDate) ||
-                          checkMonth(data.assessedDate) ||
+                          // !checkMonth(data.calibrationDate) ||
+                          // checkMonth(data.assessedDate) ||
                           !images
                         }
                       >

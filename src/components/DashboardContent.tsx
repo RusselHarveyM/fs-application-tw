@@ -17,7 +17,7 @@ export default function DashboardContent() {
   });
 
   const navigate = useNavigate();
-  const { buildings, rooms } = useContext(DataContext);
+  const { buildings, rooms, spaces } = useContext(DataContext);
   const params = useParams();
 
   useEffect(() => {
@@ -54,6 +54,7 @@ export default function DashboardContent() {
   function handleContainerSelect(id) {
     if (content.selectedTab === "buildings") {
       const filteredRooms = rooms.filter((room) => room.buildingId === id);
+      console.log(filteredRooms);
       setContent({
         selectedTab: "rooms",
         buildingId: id,
@@ -65,8 +66,8 @@ export default function DashboardContent() {
   }
 
   return (
-    <div className="flex flex-col w-full m-auto xs:p-4 sm:p-6 md:p-8 lg:p-12">
-      <div className="flex flex-col gap-4 justify-center items-center mt-4 mx-auto w-full sm:w-[22rem] md:w-full lg:w-[95rem]">
+    <div className="flex flex-col w-full m-auto my-auto xs:p-4 sm:p-6 md:p-8 lg:p-12">
+      <div className="flex flex-col gap-4 justify-center items-center mt-4 mx-auto w-full sm:w-[22rem] md:w-full lg:w-[95rem] md:h-[30rem]">
         {content.data?.length > 0 ? (
           content.data.map((item, index) => {
             let contentLength = content.data?.length;
@@ -99,18 +100,20 @@ export default function DashboardContent() {
                           : dataItem.roomNumber;
                       const code =
                         content.selectedTab === "buildings"
-                          ? dataItem.buildingCode ?? ""
-                          : "";
+                          ? dataItem.buildingCode
+                          : dataItem.status;
 
-                      const childrens = rooms.filter(
-                        (curr) => curr.buildingId === id
-                      );
+                      const childrens =
+                        content.selectedTab === "buildings"
+                          ? rooms.filter((curr) => curr.buildingId === id)
+                          : spaces.filter((curr) => curr.roomId === id);
 
                       return (
                         <Container
                           key={id}
                           img={img}
                           title={title}
+                          selectedTab={content.selectedTab}
                           noOfChildren={childrens.length}
                           code={code}
                           onClick={() => handleContainerSelect(id)}
@@ -158,7 +161,7 @@ export default function DashboardContent() {
         )}
       </div>
 
-      <div className="fixed bottom-4 left-0 right-0 flex flex-col items-center justify-center sm:bottom-8 md:bottom-4">
+      <div className="fixed bottom-4 left-0 right-0 flex flex-col items-center justify-center sm:bottom-8 md:bottom-16">
         <menu className="flex justify-center items-center bg-stone-100 rounded-full py-2 px-4 w-full sm:w-[250px] md:w-[300px]">
           <NavLink
             to="/home"
