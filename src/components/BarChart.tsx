@@ -1,23 +1,43 @@
 import { BarChart } from "@tremor/react";
 import { useEffect, useState } from "react";
 
+function getFullYear(obj) {
+  const dateParts = obj.date.split(" ");
+  const year = parseInt(dateParts[1]);
+  const month = new Date(Date.parse(`${dateParts[0]} 1, 2000`)).getMonth();
+  const dateObj = new Date(year, month);
+  return dateObj.getFullYear();
+}
+
 export function BarChartCustom({ scores }) {
   const { monthly } = scores;
   const [chartData, setChartData] = useState(monthly);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  console.log("monthly >>", scores);
+
   const availableYears = Array.from(
-    new Set(monthly.map((rating) => new Date(rating.date).getFullYear()))
+    new Set(
+      monthly.map((rating) => {
+        return getFullYear(rating);
+      })
+    )
   ).sort((a, b) => b - a);
 
   const handleYearChange = (e) => {
     setSelectedYear(e.target.value);
   };
 
+  console.log("availableYears >>", availableYears);
+
   useEffect(() => {
-    const filteredMonth = monthly?.filter(
-      (curr) => new Date(curr.date).getFullYear() === parseInt(selectedYear)
-    );
-    setChartData(filteredMonth);
+    if (monthly) {
+      console.log("socres >>", scores);
+      const filteredMonth = monthly?.filter(
+        (curr) => getFullYear(curr) === selectedYear
+      );
+      console.log("filteredMonth >>", filteredMonth);
+      setChartData(filteredMonth);
+    }
   }, [selectedYear, monthly]);
 
   return (
