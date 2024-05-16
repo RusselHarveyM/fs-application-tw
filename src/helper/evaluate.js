@@ -297,12 +297,13 @@ export default async function evaluate(
         }
         // }
       }
+
       model3 = await pbModel(imageObject.image);
 
       // structure
       if (model1 !== undefined && model3 !== undefined) {
         let models = model1.predictions;
-        if (!isEmpty(standard)) {
+        if (!isEmpty(standard) && !isCalibrate) {
           // model3.predictions = model3.predictions.filter(
           //   (pred) => pred.confidence >= 0.75
           // );
@@ -330,25 +331,21 @@ export default async function evaluate(
         }
         const commonParents = ["table", "chair", "sofa"];
         let commonChildrens;
-        if (isCalibrate) {
-          commonChildrens = ["basket", "lamp"];
-        } else {
-          commonChildrens = [
-            "basket",
-            "lamp",
-            "bag",
-            "cap",
-            "cloth",
-            "earphones",
-            "headset",
-            "laptop",
-            "personal belongings",
-            "paper",
-            "phone",
-            "sling",
-            "wallet",
-          ];
-        }
+        commonChildrens = [
+          "basket",
+          "lamp",
+          "bag",
+          "cap",
+          "cloth",
+          "earphones",
+          "headset",
+          "laptop",
+          "personal belongings",
+          "paper",
+          "phone",
+          "sling",
+          "wallet",
+        ];
         const commonAbstracts = [
           "pot",
           "litter",
@@ -381,7 +378,7 @@ export default async function evaluate(
               if (result.overlap) {
                 if (result.bigger === "first") {
                   if (
-                    !commonParents.includes(first_key) &&
+                    !commonParents.includes(first_key) ||
                     !commonChildrens.includes(second_key)
                   )
                     return;
@@ -423,7 +420,7 @@ export default async function evaluate(
                 }
                 if (result.bigger === "second") {
                   if (
-                    !commonParents.includes(second_key) &&
+                    !commonParents.includes(second_key) ||
                     !commonChildrens.includes(first_key)
                   )
                     return;

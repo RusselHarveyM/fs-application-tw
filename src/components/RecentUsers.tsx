@@ -1,6 +1,7 @@
 import UserItem from "./UserItem";
 
 export default function RecentUsers({ users, numberOfAttendees }) {
+  console.log("users list >> ", users);
   return (
     <div className="md:w-1/4 sm:full h-full bg-white shadow rounded-2xl p-8">
       <h2 className="text-lg text-neutral-700 font-semibold">Recent Users</h2>

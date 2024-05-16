@@ -20,6 +20,7 @@ export default function Overview({ ratings, dataByRoom }) {
   const data = dataByRoom.data;
   console.log("[][data]", data);
   const room = dataByRoom.room;
+  console.log("[][room]", room);
 
   useEffect(() => {
     let usersList = [];

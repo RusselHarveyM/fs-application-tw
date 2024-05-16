@@ -1,7 +1,7 @@
 import ImageGallery from "./ImageGallery";
 import Button from "./Button";
 import { useState, useContext, useEffect, useRef, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { DataContext } from "@/data/data-context";
 import Modal from "./Modal";
@@ -17,7 +17,7 @@ import {
   calculateMonthlyAverages,
 } from "@/helper/date.js";
 import Result from "./Result";
-import { isAdminLoggedIn } from "@/helper/auth";
+import { isAdminLoggedIn, getAuthToken } from "@/helper/auth";
 import { Circle } from "rc-progress";
 import SpaceHeading from "./SpaceHeading";
 
@@ -32,6 +32,7 @@ export default function Space({
   onDelete,
 }) {
   const { rooms, spaceImages, useEntry } = useContext(DataContext);
+  const navigate = useNavigate();
   const params = useParams();
   const uploadModal = useRef();
   const forSTDRef = useRef();
@@ -42,18 +43,11 @@ export default function Space({
   const [selectedImage, setSelectedImage] = useState(undefined);
   const [selectedScore, setSelectedScore] = useState(undefined);
   const [selectedRating, setSelectedRating] = useState(ratings && ratings[0]);
-  // const [prevSpaceId, setPrevSpaceId] = useState(undefined);
   const [isFetch, setIsFetch] = useState<Boolean>(false);
   const [isEvaluate, setIsEvaluate] = useState<Boolean>(false);
 
-  console.log("loaded  000 ", loaded);
-  console.log("data  000 ", data);
   const spaceImageData = loaded?.find((curr) => curr.id === spaceId);
   const images = spaceImageData?.images;
-
-  console.log("spaceImageData 000 ", spaceImageData);
-  console.log("images 000 ", images);
-  console.log("spaceId 000 ", spaceId);
 
   const loggedIn = isAdminLoggedIn();
 
@@ -166,7 +160,12 @@ export default function Space({
 
   const handleAssessBtn = useCallback(
     async (isCalibrate: boolean) => {
+      const authToken = getAuthToken();
+      if (!authToken) {
+        navigate("/");
+      }
       if (!data) return;
+
       setIsEvaluate(true);
       onLoad(true);
       // setLoadingCaption(isCalibrate ? "Calibrating..." : "Assessing...");
@@ -289,6 +288,7 @@ export default function Space({
         console.log("currentMonth 0000 ", currentMonth);
         console.log("status 0000 ", status);
 
+        console.log("authToken >> ", authToken);
         let newAction = {
           type: "rooms",
           method: "put",
@@ -298,7 +298,7 @@ export default function Space({
             roomNumber: foundRoom.roomNumber,
             image: foundRoom.image,
             status: status,
-            modifiedBy: [loggedIn.id, ...foundRoom.modifiedBy],
+            modifiedBy: [authToken.id, ...foundRoom.modifiedBy],
           },
         };
 
@@ -492,8 +492,8 @@ export default function Space({
                         disabled={
                           isFetch ||
                           isEvaluate ||
-                          !checkMonth(data.calibrationDate) ||
-                          checkMonth(data.assessedDate) ||
+                          // !checkMonth(data.calibrationDate) ||
+                          // checkMonth(data.assessedDate) ||
                           !images
                         }
                       >

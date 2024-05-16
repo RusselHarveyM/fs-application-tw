@@ -13,7 +13,6 @@ export function BarChartCustom({ scores }) {
   const { monthly } = scores;
   const [chartData, setChartData] = useState(monthly);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  console.log("monthly >>", scores);
 
   const availableYears = Array.from(
     new Set(
@@ -27,15 +26,11 @@ export function BarChartCustom({ scores }) {
     setSelectedYear(e.target.value);
   };
 
-  console.log("availableYears >>", availableYears);
-
   useEffect(() => {
     if (monthly) {
-      console.log("socres >>", scores);
       const filteredMonth = monthly?.filter(
         (curr) => getFullYear(curr) === selectedYear
       );
-      console.log("filteredMonth >>", filteredMonth);
       setChartData(filteredMonth);
     }
   }, [selectedYear, monthly]);
