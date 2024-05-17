@@ -51,8 +51,8 @@ export default function Overview({ ratings, dataByRoom }) {
       const averageScores = calculateMonthlyAverages(data);
 
       if (averageScores.length > 1) {
-        const currentMonth = averageScores[averageScores.length - 1];
-        const previousMonth = averageScores[averageScores.length - 2];
+        const currentMonth = averageScores[0];
+        const previousMonth = averageScores[1];
 
         const calculateDifference = (current, previous) =>
           ((current - previous) / previous) * 100;

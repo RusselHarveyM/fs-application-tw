@@ -1,39 +1,32 @@
 import { BarChart } from "@tremor/react";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
-function getFullYear(obj) {
-  const dateParts = obj.date.split(" ");
-  const year = parseInt(dateParts[1]);
-  const month = new Date(Date.parse(`${dateParts[0]} 1, 2000`)).getMonth();
-  const dateObj = new Date(year, month);
-  return dateObj.getFullYear();
+function parseDate(dateStr) {
+  const [monthStr, yearStr] = dateStr.split(" ");
+  const month = new Date(Date.parse(`${monthStr} 1, 2000`)).getMonth();
+  const year = parseInt(yearStr);
+  return { month, year };
 }
 
 export function BarChartCustom({ scores }) {
   const { monthly } = scores;
-  const [chartData, setChartData] = useState(monthly);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  const availableYears = Array.from(
-    new Set(
-      monthly.map((rating) => {
-        return getFullYear(rating);
-      })
-    )
-  ).sort((a, b) => b - a);
+  const availableYears = useMemo(() => {
+    return Array.from(
+      new Set(monthly.map(({ date }) => parseDate(date).year))
+    ).sort((a, b) => b - a);
+  }, [monthly]);
 
-  const handleYearChange = (e) => {
-    setSelectedYear(e.target.value);
-  };
-
-  useEffect(() => {
-    if (monthly) {
-      const filteredMonth = monthly?.filter(
-        (curr) => getFullYear(curr) === selectedYear
-      );
-      setChartData(filteredMonth);
-    }
-  }, [selectedYear, monthly]);
+  const chartData = useMemo(() => {
+    return monthly
+      .filter(({ date }) => parseDate(date).year === selectedYear)
+      .sort((a, b) => {
+        const dateA = new Date(parseDate(a.date).year, parseDate(a.date).month);
+        const dateB = new Date(parseDate(b.date).year, parseDate(b.date).month);
+        return dateA - dateB;
+      });
+  }, [monthly, selectedYear]);
 
   return (
     <div className="relative md:w-3/4 sm:w-full xs:w-full mt-0 -pt-4">
@@ -45,7 +38,7 @@ export function BarChartCustom({ scores }) {
           id="year"
           className="border border-gray-300 rounded text-neutral-500"
           value={selectedYear}
-          onChange={handleYearChange}
+          onChange={(e) => setSelectedYear(parseInt(e.target.value))}
         >
           {availableYears.map((year) => (
             <option key={year} value={year}>
