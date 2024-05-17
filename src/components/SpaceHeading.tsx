@@ -18,52 +18,45 @@ export default function SpaceHeading({
   const calibrationGuideRef = useRef();
   const loggedIn = isAdminLoggedIn();
 
-  function handleCalibrationModal() {
+  const handleCalibrationModal = () => {
     calibrationGuideRef.current.open();
-  }
+  };
 
-  // Count items per class
+  const countItemsRecursively = (items, counts = {}) => {
+    items.forEach((item) => {
+      const itemClass = item.class; // Adjust according to the actual key name for class
+      counts[itemClass] = (counts[itemClass] || 0) + 1;
+      if (item.children) {
+        countItemsRecursively(item.children, counts);
+      }
+    });
+    return counts;
+  };
+
   const itemCounts = useMemo(() => {
-    if (!isEmpty(standard)) {
-      const parsedStandard = JSON.parse(standard);
-      const counts = {};
+    if (isEmpty(standard)) return {};
 
-      parsedStandard.forEach((item) => {
-        const itemClass = item.class; // Adjust according to the actual key name for class
-        if (counts[itemClass]) {
-          counts[itemClass] += 1;
-        } else {
-          counts[itemClass] = 1;
-        }
-      });
-
-      return counts;
-    }
-    return {};
+    const parsedStandard = JSON.parse(standard);
+    return countItemsRecursively(parsedStandard);
   }, [standard]);
 
   const styledStandard = useMemo(() => {
-    if (!isEmpty(standard)) {
-      const parsedStandard = JSON.parse(standard);
-      return parsedStandard.map((item, index) => {
-        const itemClass = item.class; // Adjust according to the actual key name for class
-        const style = getColor(itemClass);
-        return (
-          <div key={index} className={`text-${style}-500`}>
-            {JSON.stringify(
-              removeProperties(item, [
-                "prediction",
-                "result",
-                "indexFrom",
-                "id",
-              ]),
-              null,
-              2
-            )}
-          </div>
-        );
-      });
-    }
+    if (isEmpty(standard)) return [];
+
+    const parsedStandard = JSON.parse(standard);
+    return parsedStandard.map((item, index) => {
+      const itemClass = item.class; // Adjust according to the actual key name for class
+      const style = getColor(itemClass);
+      return (
+        <div key={index} className={`text-${style}-500`}>
+          {JSON.stringify(
+            removeProperties(item, ["prediction", "result", "indexFrom", "id"]),
+            null,
+            2
+          )}
+        </div>
+      );
+    });
   }, [standard]);
 
   return (
@@ -117,8 +110,8 @@ export default function SpaceHeading({
       <div className="flex flex-col bg-rose-500 md:w-full gap-8 shadow py-8 md:px-16 sm:px-8 rounded-lg">
         <div className="flex justify-between">
           <div className="flex items-center gap-4 text-white text-2xl xs:ml-4 xs:text-xs">
-            <h2 className="uppercase">{name ? name : "Space"}</h2>
-            {name ? (
+            <h2 className="uppercase">{name || "Space"}</h2>
+            {name && (
               <button
                 onClick={handleCalibrationModal}
                 disabled={!checkMonth(calibrationDate)}
@@ -128,8 +121,6 @@ export default function SpaceHeading({
               >
                 {checkMonth(calibrationDate) ? "Calibrated" : "Not Calibrated"}
               </button>
-            ) : (
-              ""
             )}
             <p className="text-xs text-white">
               {calibrationDate ? getDateString(calibrationDate) : "---"}
@@ -143,8 +134,7 @@ export default function SpaceHeading({
               disabled={
                 isLoad || (viewedDate === null && assessedDate === null)
                   ? true
-                  : checkMonth(assessedDate) === true &&
-                    checkMonth(viewedDate) === false
+                  : checkMonth(assessedDate) && !checkMonth(viewedDate)
                   ? false
                   : true
               }

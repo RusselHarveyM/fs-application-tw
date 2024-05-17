@@ -18,15 +18,24 @@ export function BarChartCustom({ scores }) {
     ).sort((a, b) => b - a);
   }, [monthly]);
 
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth();
+
   const chartData = useMemo(() => {
     return monthly
-      .filter(({ date }) => parseDate(date).year === selectedYear)
+      .filter(({ date }) => {
+        const parsedDate = parseDate(date);
+        return (
+          parsedDate.year < currentYear ||
+          (parsedDate.year === currentYear && parsedDate.month < currentMonth)
+        );
+      })
       .sort((a, b) => {
         const dateA = new Date(parseDate(a.date).year, parseDate(a.date).month);
         const dateB = new Date(parseDate(b.date).year, parseDate(b.date).month);
         return dateA - dateB;
       });
-  }, [monthly, selectedYear]);
+  }, [monthly, selectedYear, currentYear, currentMonth]);
 
   return (
     <div className="relative md:w-3/4 sm:w-full xs:w-full mt-0 -pt-4">
