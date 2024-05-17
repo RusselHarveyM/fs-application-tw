@@ -7,6 +7,8 @@ export default function commentFormatter(data) {
 
   const { scores } = data;
 
+  console.log("comment formatter > ", data);
+
   for (let key in scores) {
     const obj = scores[key];
 
@@ -63,6 +65,10 @@ export default function commentFormatter(data) {
       obj.unwanted.forEach((item) => {
         item.forEach((innerItem) => {
           countItem(innerItem, unwantedCount, "extra");
+        });
+      });
+      obj.missing.forEach((item) => {
+        item.forEach((innerItem) => {
           countItem(innerItem, missingCount, "missing");
         });
       });

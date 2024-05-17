@@ -12,19 +12,22 @@ export async function c_evaluation(data, standard) {
       continue;
     }
 
-    let foundMatch = false;
+    let foundMatch = { id: -1, children: [] };
 
     if (standardObject.children.length > 0) {
       const standardChildren = standardObject.children;
 
       for (const matchingObject of matchingObjects) {
-        const { missingInObject, extraInObject } = compareChildren(
+        const { missingChildren, extraChildren } = compareChildren(
           matchingObject.children,
           standardChildren
         );
 
-        if (missingInObject.length === 0 && extraInObject.length === 0) {
-          foundMatch = true;
+        if (missingChildren.length > 0) {
+          foundMatch = { id: matchingObject.id, children: missingChildren };
+        }
+
+        if (missingChildren.length === 0 && extraChildren.length === 0) {
           const index = objects.findIndex((obj) => obj === matchingObject);
           if (index !== -1) {
             objects.splice(index, 1);
@@ -33,8 +36,12 @@ export async function c_evaluation(data, standard) {
         }
       }
 
-      if (!foundMatch) {
-        standardObject.status = "missing";
+      if (foundMatch.id !== -1) {
+        const matchingObject = matchingObjects.find(
+          (curr) => curr.id === foundMatch.id
+        );
+        if (matchingObject)
+          matchingObject.children.push(...foundMatch.children);
       }
     } else {
       const filteredObjects = matchingObjects.filter(
@@ -61,7 +68,7 @@ export async function c_evaluation(data, standard) {
         }
       } else {
         obj.children.map((child) => {
-          if (!child.status) {
+          if (child.status !== "missing") {
             child.status = "extra";
           }
         });
@@ -106,7 +113,7 @@ function compareChildren(objectChildren, standardChildren) {
     });
 
     if (foundMatchIndex === -1) {
-      missingChildren.push(standardChild);
+      missingChildren.push({ ...standardChild, status: "missing" });
     }
   }
 
