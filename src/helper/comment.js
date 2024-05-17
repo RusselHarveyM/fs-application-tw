@@ -25,37 +25,35 @@ export default function commentFormatter(data) {
       let unwantedCount = {};
       let missingCount = {};
 
+      const addOrUpdateCount = (entry, parentClass, countObj) => {
+        let found = false;
+        for (const [, value] of Object.entries(countObj)) {
+          if (value.class === entry.class && value.parent === parentClass) {
+            value.qty += 1;
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          countObj[entry.id] = {
+            qty: 1,
+            id: entry.id,
+            class: entry.class,
+            parent: parentClass,
+          };
+        }
+      };
+
       const countItem = (item, countObj, status) => {
-        const tempObj = Object.entries(countObj);
-
-        const addOrUpdateCount = (entry, parentClass) => {
-          let found = false;
-          for (const [, value] of tempObj) {
-            if (value.class === entry.class && value.parent === parentClass) {
-              value.qty += 1;
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            countObj[entry.id] = {
-              qty: 1,
-              id: entry.id,
-              class: entry.class,
-              parent: parentClass,
-            };
-          }
-        };
-
         if (item.children && item.children.length === 0) {
           if (item.status === status) {
-            addOrUpdateCount(item, undefined);
+            addOrUpdateCount(item, undefined, countObj);
           }
         } else {
           if (item.status === status || item.status === undefined) {
             item.children.forEach((child) => {
               if (child.status === status) {
-                addOrUpdateCount(child, item.class);
+                addOrUpdateCount(child, item.class, countObj);
               }
             });
           }
@@ -72,19 +70,20 @@ export default function commentFormatter(data) {
       console.log("unwantedCount", unwantedCount);
       console.log("missingCount", missingCount);
 
-      const buildComments = (countObj, status) => {
+      const buildComments = (currentKey, countObj, status) => {
         for (let key in countObj) {
           const comment = countObj[key].parent
-            ? `${countObj[key].qty} ${countObj[key].class} on ${countObj[key].parent}`
+            ? `${countObj[key].qty} ${status} ${countObj[key].class} on the ${countObj[key].parent}`
             : `${countObj[key].qty} ${status} ${countObj[key].class}`;
-          comments[key] = comments[key]
-            ? comments[key] + comment + ", "
+
+          comments[currentKey] = comments[currentKey]
+            ? comments[currentKey] + comment + ", "
             : comment + ", ";
         }
       };
 
-      buildComments(unwantedCount, "unwanted");
-      buildComments(missingCount, "missing");
+      buildComments(key, unwantedCount, "unwanted");
+      buildComments(key, missingCount, "missing");
 
       if (Object.keys(unwantedCount).length > 0) {
         endComment += "* remove unwanted items.\n";
