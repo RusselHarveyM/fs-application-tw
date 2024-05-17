@@ -84,7 +84,9 @@ function compareChildren(objectChildren, standardChildren) {
   const extraChildren = [...objectChildren];
 
   for (const standardChild of standardChildren) {
-    const foundMatchIndex = objectChildren.findIndex((objectChild) => {
+    let foundMatchIndex = -1; // Initialize here
+
+    foundMatchIndex = objectChildren.findIndex((objectChild) => {
       if (objectChild.class === standardChild.class) {
         if (
           standardChild.children &&
