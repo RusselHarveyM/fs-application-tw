@@ -1,143 +1,118 @@
-const WIL_CHECKLIST = {
-  // start
-  lounge: [
-    {
-      id: 0,
-      class: "pot",
-      children: [],
-    },
-    {
-      id: 1,
-      class: "chair",
-      children: [],
-    },
-    {
-      id: 2,
-      class: "chair",
-      children: [],
-    },
-    {
-      id: 3,
-      class: "sofa",
-      children: [],
-    },
-    {
-      id: 4,
-      class: "sofa",
-      children: [],
-    },
-    {
-      id: 5,
-      class: "table",
-      children: [
-        {
-          id: 50,
-          class: "basket",
-          children: [],
-        },
-      ],
-    },
-    {
-      id: 6,
-      class: "table",
-      children: [],
-    },
-  ],
-  // end
-};
-
-export async function c_evaluation(data, spacename, standard) {
-  // let space = WIL_CHECKLIST[spacename].map((obj) => ({
-  //   ...obj,
-  //   children: [...obj.children],
-  // }));
+export async function c_evaluation(data, standard) {
   const SPACE_STANDARD = JSON.parse(standard);
-  let missing_objects = [];
   const objects = [...data];
 
-  for (const wilObj of SPACE_STANDARD) {
-    let filteredObjects = objects.filter((obj) => obj.class === wilObj.class);
-    if (filteredObjects.length === 0) {
-      wilObj.status = "missing";
-      missing_objects.push(wilObj);
-    } else {
-      if (wilObj.children.length > 0) {
-        let newFiltered = filteredObjects.filter(
-          (obj) => obj.children.length > 0
+  for (const standardObject of SPACE_STANDARD) {
+    const matchingObjects = objects.filter(
+      (obj) => obj.class === standardObject.class
+    );
+
+    if (matchingObjects.length === 0) {
+      standardObject.status = "missing";
+      continue;
+    }
+
+    let foundMatch = false;
+
+    if (standardObject.children.length > 0) {
+      const standardChildren = standardObject.children;
+
+      for (const matchingObject of matchingObjects) {
+        const { missingInObject, extraInObject } = compareChildren(
+          matchingObject.children,
+          standardChildren
         );
-        if (newFiltered.length === 0) {
-          wilObj.status = "c_missing";
-          missing_objects.push(wilObj);
-        } else {
-          const base = wilObj.children;
-          // note: must separate multiple/single classes
-          let missing_objects_children = [];
-          for (const curr of newFiltered) {
-            const curObj = curr.children;
-            base.forEach((baseObj, index) => {
-              const filteredData = curObj.filter(
-                (obj) => obj.class === baseObj.class
-              );
-              if (filteredData.length === 0) {
-                baseObj.status = "missing";
-                missing_objects_children.push(baseObj);
-              } else {
-                const foundIndex = curObj.findIndex(
-                  (obj) => obj.id === filteredData[0].id
-                );
 
-                curObj.splice(foundIndex, 1);
-                base.splice(index, 1);
-                if (base.length === 0) {
-                  if (curObj.length === 0) {
-                    const foundIndex = objects.findIndex(
-                      (obj) => obj.id === curr.id
-                    );
-                    objects.splice(foundIndex, 1);
-                  } else {
-                    curr.status = "c_extra";
-                  }
-                }
-              }
-            });
+        if (missingInObject.length === 0 && extraInObject.length === 0) {
+          foundMatch = true;
+          const index = objects.findIndex((obj) => obj === matchingObject);
+          if (index !== -1) {
+            objects.splice(index, 1);
           }
+          break;
+        }
+      }
 
-          const foundObj = missing_objects_children.find(
-            (obj) => obj.status === "missing"
-          );
-          if (foundObj) {
-            // if there is extra/unwanted
-            if (newFiltered.length > 0) {
-              newFiltered.forEach((obj) => {
-                if (obj.status !== "c_extra") obj.status = "extra";
-                base.push(obj);
-              });
-            }
-            missing_objects.push(wilObj);
+      if (!foundMatch) {
+        standardObject.status = "missing";
+      }
+    } else {
+      const filteredObjects = matchingObjects.filter(
+        (obj) => obj.children.length === 0
+      );
+      if (filteredObjects.length > 0) {
+        for (const obj of filteredObjects) {
+          const index = objects.findIndex((o) => o === obj);
+          if (index !== -1) {
+            objects.splice(index, 1);
           }
-          // unwanted_objects_children = [...newFiltered];
         }
       } else {
-        const foundObj = filteredObjects.find(
-          (obj) => obj.children.length === 0
-        );
-        if (foundObj) {
-          const foundObjIndex = objects.findIndex(
-            (obj) => obj.id === foundObj.id
-          );
-          // found_objects.push(wilObj);
-          objects.splice(foundObjIndex, 1);
-        }
+        standardObject.status = "missing";
       }
     }
   }
-  console.log(" objects 12312 ", objects);
+
   if (objects.length > 0) {
-    objects.forEach((obj) => {
-      obj.status = "extra";
-      missing_objects.push(obj);
+    objects.map((obj) => {
+      if (obj.children.length === 0) {
+        if (!obj.status) {
+          obj.status = "extra";
+        }
+      } else {
+        obj.children.map((child) => {
+          if (!child.status) {
+            child.status = "extra";
+          }
+        });
+      }
     });
   }
 
-  return missing_objects;
+  return objects;
+}
+
+function compareChildren(objectChildren, standardChildren) {
+  const missingChildren = [];
+  const extraChildren = [...objectChildren];
+
+  for (const standardChild of standardChildren) {
+    const foundMatchIndex = objectChildren.findIndex((objectChild) => {
+      if (objectChild.class === standardChild.class) {
+        if (
+          standardChild.children &&
+          objectChild.children &&
+          standardChild.children.length > 0 &&
+          objectChild.children.length > 0
+        ) {
+          const {
+            missingChildren: subMissingChildren,
+            extraChildren: subExtraChildren,
+          } = compareChildren(objectChild.children, standardChild.children);
+
+          if (
+            subMissingChildren.length === 0 &&
+            subExtraChildren.length === 0
+          ) {
+            extraChildren.splice(foundMatchIndex, 1);
+            return true;
+          }
+        } else {
+          extraChildren.splice(foundMatchIndex, 1);
+          return true;
+        }
+      }
+      return false;
+    });
+
+    if (foundMatchIndex === -1) {
+      missingChildren.push(standardChild);
+    }
+  }
+
+  extraChildren.forEach((child) => {
+    child.status = "extra";
+  });
+
+  return { missingChildren, extraChildren };
 }

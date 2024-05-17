@@ -183,12 +183,7 @@ export default function Space({
 
       console.log("newImages >> ", images);
 
-      const raw5s = await evaluate(
-        newImages,
-        data?.name,
-        data?.standard,
-        isCalibrate
-      );
+      const raw5s = await evaluate(newImages, data?.standard, isCalibrate);
 
       console.log("raw5s  >>> ", raw5s);
 

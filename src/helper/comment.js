@@ -5,146 +5,101 @@ export default function commentFormatter(data) {
     shine: "Summary: The model found ",
   };
 
-  const count = data.count;
-  const scores = data.scores;
+  const { scores } = data;
 
   for (let key in scores) {
     const obj = scores[key];
-    let objectsFound = {};
-
-    for (let prop in obj) {
-      if (prop === "score") continue;
-
-      if (Array.isArray(obj[prop])) {
-        obj[prop].forEach((item) => {
-          const id = item.id;
-          const itemName = item.class;
-          const itemType = prop;
-          const itemChildren = item.children;
-          const itemQty = objectsFound[itemName]
-            ? objectsFound[itemName].qty + 1
-            : 1;
-
-          objectsFound[itemName] = {
-            id,
-            qty: itemQty,
-            class: itemName,
-            type: itemType,
-            children: itemChildren,
-          };
-
-          // Check if the item has children
-          if (item.children && item.children.length > 0) {
-            let childrenObjects = [];
-            item.children.forEach((child) => {
-              const id = child.id;
-              const childName = child.class;
-              const childType = itemType;
-              const childQty = objectsFound[childName]
-                ? objectsFound[childName].qty + 1
-                : 1;
-
-              let object = {
-                id,
-                qty: childQty,
-                class: childName,
-                type: childType,
-              };
-              childrenObjects.push(object);
-            });
-            objectsFound[itemName].children = childrenObjects;
-          }
-        });
-      } else if (typeof obj[prop] === "object") {
-        for (let innerProp in obj[prop]) {
-          if (!objectsFound[innerProp]) {
-            objectsFound[innerProp] = {
-              id: obj[prop].id,
-              qty: obj[prop][innerProp],
-              class: innerProp,
-              type: innerProp,
-            };
-          }
-        }
-      } else {
-        if (!objectsFound[prop]) {
-          objectsFound[prop] = {
-            id: obj.id,
-            qty: obj[prop],
-            class: prop,
-            type: prop,
-          };
-        }
-      }
-    }
 
     if (key === "set") {
-      let endComment = ". Things to improve: ";
-      for (const [countKey, value] of Object.entries(count)) {
-        comments[key] += ` ${count[countKey].qty} ${count[countKey].class},`;
-      }
-      if (scores.set.unorganized > 0) {
-        comments[key] += ` ${scores.set.unorganized} unorganized area,`;
-        endComment += ` * arrange areas according to standard.\n`;
+      if (obj.unorganized > 0) {
+        comments[key] += `There is ${obj.unorganized} unorganized area, `;
+        comments[key] +=
+          "Things to improve: * arrange areas according to the standard.\n";
       } else {
         comments[key] = "Summary: The space is in order.";
       }
-      comments[key] += endComment;
     }
 
     if (key === "sort") {
-      let endComment = ". Things to improve: ";
-      let missingFlag = false;
-      let unwantedFlag = false;
-      let foundChildrens = [];
-      for (const [itemName, item] of Object.entries(objectsFound)) {
-        if (
-          (item.type === "unwanted" || item.type === "missing") &&
-          !foundChildrens.includes(item.id)
-        ) {
-          comments[key] += ` ${item.qty} ${item.type} ${item.class}/s,`;
+      let endComment = "Things to improve: ";
+      let unwantedCount = {};
+      let missingCount = {};
 
-          if (item.children && item.children.length > 0) {
+      const countItem = (item, countObj, status) => {
+        const tempObj = Object.entries(countObj);
+
+        const addOrUpdateCount = (entry, parentClass) => {
+          let found = false;
+          for (const [, value] of tempObj) {
+            if (value.class === entry.class && value.parent === parentClass) {
+              value.qty += 1;
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            countObj[entry.id] = {
+              qty: 1,
+              id: entry.id,
+              class: entry.class,
+              parent: parentClass,
+            };
+          }
+        };
+
+        if (item.children && item.children.length === 0) {
+          if (item.status === status) {
+            addOrUpdateCount(item, undefined);
+          }
+        } else {
+          if (item.status === status || item.status === undefined) {
             item.children.forEach((child) => {
-              if (child.type === "missing" || child.type === "c_missing")
-                comments[
-                  key
-                ] += ` missing ${child.class} on the ${item.class},`;
-              if (child.type === "extra" || child.type === "c_extra")
-                comments[
-                  key
-                ] += ` unwanted ${child.class} on the ${item.class},`;
-              foundChildrens.push(child.id);
+              if (child.status === status) {
+                addOrUpdateCount(child, item.class);
+              }
             });
           }
-
-          if (item.type === "unwanted") {
-            unwantedFlag = true;
-          }
-          if (item.type === "missing") {
-            missingFlag = true;
-          }
         }
+      };
+
+      obj.unwanted.forEach((item) => {
+        item.forEach((innerItem) => {
+          countItem(innerItem, unwantedCount, "extra");
+          countItem(innerItem, missingCount, "missing");
+        });
+      });
+
+      console.log("unwantedCount", unwantedCount);
+      console.log("missingCount", missingCount);
+
+      const buildComments = (countObj, status) => {
+        for (let key in countObj) {
+          const comment = countObj[key].parent
+            ? `${countObj[key].qty} ${countObj[key].class} on ${countObj[key].parent}`
+            : `${countObj[key].qty} ${status} ${countObj[key].class}`;
+          comments[key] = comments[key]
+            ? comments[key] + comment + ", "
+            : comment + ", ";
+        }
+      };
+
+      buildComments(unwantedCount, "unwanted");
+      buildComments(missingCount, "missing");
+
+      if (Object.keys(unwantedCount).length > 0) {
+        endComment += "* remove unwanted items.\n";
+      }
+      if (Object.keys(missingCount).length > 0) {
+        endComment += "* replace missing items.\n";
       }
 
-      if (!missingFlag && !unwantedFlag) {
-        comments[key] = "Summary: The space is well kept.";
-      }
-
-      if (missingFlag) {
-        endComment += ` * make sure all items are in their correct positions.`;
-        endComment += ` * make sure all necessary areas are captured.`;
-      }
-      if (unwantedFlag) {
-        endComment += ` * remove unnecessary items.`;
-      }
-
-      comments[key] += endComment;
+      comments[key] = comments[key] ? comments[key] + endComment : endComment;
     }
 
     if (key === "shine") {
-      let endComment = ". Things to improve: ";
+      let endComment = "Things to improve: ";
       const shine = scores.shine;
+
       if (
         shine.damage === 0 &&
         shine.litter === 0 &&
@@ -152,29 +107,27 @@ export default function commentFormatter(data) {
         shine.adhesive === 0
       ) {
         comments[key] = "Summary: The space is clean.";
+      } else {
+        if (shine.damage > 0) {
+          comments[key] += `${shine.damage} damage/s, `;
+          endComment += "* fix damage/s. ";
+        }
+        if (shine.litter > 0) {
+          comments[key] += `${shine.litter} litter/s, `;
+          endComment += "* remove litter/s. ";
+        }
+        if (shine.smudge > 0) {
+          comments[key] += `${shine.smudge} smudge/s, `;
+          endComment += "* clean smudge/s. ";
+        }
+        if (shine.adhesive > 0) {
+          comments[key] += `${shine.adhesive} adhesive/s, `;
+          endComment += "* clean adhesive/s. ";
+        }
         comments[key] += endComment;
-        continue;
       }
-      if (shine.damage > 0) {
-        comments[key] += ` ${shine.damage} damage/s,`;
-        endComment += ` * fix damage/s.`;
-      }
-      if (shine.litter > 0) {
-        comments[key] += ` ${shine.litter} litter/s,`;
-        endComment += ` * remove litter/s.`;
-      }
-      if (shine.smudge > 0) {
-        comments[key] += ` ${shine.smudge} smudge/s,`;
-        endComment += ` * clean smudge/s.`;
-      }
-      if (shine.adhesive > 0) {
-        comments[key] += ` ${shine.adhesive} adhesive/s,`;
-        endComment += ` * clean adhesive/s.`;
-      }
-      comments[key] += endComment;
     }
   }
 
-  console.log("comments >>> ", comments);
   return comments;
 }
