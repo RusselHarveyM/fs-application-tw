@@ -15,9 +15,7 @@ export const DataContext = createContext({
   useEntry: () => {},
 });
 
-// const endpoint = "https://fs-backend-copy-production.up.railway.app";
 const endpoint = "https://3s-backend-production.up.railway.app";
-// const endpoint = "https://localhost:7124";
 
 export default function DataContextProvider({ children }) {
   const { toast } = useToast();
@@ -729,13 +727,10 @@ export default function DataContextProvider({ children }) {
     if (action.type === "users") {
       if (action.method === "post") {
         try {
-          // Call the addNewUser function to add the new user to the backend
           await addNewUser(action.data);
 
-          // Fetch the updated list of users from the backend
           const updatedUsers = (await axios.get(`${endpoint}/api/user`)).data;
 
-          // Update the state with the new list of users
           setData((prevData) => ({
             ...prevData,
             users: updatedUsers.map((user) => ({
@@ -753,20 +748,14 @@ export default function DataContextProvider({ children }) {
         const updatedUserData = action.data.data; // Assuming action.data contains the updated user data
         const userId = action.data.id;
 
-        // Extract username and password from updatedUserData
-
-        // Perform the edit logic here, such as making a PUT request to your backend API
         try {
-          // Assuming your API endpoint for updating a user is `${endpoint}/api/user/${userId}`
           await updateUser(userId, updatedUserData);
 
-          // After successful update, update the user data in state
           setData((prevData) => {
             return {
               ...prevData,
               users: prevData.users.map((user) => {
                 if (user.id === userId) {
-                  // Merge existing user data with the updated data, excluding username and password
                   return {
                     ...user,
                     ...updatedUserData,
@@ -783,11 +772,8 @@ export default function DataContextProvider({ children }) {
       }
       if (action.method === "delete") {
         const userId = action.data.id;
-        // Perform the deletion logic here, such as making a DELETE request to your backend API
         try {
-          // Assuming your API endpoint for deleting a user is `${endpoint}/api/user/${userId}`
           await deleteUser(userId);
-          // After successful deletion, update the users data in state
           setData((prevData) => ({
             ...prevData,
             users: prevData.users.filter((user) => user.id !== userId),
@@ -799,13 +785,11 @@ export default function DataContextProvider({ children }) {
       }
     }
     if (action.type === "buildings") {
-      // Handle the action for buildings here for post
       if (action.method === "post") {
         const newBuildingData = action.data; // Assuming action.data contains the new Building data
         console.log(newBuildingData);
 
         try {
-          // Assuming your API endpoint for adding a Building is `${endpoint}/api/buildings`
           await addBuilding(newBuildingData);
           await getBuildings();
           console.log("Building added successfully");
@@ -816,12 +800,9 @@ export default function DataContextProvider({ children }) {
       if (action.method === "put") {
         const updatedBuildingData = action.data; // Assuming action.data contains the updated Building data
         const buildingId = updatedBuildingData.id;
-        // Perform the edit logic here, such as making a PUT request to your backend API
         try {
-          // Assuming your API endpoint for updating a Building is `${endpoint}/api/user/${BuildingId}`
           await updateBuilding(buildingId, updatedBuildingData);
           await getBuildings();
-          // After successful update, update the user data in state
           console.log(buildingId, updatedBuildingData);
           console.log(`Building with ID ${buildingId} updated successfully`);
         } catch (error) {
@@ -831,11 +812,8 @@ export default function DataContextProvider({ children }) {
       if (action.method === "delete") {
         const buildingName = action.data.buildingName;
         console.log(buildingName);
-        // Perform the deletion logic here, such as making a DELETE request to your backend API
         try {
-          // Assuming your API endpoint for deleting a building is `${endpoint}/api/buildings/${buildingName}`
           await deleteBuilding(buildingName);
-          // After successful deletion, update the building data in state
           setData((prevData) => ({
             ...prevData,
             buildings: prevData.buildings.filter(
@@ -856,18 +834,9 @@ export default function DataContextProvider({ children }) {
         roomData.modifiedBy = [];
         const roomId = action.data.id;
         console.log(roomData);
-        // Perform the creation logic here, such as making a POST request to your backend API
         try {
-          // Assuming your API endpoint for creating a room is `${endpoint}/api/rooms`
           await addRoom(roomData);
-          // After successful creation, update the room data in state there is no prevdata tho, since its newly added how to render it\
-          //update the room data in state there is no prevdata tho, since its newly added how to render it
-          // setData((prevData) => {
-          //   return {
-          //     ...prevData,
-          //     rooms: [...prevData.rooms, roomData],
-          //   };
-          // });
+
           await getRooms();
           console.log("Room created successfully");
         } catch (error) {
@@ -877,9 +846,7 @@ export default function DataContextProvider({ children }) {
       if (action.method === "put") {
         const updatedRoomData = action.data; // Assuming action.data contains the updated Building data
         const roomId = updatedRoomData.id;
-        // Perform the edit logic here, such as making a PUT request to your backend API
         try {
-          // Assuming your API endpoint for updating a Building is `${endpoint}/api/user/${BuildingId}`
           await updateRoom(roomId, updatedRoomData);
           await getRooms();
           console.log(roomId, updatedRoomData);
@@ -891,11 +858,8 @@ export default function DataContextProvider({ children }) {
       if (action.method === "delete") {
         const { roomNumber, buildingId } = action.data;
         console.log(roomNumber, buildingId);
-        // Perform the deletion logic here, such as making a DELETE request to your backend API
         try {
-          // Assuming your API endpoint for deleting a room is `${endpoint}/api/rooms/${roomNumber}`
           await deleteRoom(roomNumber, buildingId);
-          // After successful deletion, update the room data in state
           setData((prevData) => ({
             ...prevData,
             rooms: prevData.rooms.filter(
@@ -918,11 +882,8 @@ export default function DataContextProvider({ children }) {
       if (action.method === "post") {
         const spaceData = action.data;
         console.log(spaceData);
-        // Perform the creation logic here, such as making a POST request to your backend API
         try {
-          // Assuming your API endpoint for creating a room is `${endpoint}/api/rooms`
           await addSpace(spaceData);
-          //update the room data in state there is no prevdata tho, since its newly added how to render it
           await getSpaces();
           console.log("Space created successfully");
         } catch (error) {
@@ -955,11 +916,8 @@ export default function DataContextProvider({ children }) {
       if (action.method === "delete") {
         const spaceId = action.data.id;
         console.log(spaceId);
-        // Perform the deletion logic here, such as making a DELETE request to your backend API
         try {
-          // Assuming your API endpoint for deleting a room is `${endpoint}/api/space/${spaceId}`
           await deleteSpace(spaceId);
-          // After successful deletion, update the space data in state
           setData((prevData) => ({
             ...prevData,
             spaces: prevData.spaces.filter((space) => space.id !== spaceId),

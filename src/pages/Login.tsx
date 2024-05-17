@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export function Login() {
-  const [errorHighlight, setErrorHighlight] = useState("");
+  const [error, setError] = useState("");
   const [isSubmit, setIsSubmit] = useState(false);
   const [usersData, setUsersData] = useState(undefined);
   const emailRef = useRef();
@@ -20,44 +20,53 @@ export function Login() {
     const password = passwordRef.current.value.trim();
 
     if (email === "" || password === "") {
-      console.log("in");
-      setErrorHighlight("bg-red-100 border-2 border-red-200");
+      setError("Please enter both email and password.");
       return;
     }
-    emailRef.current.disabled = true;
-    passwordRef.current.disabled = true;
-    setIsSubmit(true);
-    let response = usersData;
-    if (usersData === undefined) {
-      response = (await axios.get(`https://3s-backend-production.up.railway.app/api/user`)).data.map(
-        (user) => ({
-          ...user,
-          Name: `${user.firstName} ${user.lastName}`, // Calculate fullname
-        })
-      );
-      setUsersData(response);
-    }
-    console.log(response);
-    const foundUser = response.filter((user) => {
-      console.log(user);
-      if (user.username === email && user.password === password) {
-        return true;
-      }
-    });
-    console.log(foundUser);
-    if (foundUser.length > 0) {
-      const oneHourFromNow = new Date().getTime() + 3600000;
 
-      localStorage.setItem(
-        "isLoggedIn",
-        JSON.stringify({
-          id: foundUser[0].id,
-          role: foundUser[0].role,
-          expiry: oneHourFromNow,
-        })
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    setError("");
+    setIsSubmit(true);
+
+    try {
+      let response = usersData;
+      if (!usersData) {
+        const { data } = await axios.get(
+          "https://3s-backend-production.up.railway.app/api/user"
+        );
+        response = data.map((user) => ({
+          ...user,
+          Name: `${user.firstName} ${user.lastName}`,
+        }));
+        setUsersData(response);
+      }
+
+      const foundUser = response.find(
+        (user) => user.username === email && user.password === password
       );
+      if (foundUser) {
+        const oneHourFromNow = new Date().getTime() + 3600000;
+        localStorage.setItem(
+          "isLoggedIn",
+          JSON.stringify({
+            id: foundUser.id,
+            role: foundUser.role,
+            expiry: oneHourFromNow,
+          })
+        );
+        navigate("/home");
+      } else {
+        setError("Invalid email or password.");
+        setIsSubmit(false);
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again.");
       setIsSubmit(false);
-      return navigate("/home");
     }
   }
 
@@ -79,7 +88,7 @@ export function Login() {
                 type="email"
                 placeholder="johndoe@cit.edu"
                 ref={emailRef}
-                className={errorHighlight}
+                className={error ? "bg-red-100 border-2 border-red-200" : ""}
                 required
               />
             </div>
@@ -87,7 +96,7 @@ export function Login() {
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
                 <NavLink
-                  to={"/forgot-password"}
+                  to="/forgot-password"
                   className="ml-auto inline-block text-sm underline"
                 >
                   Forgot your password?
@@ -96,11 +105,12 @@ export function Login() {
               <Input
                 id="password"
                 type="password"
-                required
                 ref={passwordRef}
-                className={errorHighlight}
+                className={error ? "bg-red-100 border-2 border-red-200" : ""}
+                required
               />
             </div>
+            {error && <p className="text-red-500 text-sm">{error}</p>}
             <Button
               type="submit"
               className="w-full bg-red-500 hover:bg-red-400"

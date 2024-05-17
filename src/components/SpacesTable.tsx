@@ -32,75 +32,65 @@ type SpaceImagesBySpace = {
 
 export default function SpacesTable({ data, ratings, dataByRoom }) {
   const { spaceImages } = useContext(DataContext);
-  const [selectedId, setSelectedId] = useState(undefined);
+  const [selectedId, setSelectedId] = useState<string | undefined>();
   const [imagesBySpace, setImagesBySpace] = useState<SpaceImagesBySpace[]>([]);
-  const [isLoad, setIsLoad] = useState<Boolean>(false);
-  const guideModal = useRef();
+  const [isLoading, setIsLoading] = useState(false);
+  const guideModal = useRef<any>();
 
   useEffect(() => {
     guideModal.current.open();
   }, []);
 
   useEffect(() => {
-    setIsLoad(false);
+    setIsLoading(false);
   }, [spaceImages]);
 
-  function handleClickSpace(clickedData) {
-    if (clickedData.id !== selectedId && !isLoad) {
+  const handleClickSpace = (clickedData) => {
+    if (clickedData.id !== selectedId && !isLoading) {
       setSelectedId(clickedData.id);
       const foundData = imagesBySpace.find(
         (curr) => curr.id === clickedData.id
       );
-      if (!foundData) setIsLoad(true);
+      if (!foundData) setIsLoading(true);
     }
-  }
+  };
 
-  async function handleImageStore(id, images) {
+  const handleImageStore = async (id, images) => {
     if (images.length === 0 || images[0]?.spaceId === id) {
-      const foundData = imagesBySpace.find((curr) => curr.id === id);
       setImagesBySpace((prev) => {
-        let data = {
-          id: id,
-          images,
-        };
-        if (foundData) {
-          const filteredData = imagesBySpace.filter((curr) => curr.id !== id);
-          return [data, ...filteredData];
-        }
-        return [data, ...prev];
+        const updatedImages = [
+          ...prev.filter((curr) => curr.id !== id),
+          { id, images },
+        ];
+        return updatedImages;
       });
-      setIsLoad(true);
+      setIsLoading(true);
     }
-  }
+  };
 
-  function handleLoading(value) {
-    setIsLoad(value);
-  }
+  const handleLoading = (value) => {
+    setIsLoading(value);
+  };
 
-  async function handleImageDelete(id, spaceImageId) {
-    const newData = [...imagesBySpace.filter((curr) => curr.id !== id)];
-    const foundData = imagesBySpace.find((curr) => curr.id === id);
-    if (foundData) {
-      setIsLoad(true);
-      setImagesBySpace(() => {
-        const images = foundData?.images?.filter(
-          (curr) => curr.id !== spaceImageId
+  const handleImageDelete = async (id, spaceImageId) => {
+    setImagesBySpace((prev) => {
+      const newData = prev.filter((curr) => curr.id !== id);
+      const foundData = prev.find((curr) => curr.id === id);
+      if (foundData) {
+        setIsLoading(true);
+        const updatedImages = foundData.images.filter(
+          (img) => img.id !== spaceImageId
         );
-        const data = {
-          ...foundData,
-          images,
-        };
-        return [data, ...newData];
-      });
-    }
-  }
+        newData.push({ ...foundData, images: updatedImages });
+      }
+      return newData;
+    });
+  };
+
   const foundSpace = data.find((curr) => curr.id === selectedId);
-
   const isLoggedIn = isAdminLoggedIn();
-
   const foundRatings = ratings?.filter((curr) => curr.spaceId === selectedId);
-
-  const currRatings = sortDate(ratings);
+  const sortedRatings = sortDate(ratings);
 
   return (
     <>
@@ -116,8 +106,8 @@ export default function SpacesTable({ data, ratings, dataByRoom }) {
             A list of your recent spaces.
           </TableCaption>
           <TableHeader>
-            <TableRow className="bg-rose-500 pointer-events-none  md:text-base xs:text-[0.5rem]">
-              <TableHead className=" text-white">Name</TableHead>
+            <TableRow className="bg-rose-500 pointer-events-none md:text-base xs:text-[0.5rem]">
+              <TableHead className="text-white">Name</TableHead>
               {isLoggedIn && (
                 <>
                   <TableHead className="text-center text-white">Sort</TableHead>
@@ -140,28 +130,24 @@ export default function SpacesTable({ data, ratings, dataByRoom }) {
           </TableHeader>
           <TableBody>
             {data?.map((currData) => {
-              let statusCss = "w-fit rounded-lg py-2 px-4  bg-rose-500 ";
-              let statusCaption = "not viewed";
-              if (
+              const statusCss = `w-fit rounded-lg py-2 px-4 ${
                 checkMonth(currData.viewedDate) &&
                 checkMonth(currData.assessedDate)
-              ) {
-                statusCaption = "viewed";
-                statusCss += "text-white  ";
-              } else {
-                statusCss += "opacity-20 text-white  ";
-              }
-
-              const viewedDate =
-                currData?.viewedDate && currData?.assessedDate
-                  ? getDateString(currData?.viewedDate)
-                  : "----";
-
-              const assessedDate = currData?.assessedDate
-                ? getDateString(currData?.assessedDate)
+                  ? "bg-rose-500 text-white"
+                  : "bg-rose-500 opacity-20 text-white"
+              }`;
+              const statusCaption =
+                checkMonth(currData.viewedDate) &&
+                checkMonth(currData.assessedDate)
+                  ? "viewed"
+                  : "not viewed";
+              const viewedDate = currData?.viewedDate
+                ? getDateString(currData.viewedDate)
                 : "----";
-
-              const foundRatingsByCurr = currRatings.find(
+              const assessedDate = currData?.assessedDate
+                ? getDateString(currData.assessedDate)
+                : "----";
+              const foundRatingsByCurr = sortedRatings.find(
                 (curr) => curr.spaceId === currData.id
               );
 
@@ -169,35 +155,34 @@ export default function SpacesTable({ data, ratings, dataByRoom }) {
                 <TableRow
                   key={currData.id}
                   onClick={() => handleClickSpace(currData)}
-                  className={`  md:text-base xs:text-[0.5rem] border-neutral-100 hover:bg-white${
-                    isLoad
-                      ? " animate-pulse cursor-wait"
-                      : " hover:cursor-pointer hover:bg-rose-50"
+                  className={`md:text-base xs:text-[0.5rem] border-neutral-100 hover:bg-white ${
+                    isLoading
+                      ? "animate-pulse cursor-wait"
+                      : "hover:cursor-pointer hover:bg-rose-50"
                   } ${
-                    currData.id === selectedId && "bg-rose-50 hover:bg-rose-50"
+                    currData.id === selectedId
+                      ? "bg-rose-50 hover:bg-rose-50"
+                      : ""
                   }`}
                 >
                   <TableCell className="font-medium text-neutral-600">
-                    {currData?.name}
+                    {currData.name}
                   </TableCell>
                   {isLoggedIn && (
                     <>
                       <TableCell className="text-center text-neutral-700 font-bold">
-                        {foundRatingsByCurr ? foundRatingsByCurr?.sort : "-"}
+                        {foundRatingsByCurr?.sort ?? "-"}
                       </TableCell>
                       <TableCell className="text-center text-neutral-700 font-bold">
-                        {foundRatingsByCurr
-                          ? foundRatingsByCurr?.setInOrder
-                          : "-"}
+                        {foundRatingsByCurr?.setInOrder ?? "-"}
                       </TableCell>
                       <TableCell className="text-center text-neutral-700 font-bold">
-                        {foundRatingsByCurr ? foundRatingsByCurr?.shine : "-"}
+                        {foundRatingsByCurr?.shine ?? "-"}
                       </TableCell>
                     </>
                   )}
-
                   <TableCell className="text-center text-neutral-600 flex items-center justify-center">
-                    <p className={`${statusCss}`}>{statusCaption}</p>
+                    <p className={statusCss}>{statusCaption}</p>
                   </TableCell>
                   <TableCell className="text-right text-neutral-600">
                     {viewedDate}

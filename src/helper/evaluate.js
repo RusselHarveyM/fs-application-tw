@@ -64,8 +64,6 @@ function calculateOverlap(prediction1, prediction2) {
   const newX2 = prediction2.x - prediction2.width / 2;
   const newY2 = prediction2.y - prediction2.height / 2;
 
-  console.log(`Area1: ${area1}, Area2: ${area2}`);
-
   // Check for complete containment of one rectangle in the other
   const isContained1 =
     newX1 <= newX2 &&
@@ -79,10 +77,8 @@ function calculateOverlap(prediction1, prediction2) {
     newY2 + prediction2.height >= newY1 + prediction1.height;
 
   if (isContained1) {
-    console.log("Prediction1 contains Prediction2");
     return { overlap: 1, overlapArea: area2, bigger: "first" };
   } else if (isContained2) {
-    console.log("Prediction2 contains Prediction1");
     return { overlap: 1, overlapArea: area1, bigger: "second" };
   }
 
@@ -98,10 +94,6 @@ function calculateOverlap(prediction1, prediction2) {
       Math.max(newY1, newY2)
   );
   const overlapArea = x_overlap * y_overlap;
-
-  console.log(
-    `x_overlap: ${x_overlap}, y_overlap: ${y_overlap}, overlapArea: ${overlapArea}`
-  );
 
   // Determine which rectangle is bigger
   const bigger = area1 > area2 ? "first" : "second";
@@ -225,9 +217,6 @@ export default async function evaluate(images, standard, isCalibrate) {
             );
 
             if (result.overlap > 0) {
-              console.log(`[R] Object 1 >>`, first_object);
-              console.log(`[R] Object 2 >> `, second_object);
-              console.log(`[R] Result >> `, result);
               if (
                 result.bigger === "first" &&
                 commonParents.includes(first_key) &&

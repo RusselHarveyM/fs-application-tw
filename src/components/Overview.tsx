@@ -54,34 +54,34 @@ export default function Overview({ ratings, dataByRoom }) {
         const currentMonth = averageScores[averageScores.length - 1];
         const previousMonth = averageScores[averageScores.length - 2];
 
-        const sortDifference =
-          ((currentMonth.Sort - previousMonth.Sort) / previousMonth.Sort) * 100;
-        const setDifference =
-          ((currentMonth["Set In Order"] - previousMonth["Set In Order"]) /
-            previousMonth["Set In Order"]) *
-          100;
-        const shineDifference =
-          ((currentMonth.Shine - previousMonth.Shine) / previousMonth.Shine) *
-          100;
+        const calculateDifference = (current, previous) =>
+          ((current - previous) / previous) * 100;
 
-        const overallDifference =
-          ((currentMonth.Average - previousMonth.Average) /
-            previousMonth.Average) *
-          100;
-
-        setScores(() => ({
+        setScores({
           monthly: averageScores,
           average: currentMonth,
-          sortDifference: sortDifference.toFixed(1),
-          setDifference: setDifference.toFixed(1),
-          shineDifference: shineDifference.toFixed(1),
-          overallDifference: overallDifference.toFixed(1),
-        }));
-      } else {
-        setScores(() => ({
+          sortDifference: calculateDifference(
+            currentMonth.Sort,
+            previousMonth.Sort
+          ).toFixed(1),
+          setDifference: calculateDifference(
+            currentMonth["Set In Order"],
+            previousMonth["Set In Order"]
+          ).toFixed(1),
+          shineDifference: calculateDifference(
+            currentMonth.Shine,
+            previousMonth.Shine
+          ).toFixed(1),
+          overallDifference: calculateDifference(
+            currentMonth.Average,
+            previousMonth.Average
+          ).toFixed(1),
+        });
+      } else if (averageScores.length === 1) {
+        setScores({
           monthly: averageScores,
           average: averageScores[0],
-        }));
+        });
       }
     }
   }, [room, spaces, data, ratings, id]);

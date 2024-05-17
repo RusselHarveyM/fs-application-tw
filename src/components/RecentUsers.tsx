@@ -1,6 +1,13 @@
 import UserItem from "./UserItem";
+type RecentUsersProps = {
+  users: { id: string; firstName: string; lastName: string }[];
+  numberOfAttendees: number;
+};
 
-export default function RecentUsers({ users, numberOfAttendees }) {
+export default function RecentUsers({
+  users,
+  numberOfAttendees,
+}: RecentUsersProps) {
   console.log("users list >> ", users);
   return (
     <div className="md:w-1/4 sm:full h-full bg-white shadow rounded-2xl p-8">
