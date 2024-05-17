@@ -194,7 +194,7 @@ export default async function evaluate(images, standard, isCalibrate) {
               first_object.prediction,
               second_object.prediction
             );
-            if (result.overlap) {
+            if (result.overlapArea) {
               if (
                 result.bigger === "first" &&
                 commonParents.includes(first_key) &&
