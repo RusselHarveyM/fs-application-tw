@@ -57,31 +57,60 @@ async function yellowModel(image) {
 function calculateOverlap(prediction1, prediction2) {
   const area1 = prediction1.width * prediction1.height;
   const area2 = prediction2.width * prediction2.height;
+
+  const newX1 = prediction1.x - prediction1.width / 2;
+  const newY1 = prediction1.y - prediction1.height / 2;
+
+  const newX2 = prediction2.x - prediction2.width / 2;
+  const newY2 = prediction2.y - prediction2.height / 2;
+
+  console.log(`Area1: ${area1}, Area2: ${area2}`);
+
+  // Check for complete containment of one rectangle in the other
+  const isContained1 =
+    newX1 <= newX2 &&
+    newX1 + prediction1.width >= newX2 + prediction2.width &&
+    newY1 <= newY2 &&
+    newY1 + prediction1.height >= newY2 + prediction2.height;
+  const isContained2 =
+    newX2 <= newX1 &&
+    newX2 + prediction2.width >= newX1 + prediction1.width &&
+    newY2 <= newY1 &&
+    newY2 + prediction2.height >= newY1 + prediction1.height;
+
+  if (isContained1) {
+    console.log("Prediction1 contains Prediction2");
+    return { overlap: 1, overlapArea: area2, bigger: "first" };
+  } else if (isContained2) {
+    console.log("Prediction2 contains Prediction1");
+    return { overlap: 1, overlapArea: area1, bigger: "second" };
+  }
+
+  // Calculate overlap area
   const x_overlap = Math.max(
     0,
-    Math.min(
-      prediction1.x + prediction1.width,
-      prediction2.x + prediction2.width
-    ) - Math.max(prediction1.x, prediction2.x)
+    Math.min(newX1 + prediction1.width, newX2 + prediction2.width) -
+      Math.max(newX1, newX2)
   );
   const y_overlap = Math.max(
     0,
-    Math.min(
-      prediction1.y + prediction1.height,
-      prediction2.y + prediction2.height
-    ) - Math.max(prediction1.y, prediction2.y)
+    Math.min(newY1 + prediction1.height, newY2 + prediction2.height) -
+      Math.max(newY1, newY2)
   );
   const overlapArea = x_overlap * y_overlap;
-  const totalArea = area1 + area2 - overlapArea;
+
+  console.log(
+    `x_overlap: ${x_overlap}, y_overlap: ${y_overlap}, overlapArea: ${overlapArea}`
+  );
+
+  // Determine which rectangle is bigger
   const bigger = area1 > area2 ? "first" : "second";
+
+  // Calculate overlap ratio with respect to the smaller rectangle's area
   const smallerArea = Math.min(area1, area2);
   const overlap = overlapArea / smallerArea;
 
-  return {
-    overlap,
-    overlapArea: totalArea,
-    bigger,
-  };
+  return { overlap, overlapArea, bigger };
 }
 
 export default async function evaluate(images, standard, isCalibrate) {
@@ -194,7 +223,11 @@ export default async function evaluate(images, standard, isCalibrate) {
               first_object.prediction,
               second_object.prediction
             );
-            if (result.overlapArea) {
+
+            if (result.overlap > 0) {
+              console.log(`[R] Object 1 >>`, first_object);
+              console.log(`[R] Object 2 >> `, second_object);
+              console.log(`[R] Result >> `, result);
               if (
                 result.bigger === "first" &&
                 commonParents.includes(first_key) &&
