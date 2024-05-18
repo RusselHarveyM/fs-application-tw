@@ -16,13 +16,25 @@ const highlightNavClass =
 
 function NavItem({ to, children }: { to: string; children: React.ReactNode }) {
   const location = useLocation();
+  let highlight = false;
+
+  console.log("to >> ", to);
+
+  // Check if the path starts with "/home/"
+  if (location.pathname.startsWith("/home/")) {
+    const segments = location.pathname.split("/");
+    // Check if the segment after "/home/" is "manage" or "settings"
+    if (segments[2] === "manage" || segments[2] === "settings") {
+      // Only highlight if the current link matches the "manage" or "settings" segment
+      highlight = to === `/home/${segments[2]}`;
+    }
+  } else {
+    // Highlight only if the current link matches the entire "/home/" path
+    highlight = to === "/home";
+  }
+
   return (
-    <NavLink
-      to={to}
-      className={
-        location.pathname.startsWith(to) ? highlightNavClass : undefined
-      }
-    >
+    <NavLink to={to} className={highlight ? highlightNavClass : undefined}>
       {children}
     </NavLink>
   );
