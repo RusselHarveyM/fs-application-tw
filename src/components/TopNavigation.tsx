@@ -27,6 +27,8 @@ function NavItem({ to, children }: { to: string; children: React.ReactNode }) {
     if (segments[2] === "manage" || segments[2] === "settings") {
       // Only highlight if the current link matches the "manage" or "settings" segment
       highlight = to === `/home/${segments[2]}`;
+    } else {
+      highlight = to === "/home";
     }
   } else {
     // Highlight only if the current link matches the entire "/home/" path
