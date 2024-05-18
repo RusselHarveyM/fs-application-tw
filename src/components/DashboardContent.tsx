@@ -5,8 +5,8 @@ import { useNavigate, useParams, NavLink } from "react-router-dom";
 import ImageTab from "./ImageTab";
 import dummy from "../data/test01.json";
 import { DataContext } from "@/data/data-context";
-import Building from "../assets/building.png";
-import Room from "../assets/room.png";
+import Building from "../assets/buildings.png";
+import Room from "../assets/rooms.png";
 
 export default function DashboardContent() {
   const [content, setContent] = useState({
@@ -66,7 +66,7 @@ export default function DashboardContent() {
 
   return (
     <div className="flex flex-col w-full m-auto my-auto xs:p-4 sm:p-6 md:p-8 lg:p-12">
-      <div className="flex xs:flex-col xs:h-[20rem] xs:overflow-y-scroll md:overflow-x-hidden md:overflow-y-hidden gap-4 justify-center items-center md:mt-4 mx-auto xs:w-full sm:w-[22rem] md:w-full lg:w-[95rem] md:h-[30rem]">
+      <div className="flex xs:flex-col xs:h-[20rem] xs:overflow-y-scroll md:overflow-x-hidden md:overflow-y-hidden gap-4 justify-center items-center md:mt-4 mx-auto xs:w-full sm:w-[22rem] md:w-full lg:w-[95rem] md:h-[32rem]">
         {content.data?.length > 0 ? (
           content.data.map((item, index) => {
             let contentLength = content.data?.length;
@@ -161,7 +161,7 @@ export default function DashboardContent() {
       </div>
 
       <div className="fixed bottom-4 left-0 right-0 flex flex-col items-center justify-center sm:bottom-8 md:bottom-16">
-        <menu className="flex justify-center items-center bg-stone-100 rounded-full py-2 px-4 w-full sm:w-[250px] md:w-[300px]">
+        <menu className="flex justify-center items-center shadow-sm border-2  rounded-full py-2 px-4 w-full sm:w-[150px] md:w-[220px]">
           <NavLink
             to="/home"
             className={`flex justify-center flex-col items-center w-[50%] ${
@@ -175,7 +175,6 @@ export default function DashboardContent() {
               isSelected={content.selectedTab === "buildings"}
               isDisabled={false}
             />
-            <h3 className="text-neutral-600 text-sm">Buildings</h3>
           </NavLink>
           <Button
             liCss="flex justify-center flex-col items-center w-[50%]"
@@ -189,12 +188,11 @@ export default function DashboardContent() {
               isSelected={content.selectedTab === "rooms"}
               isDisabled={content.selectedTab === "rooms" ? false : true}
             />
-            <h3 className="text-neutral-600 text-sm">Rooms</h3>
           </Button>
         </menu>
-        <p className="text-neutral-500">
+        <p className=" mt-2">
           /{" "}
-          <span className="text-neutral-600">
+          <span className="">
             {content.selectedTab === "rooms" &&
               buildings.find((building) => {
                 const id = content.buildingId || params.id;

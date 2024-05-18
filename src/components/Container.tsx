@@ -1,3 +1,11 @@
+import React from "react";
+
+const containerStatusCssMap = {
+  healthy: "border-green-300 bg-green-100 text-green-500",
+  warning: "border-orange-300 bg-orange-100 text-orange-500",
+  critical: "border-red-300 bg-red-100 text-red-500",
+};
+
 export default function Container({
   img = "",
   title = "",
@@ -6,17 +14,8 @@ export default function Container({
   noOfChildren = 0,
   ...props
 }) {
-  let containerStatusCss = "";
-
-  if (code === "healthy") {
-    containerStatusCss = " border-green-300 bg-green-100 text-green-500";
-  } else if (code === "warning") {
-    containerStatusCss = " border-orange-300 bg-orange-100 text-orange-500";
-  } else if (code === "critical") {
-    containerStatusCss = " border-red-300 bg-red-100 text-red-500";
-  } else {
-    containerStatusCss = "border-neutral-200 bg-white";
-  }
+  const containerStatusCss =
+    containerStatusCssMap[code] || "border-neutral-200 bg-white";
 
   return (
     <button
@@ -38,8 +37,8 @@ export default function Container({
           {title ? (
             <h2
               className={`${
-                selectedTab === "buildings" && "xs:hidden"
-              } sm:block text-sm md:text-base sm:text-sm xs:text-xs truncate md:w-auto`}
+                selectedTab === "buildings" ? "hidden xs:block" : "block"
+              } text-sm md:text-base sm:text-sm xs:text-xs truncate md:w-auto`}
             >
               {title}
             </h2>
@@ -49,7 +48,7 @@ export default function Container({
           {code ? (
             <p
               className={`${
-                selectedTab === "rooms" && "xs:hidden"
+                selectedTab === "rooms" ? "hidden xs:block" : "block"
               } font-bold text-xs md:text-sm sm:text-xs xs:text-xs truncate`}
             >
               {code}

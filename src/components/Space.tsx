@@ -414,7 +414,7 @@ export default function Space({
         <Result
           // data={data}
           ratings={ratings}
-          // isLoading={isLoad}
+          isLoading={isEvaluate || isFetch}
           handleResultSelect={handleResultSelect}
           handleScoreClick={handleScoreClick}
           selectedRating={selectedRating}
