@@ -6,7 +6,7 @@ export default function Button({
   ...props
 }) {
   const baseClasses =
-    "px-4 py-2 text-xs md:text-base rounded-md text-neutral-600";
+    "px-4 py-2 xs:text-[7px] md:text-base rounded-md text-neutral-600";
   const disabledClasses = "opacity-50 hover:cursor-not-allowed";
   const enabledClasses = "hover:cursor-pointer";
 

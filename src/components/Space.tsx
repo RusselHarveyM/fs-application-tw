@@ -443,7 +443,7 @@ export default function Space({
 
       {renderImageUploadModal}
       {renderImageDeleteModal}
-      <div className="flex flex-col gap-4 md:w-[90rem] sm:w-[44rem] xs:w-[22rem] mx-auto bg-white rounded-lg mt-10 mb-20">
+      <div className="flex flex-col gap-4 md:w-[90rem] sm:w-[44rem] xs:w-[23rem] mx-auto bg-white rounded-lg mt-10 mb-20">
         <SpaceHeading
           name={data?.name}
           calibrationDate={data?.calibrationDate}

@@ -103,14 +103,16 @@ export default function SpacesTable({ data, ratings, dataByRoom }) {
         </Modal>
       )}
 
-      <div className="md:w-[90rem] sm:w-[44rem] xs:w-[22rem] mx-auto bg-white shadow-sm rounded-lg mt-10 flex flex-col items-center justify-center p-6">
+      <div className="md:w-[90rem] sm:w-[44rem] xs:w-[23rem] mx-auto bg-white shadow-sm rounded-lg mt-10 flex flex-col items-center justify-center md:p-6 xs:p-2">
         <Table>
-          <TableCaption className="xs:text-[0.75rem]">
+          <TableCaption className="xs:text-[8px] md:text-base">
             A list of your recent spaces.
           </TableCaption>
           <TableHeader>
             <TableRow className="bg-rose-500 pointer-events-none md:text-base xs:text-[0.5rem]">
-              <TableHead className="text-white">Name</TableHead>
+              <TableHead className="text-white xs:w-24 md:w-fit">
+                Name
+              </TableHead>
               {isLoggedIn && (
                 <>
                   <TableHead className="text-center text-white">Sort</TableHead>
@@ -122,18 +124,18 @@ export default function SpacesTable({ data, ratings, dataByRoom }) {
                   </TableHead>
                 </>
               )}
-              <TableHead className="text-center text-white">Status</TableHead>
-              <TableHead className="text-right text-white">
+              <TableHead className="text-center text-white ">Status</TableHead>
+              <TableHead className="text-right text-white xs:text-[0.4rem] xs:w-24 md:w-fit md:text-base">
                 Last Checked
               </TableHead>
-              <TableHead className="text-right text-white">
+              <TableHead className="text-right text-white xs:text-[0.4rem] xs:w-24 md:w-fit md:text-base">
                 Last Assessed
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data?.map((currData) => {
-              const statusCss = `w-fit rounded-lg py-2 px-4 ${
+              const statusCss = `md:text-base sm:text-sm xs:text-[5px] w-fit rounded-lg xs:py-1 xs:px-2 md:py-2 md:px-4 ${
                 checkMonth(currData.viewedDate) &&
                 checkMonth(currData.assessedDate)
                   ? "bg-rose-500 text-white"
@@ -168,7 +170,7 @@ export default function SpacesTable({ data, ratings, dataByRoom }) {
                       : ""
                   }`}
                 >
-                  <TableCell className="font-medium text-neutral-600">
+                  <TableCell className="font-medium text-neutral-600 xs:text-[6px] md:text-base">
                     {currData.name}
                   </TableCell>
                   {isLoggedIn && (
@@ -184,13 +186,13 @@ export default function SpacesTable({ data, ratings, dataByRoom }) {
                       </TableCell>
                     </>
                   )}
-                  <TableCell className="text-center text-neutral-600 flex items-center justify-center">
+                  <TableCell className="text-center text-neutral-600 flex items-center justify-center xs:w-24 md:w-full">
                     <p className={statusCss}>{statusCaption}</p>
                   </TableCell>
-                  <TableCell className="text-right text-neutral-600">
+                  <TableCell className="text-right text-neutral-600 xs:text-[6px] md:text-base">
                     {viewedDate}
                   </TableCell>
-                  <TableCell className="text-right text-neutral-600">
+                  <TableCell className="text-right text-neutral-600 xs:text-[6px] md:text-base">
                     {assessedDate}
                   </TableCell>
                 </TableRow>

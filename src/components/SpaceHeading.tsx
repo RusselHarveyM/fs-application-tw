@@ -110,19 +110,21 @@ export default function SpaceHeading({
       <div className="flex flex-col bg-rose-500 md:w-full gap-8 shadow py-8 md:px-16 sm:px-8 rounded-lg">
         <div className="flex justify-between">
           <div className="flex items-center gap-4 text-white text-2xl xs:ml-4 xs:text-xs">
-            <h2 className="uppercase">{name || "Space"}</h2>
+            <h2 className="uppercase md:text-base sm:text-sm xs:text-[8px]">
+              {name || "Space"}
+            </h2>
             {name && (
               <button
                 onClick={handleCalibrationModal}
                 disabled={!checkMonth(calibrationDate)}
-                className={`text-xs ${
+                className={`md:text-xs sm:text-[12px] xs:text-[6px] ${
                   checkMonth(calibrationDate) ? "bg-white" : "bg-neutral-200"
-                } py-2 px-4 rounded-2xl text-rose-500 font-semibold opacity-60`}
+                } md:py-2 md:px-4 sm:py-2 sm:px-3  xs:py-1 xs:px-2 rounded-2xl text-rose-500 font-semibold opacity-60`}
               >
                 {checkMonth(calibrationDate) ? "Calibrated" : "Not Calibrated"}
               </button>
             )}
-            <p className="text-xs text-white">
+            <p className="md:text-xs sm:text-[12px] xs:text-[6px] text-white">
               {calibrationDate ? getDateString(calibrationDate) : "---"}
             </p>
           </div>

@@ -1,5 +1,4 @@
 import { Circle } from "rc-progress";
-import { Skeleton } from "./ui/skeleton";
 import { Images } from "lucide-react";
 
 export default function ImageGallery({
@@ -21,12 +20,12 @@ export default function ImageGallery({
     >
       {isLoad ? (
         <div className="absolute top-0 left-0 flex justify-center items-center w-[27rem] h-[30rem] sm:w-full sm:h-full xs:w-full xs:h-full bg-neutral-50 opacity-90">
-          <h3 className="text-neutral-600 ">
+          <h3 className="text-neutral-600 md:text-base xs:text-[8px]">
             Please wait<p className="animate-bounce">...</p>
           </h3>
         </div>
       ) : (
-        <Images className="absolute sm:w-28 sm:h-28 w-40 h-40 xs:w-28 xs:h-28 xs:left-24 xs:top-2 sm:top-5 sm:left-60 md:left-40 md:top-40 top-40 left-32 text-neutral-200 opacity-50" />
+        <Images className="absolute sm:w-28 sm:h-28 w-40 h-40 xs:w-[70px] xs:h-[70px] xs:left-28 xs:top-8 sm:top-5 sm:left-60 md:left-40 md:top-40 top-40 left-32 text-neutral-200 opacity-50" />
       )}
 
       {images && images?.length > 0
@@ -77,7 +76,7 @@ export default function ImageGallery({
                 />
                 <sup
                   className={
-                    "absolute md:top-16 sm:top-14 xs:top-3 right-1 md:h-6 xs:h-2 xs:w-6 md:w-fit xs:text-[0.6] w-fit py-1 px-1 flex justify-center items-center rounded-lg border-4 uppercase font-bold md:text-md " +
+                    "absolute md:top-16 sm:top-14 xs:top-4 right-1 md:h-6 xs:h-2 xs:w-6 md:w-fit  w-fit py-1 px-1 flex justify-center items-center rounded-lg md:border-4 sm:border-2 xs:border-[0.5px] uppercase font-bold md:text-md xs:text-[5px] sm:text-sm " +
                     css
                   }
                 >

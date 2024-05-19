@@ -20,7 +20,7 @@ export function getColor(name) {
 
   const yellow = ["litter", "smudges"];
 
-  const blue = ["electronics", "aircon"];
+  const blue = ["electronics", "aircon", "light", "spotlight"];
 
   return name === "chair"
     ? "purple"
