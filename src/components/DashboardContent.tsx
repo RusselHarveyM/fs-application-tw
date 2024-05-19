@@ -67,7 +67,6 @@ export default function DashboardContent() {
     <div className="flex flex-col w-full m-auto my-auto xs:p-4 sm:p-6 md:p-8 lg:p-12">
       <BrickWallLayout
         data={content.data || dummy}
-        isLoad={content.data ? false : true}
         selectedTab={content.selectedTab}
         handleContainerSelect={handleContainerSelect}
         rooms={rooms}

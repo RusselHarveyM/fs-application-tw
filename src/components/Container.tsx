@@ -37,7 +37,7 @@ export default function Container({
           {title ? (
             <h2
               className={`${
-                selectedTab === "buildings" ? "hidden xs:block" : "block"
+                selectedTab === "buildings" ? "hidden md:block" : "block"
               } text-sm md:text-base sm:text-sm xs:text-xs truncate md:w-auto`}
             >
               {title}
