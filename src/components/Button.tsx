@@ -23,7 +23,9 @@ export default function Button({
       case "red":
         return `bg-red-500 text-white hover:bg-red-200 hover:text-red-400 ${enabledClasses}`;
       default:
-        return !props.disabled ? `hover:text-red-500 ${enabledClasses}` : "";
+        return props.disabled
+          ? "hover:cursor-not-allowed opacity-50"
+          : `hover:text-red-500 ${enabledClasses}`;
     }
   };
 
