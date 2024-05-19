@@ -76,7 +76,7 @@ export default function ImageGallery({
                 />
                 <sup
                   className={
-                    "absolute md:top-16 sm:top-14 xs:top-4 right-1 md:h-6 xs:h-2 xs:w-6 md:w-fit  w-fit py-1 px-1 flex justify-center items-center rounded-lg md:border-4 sm:border-2 xs:border-[0.5px] uppercase font-bold md:text-md xs:text-[5px] sm:text-sm " +
+                    "absolute md:top-16 sm:top-14 xs:top-8 right-1 md:h-6 xs:h-2 xs:w-6 md:w-fit  w-fit py-1 px-1 flex justify-center items-center rounded-lg md:border-4 sm:border-2 xs:border-[0.5px] uppercase font-bold md:text-md xs:text-[5px] sm:text-sm " +
                     css
                   }
                 >

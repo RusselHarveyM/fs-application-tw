@@ -21,7 +21,7 @@ export default function Sidebar({
   buildingData,
   isLoad = false,
 }) {
-  const [isCollapse, setIsCollapse] = useState(false);
+  const [isCollapse, setIsCollapse] = useState(true);
   const highlightNavClass =
     "font-bold border-rose-500 text-rose-500 rounded-none";
 
