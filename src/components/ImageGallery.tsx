@@ -19,13 +19,14 @@ export default function ImageGallery({
         (images && images?.length > 0) || isLoad ? undefined : cssLoad
       } relative`} // Add relative here to position the child absolute elements
     >
-      <Images className="absolute sm:w-28 sm:h-28 w-40 h-40 xs:w-28 xs:h-28 xs:left-24 xs:top-2 sm:top-5 sm:left-60 md:left-40 md:top-40 top-40 left-32 text-neutral-200 opacity-50" />
-      {isLoad && (
+      {isLoad ? (
         <div className="absolute top-0 left-0 flex justify-center items-center w-[27rem] h-[30rem] sm:w-full sm:h-full xs:w-full xs:h-full bg-neutral-50 opacity-90">
           <h3 className="text-neutral-600 ">
             Please wait<p className="animate-bounce">...</p>
           </h3>
         </div>
+      ) : (
+        <Images className="absolute sm:w-28 sm:h-28 w-40 h-40 xs:w-28 xs:h-28 xs:left-24 xs:top-2 sm:top-5 sm:left-60 md:left-40 md:top-40 top-40 left-32 text-neutral-200 opacity-50" />
       )}
 
       {images && images?.length > 0

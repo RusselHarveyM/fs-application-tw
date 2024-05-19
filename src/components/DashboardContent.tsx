@@ -74,7 +74,7 @@ export default function DashboardContent() {
       />
 
       <div className="fixed bottom-4 left-0 right-0 flex flex-col items-center justify-center sm:bottom-8 md:bottom-16">
-        <menu className="flex justify-center items-center shadow-sm border-2 rounded-full py-2 px-4 w-full sm:w-[150px] md:w-[220px]">
+        <menu className="flex justify-center items-center shadow-sm border-2 rounded-full py-2 px-4 w-full xs:w-[220px] sm:w-[150px] md:w-[220px]">
           <NavLink
             to="/home"
             className={`flex justify-center flex-col items-center w-[50%] ${
@@ -103,7 +103,7 @@ export default function DashboardContent() {
             />
           </Button>
         </menu>
-        <p className="mt-2">
+        <p className="md:text-base sm:text-sm xs:text-xs mt-2">
           /{" "}
           <span className="">
             {content.selectedTab === "rooms" &&
