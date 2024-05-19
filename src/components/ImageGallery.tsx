@@ -12,7 +12,7 @@ export default function ImageGallery({
 
   return (
     <div
-      className={`grid md:grid-cols-4 md:grid-rows-5 sm:grid-cols-7 sm:grid-rows-2 xs:grid-cols-5 xs:grid-rows-4 md:w-1/3 sm:w-full xs:w-full shadow-inner md:h-[30rem] sm:h-[10rem] ${
+      className={`grid md:grid-cols-4 md:grid-rows-5 sm:grid-cols-7 sm:grid-rows-2 xs:grid-cols-[repeat(5,minmax(0,70px))] xs:grid-rows-[repeat(4,minmax(0,40px))] md:w-1/3 sm:w-full xs:w-full shadow-inner md:h-[30rem] sm:h-[10rem] ${
         isLoad ? "bg-neutral-400 " : "bg-neutral-100"
       }  ${
         (images && images?.length > 0) || isLoad ? undefined : cssLoad
@@ -76,7 +76,7 @@ export default function ImageGallery({
                 />
                 <sup
                   className={
-                    "absolute md:top-16 sm:top-14 xs:top-8 right-1 md:h-6 xs:h-2 xs:w-6 md:w-fit  w-fit py-1 px-1 flex justify-center items-center rounded-lg md:border-4 sm:border-2 xs:border-[0.5px] uppercase font-bold md:text-md xs:text-[5px] sm:text-sm " +
+                    "absolute md:top-16 sm:top-14 xs:top-6 right-1 md:h-6 xs:h-2 xs:w-6 md:w-fit  w-fit py-1 px-1 flex justify-center items-center rounded-lg md:border-4 sm:border-2 xs:border-[0.5px] uppercase font-bold md:text-md xs:text-[5px] sm:text-sm " +
                     css
                   }
                 >
