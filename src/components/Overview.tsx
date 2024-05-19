@@ -59,8 +59,8 @@ export default function Overview({ ratings, dataByRoom }) {
         const previousMonth = averageScores[1];
 
         const calculateDifference = (current, previous) => {
-          if (previous == 0) {
-            if (current == 0) {
+          if (previous && parseFloat(previous) === 0) {
+            if (current && parseFloat(current) === 0) {
               return 0;
             } else {
               return current * 10;

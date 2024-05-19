@@ -258,20 +258,24 @@ export default function Space({
 
         const roomData = [...dataByRoom.data];
 
-        roomData.push({
-          ratings: [
-            {
-              dateModified: getDateNow(),
-              spaceId: data?.id,
-              sort: sortScoreFixed,
-              setInOrder: setScoreFixed,
-              shine: shineScoreFixed,
-            },
-          ],
-        });
+        const foundSpace = roomData.find((obj) => obj.name === data?.name);
+
+        if (foundSpace) {
+          foundSpace.ratings.push({
+            dateModified: getDateNow(),
+            spaceId: data?.id,
+            sort: sortScoreFixed,
+            setInOrder: setScoreFixed,
+            shine: shineScoreFixed,
+          });
+        }
+
+        console.log("roomData 0000 ", roomData);
 
         const roomDataResult = calculateMonthlyAverages(roomData);
-        const currentMonth = roomDataResult[roomDataResult.length - 1];
+        console.log("roomDataResult 0000 ", roomDataResult);
+
+        const currentMonth = roomDataResult[0];
 
         let status =
           currentMonth.Average < 4

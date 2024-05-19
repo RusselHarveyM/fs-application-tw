@@ -35,12 +35,12 @@ export default function SpacesTable({ data, ratings, dataByRoom }) {
   const [selectedId, setSelectedId] = useState<string | undefined>();
   const [imagesBySpace, setImagesBySpace] = useState<SpaceImagesBySpace[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const guideModal = useRef<any>();
+  // const guideModal = useRef<any>();
   const isLoggedIn = isAdminLoggedIn();
 
-  useEffect(() => {
-    if (!isLoggedIn) guideModal.current.open();
-  }, []);
+  // useEffect(() => {
+  //   if (!isLoggedIn) guideModal.current.open();
+  // }, []);
 
   useEffect(() => {
     setIsLoading(false);
@@ -94,14 +94,14 @@ export default function SpacesTable({ data, ratings, dataByRoom }) {
 
   return (
     <>
-      {!isLoggedIn && (
+      {/* {!isLoggedIn && (
         <Modal ref={guideModal} buttonVariant="rose" buttonCaption="Confirm">
           <div className="flex justify-center items-center gap-4 text-white text-xl mb-4 p-3 bg-rose-500">
             <h2>How to use</h2>
             <CircleHelp />
           </div>
         </Modal>
-      )}
+      )} */}
 
       <div className="md:w-[90rem] sm:w-[44rem] xs:w-[23rem] mx-auto bg-white shadow-sm rounded-lg mt-10 flex flex-col items-center justify-center md:p-6 xs:p-2">
         <Table>

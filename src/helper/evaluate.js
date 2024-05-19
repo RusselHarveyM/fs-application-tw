@@ -6,8 +6,8 @@ const API_KEY = "YQqkSBcCWshZKil9jU2C";
 
 const apiEndpoints = {
   countModel: "https://detect.roboflow.com/new-count-model/18",
-  orderModel: "https://detect.roboflow.com/classroom-order-seg/17",
-  pbModel: "https://detect.roboflow.com/classroom-type-identification/21",
+  orderModel: "https://detect.roboflow.com/classroom-order-seg/23",
+  pbModel: "https://detect.roboflow.com/classroom-type-identification/22",
   blueModel: "https://detect.roboflow.com/classroom-blue-det/7",
   yellowModel: "https://detect.roboflow.com/new_yellow_model/9",
 };
@@ -351,39 +351,30 @@ function score(data, imagesLength) {
   const decrementPercentageShine = 1.5;
 
   // Calculate total unwanted and missing items, including children
-
   let totalUnwanted = countStatus(sort.unwanted, "extra");
   let totalMissing = countStatus(sort.missing, "missing");
 
   const totalUnwantedAndMissing = totalUnwanted + totalMissing;
 
+  // Calculate sort score
   sort.score = Math.max(
     0,
-    Math.min(
-      10,
-      10 - totalUnwantedAndMissing * decrementPercentageSort * imagesLength
-    )
+    Math.min(10, 10 - totalUnwantedAndMissing * decrementPercentageSort)
   );
 
-  set.score = Math.max(
-    0,
-    Math.min(10, 10 - set.unorganized * decrementPercentageSet * imagesLength)
-  );
+  // Calculate set score
+  let setDecrement = decrementPercentageSet / imagesLength;
+  set.score = Math.max(0, Math.min(10, 10 - set.unorganized * setDecrement));
 
-  shine.score = Math.max(
-    0,
-    Math.min(
-      10,
-      10 -
-        ((shine.damage * 2 * decrementPercentageShine +
-          shine.litter +
-          shine.smudge +
-          shine.adhesive) *
-          decrementPercentageShine *
-          imagesLength) /
-          4
-    )
-  );
+  // Calculate shine score
+  let shineDecrement =
+    (shine.damage * 2 + shine.litter + shine.smudge) *
+    (decrementPercentageShine / imagesLength);
+  // shineDecrement =
+  //   shine.damage >= imagesLength
+  //     ? shineDecrement / imagesLength
+  //     : shineDecrement;
+  shine.score = Math.max(0, Math.min(10, 10 - shineDecrement));
 
   return {
     sort: sort.score,
@@ -391,6 +382,55 @@ function score(data, imagesLength) {
     shine: shine.score,
   };
 }
+
+// function score(data, imagesLength) {
+//   const { sort, set, shine } = data.scores;
+
+//   const decrementPercentageSort = 0.5;
+//   const decrementPercentageSet = 2;
+//   const decrementPercentageShine = 1.5;
+
+//   // Calculate total unwanted and missing items, including children
+
+//   let totalUnwanted = countStatus(sort.unwanted, "extra");
+//   let totalMissing = countStatus(sort.missing, "missing");
+
+//   const totalUnwantedAndMissing = totalUnwanted + totalMissing;
+
+//   sort.score = Math.max(
+//     0,
+//     Math.min(
+//       10,
+//       10 - totalUnwantedAndMissing * decrementPercentageSort * imagesLength
+//     )
+//   );
+
+//   set.score = Math.max(
+//     0,
+//     Math.min(10, 10 - set.unorganized * decrementPercentageSet * imagesLength)
+//   );
+
+//   shine.score = Math.max(
+//     0,
+//     Math.min(
+//       10,
+//       10 -
+//         ((shine.damage * 2 * decrementPercentageShine +
+//           shine.litter +
+//           shine.smudge +
+//           shine.adhesive) *
+//           decrementPercentageShine *
+//           imagesLength) /
+//           4
+//     )
+//   );
+
+//   return {
+//     sort: sort.score,
+//     set: set.score,
+//     shine: shine.score,
+//   };
+// }
 
 function updateChildObject(
   objects_temp,

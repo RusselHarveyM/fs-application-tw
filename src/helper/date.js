@@ -52,33 +52,51 @@ export function sortDate(object) {
 export function calculateMonthlyAverages(data) {
   console.log("calculateMonthlyAverages", data);
   const monthlyAverages = data.reduce((acc, space) => {
-    space.ratings.forEach((rating) => {
+    const latestRating = sortDate(space.ratings);
+
+    console.log("[t] latestRating", latestRating);
+    latestRating.forEach((rating) => {
       if (rating) {
         const date = new Date(rating.dateModified);
         const month = `${date.toLocaleDateString("en-US", {
           month: "short",
         })} ${date.getFullYear()}`;
-        acc[month] = acc[month] || {
-          date: month,
-          originalDate: date,
-          Sort: 0,
-          "Set In Order": 0,
-          Shine: 0,
-          count: 0,
-        };
-        acc[month].Sort += rating.sort;
-        acc[month]["Set In Order"] += rating.setInOrder;
-        acc[month].Shine += rating.shine;
-        acc[month].count++;
+
+        if (acc[month] && !acc[month].id.includes(space.id)) {
+          acc[month].Sort += rating.sort;
+          acc[month]["Set In Order"] += rating.setInOrder;
+          acc[month].Shine += rating.shine;
+          acc[month].count++;
+          acc[month].id.push(space.id);
+        }
+
+        if (!acc[month]) {
+          acc[month] = acc[month] || {
+            id: [space.id],
+            date: month,
+            originalDate: date,
+            Sort: rating.sort,
+            "Set In Order": rating.setInOrder,
+            Shine: rating.shine,
+            count: 1,
+          };
+        }
       }
     });
     return acc;
   }, {});
+  console.log("monthlyAverages", monthlyAverages);
 
   const averageScores = Object.values(monthlyAverages).map((average) => {
-    let sort = (average.Sort / average.count).toFixed(1);
-    let set = (average["Set In Order"] / average.count).toFixed(1);
-    let shine = (average.Shine / average.count).toFixed(1);
+    let sort = (
+      average.Sort / (average.count === 0 ? 1 : average.count)
+    ).toFixed(1);
+    let set = (
+      average["Set In Order"] / (average.count === 0 ? 1 : average.count)
+    ).toFixed(1);
+    let shine = (
+      average.Shine / (average.count === 0 ? 1 : average.count)
+    ).toFixed(1);
     return {
       date: average.date,
       originalDate: average.originalDate,
