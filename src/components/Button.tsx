@@ -5,34 +5,32 @@ export default function Button({
   cssAdOns = "",
   ...props
 }) {
-  let cssClasses =
-    "px-4 py-2 text-xs md:text-base rounded-md text-neutral-600  " + cssAdOns;
-  if (variant === "rose") {
-    if (props.disabled === true) {
-      cssClasses +=
-        " bg-rose-500 text-white opacity-50 hover:cursor-not-allowed";
-    } else {
-      cssClasses +=
-        " bg-rose-500 text-white hover:bg-white hover:text-rose-400 hover:cursor-pointer";
+  const baseClasses =
+    "px-4 py-2 text-xs md:text-base rounded-md text-neutral-600";
+  const disabledClasses = "opacity-50 hover:cursor-not-allowed";
+  const enabledClasses = "hover:cursor-pointer";
+
+  const getVariantClasses = () => {
+    switch (variant) {
+      case "rose":
+        return props.disabled
+          ? `bg-rose-500 text-white ${disabledClasses}`
+          : `bg-rose-500 text-white hover:bg-white hover:text-rose-400 ${enabledClasses}`;
+      case "blue":
+        return props.disabled
+          ? `bg-blue-100 text-white ${disabledClasses}`
+          : `bg-blue-400 text-white hover:bg-blue-200 hover:text-blue-400 ${enabledClasses}`;
+      case "red":
+        return `bg-red-500 text-white hover:bg-red-200 hover:text-red-400 ${enabledClasses}`;
+      default:
+        return !props.disabled ? `hover:text-red-500 ${enabledClasses}` : "";
     }
-  }
-  if (variant === "blue") {
-    if (props.disabled === true) {
-      cssClasses += " bg-blue-100 text-white hover:cursor-not-allowed";
-    } else {
-      cssClasses +=
-        " bg-blue-400 text-white hover:bg-blue-200 hover:text-blue-400 hover:cursor-pointer";
-    }
-  } else if (variant === "red") {
-    cssClasses +=
-      " bg-red-500 text-white hover:bg-red-200 hover:text-red-400 hover:cursor-pointer";
-  } else {
-    if (!props.disabled === true) {
-      cssClasses += " hover:text-red-500 hover:cursor-pointer";
-    }
-  }
+  };
+
+  const cssClasses = `${baseClasses} ${cssAdOns} ${getVariantClasses()}`;
+
   return (
-    <li className={liCss + " list-none"}>
+    <li className={`${liCss} list-none`}>
       <button {...props} className={cssClasses}>
         {children}
       </button>

@@ -10,6 +10,7 @@ import {
 import Button from "./Button";
 
 import { NavLink } from "react-router-dom";
+import { isAdminLoggedIn } from "@/helper/auth";
 
 import { useState } from "react";
 
@@ -23,6 +24,8 @@ export default function Sidebar({
   const [isCollapse, setIsCollapse] = useState(false);
   const highlightNavClass =
     "font-bold border-rose-500 text-rose-500 rounded-none";
+
+  const loggedIn = isAdminLoggedIn();
 
   function handleCollapsiblePress() {
     setIsCollapse(!isCollapse);
@@ -69,7 +72,7 @@ export default function Sidebar({
                 selectedTab === "overview" ? highlightNavClass : undefined
               }`}
               onClick={() => onSelectTab("overview")}
-              disabled={isLoad}
+              disabled={isLoad || !loggedIn}
             >
               <Home />
               Overview
