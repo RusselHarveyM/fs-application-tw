@@ -147,7 +147,7 @@ export default function ImageDisplay({
                       }   `}
                     >
                       <p
-                        className={`absolute md:-top-3 xs:-top-1 rounded bg-${style}-500 md:text-black bg-opacity-60 xs:text-white w-fit  xs:text-[4px] md:text-xs `}
+                        className={`absolute md:-top-3 xs:-top-2 rounded bg-${style}-500 md:text-black bg-opacity-60 xs:text-white w-fit  xs:text-[5px] md:text-xs `}
                       >
                         {innerPrediction.class}
                       </p>
