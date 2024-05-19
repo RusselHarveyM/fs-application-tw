@@ -2,7 +2,7 @@ import axios from "axios";
 import { c_evaluation } from "./checklist";
 import { isEmpty } from "./string";
 
-const API_KEY = "OeSBdrSNcfGEme3a9fDf";
+const API_KEY = "YQqkSBcCWshZKil9jU2C";
 
 const apiEndpoints = {
   countModel: "https://detect.roboflow.com/new-count-model/14",
