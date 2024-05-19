@@ -57,6 +57,11 @@ const BrickWallLayout: React.FC<BrickWallLayoutProps> = ({
   return (
     <Carousel>
       <CarouselContent>
+        {slides.length === 0 && (
+          <div className="flex m-auto md:h-[30rem] xs:h-[20rem] sm:h-[22rem]">
+            <p className="m-auto h-fit w-fit text-neutral-700">No Data</p>
+          </div>
+        )}
         {slides.map((slideData, slideIndex) => (
           <CarouselItem
             key={slideIndex}
@@ -110,14 +115,14 @@ const BrickWallLayout: React.FC<BrickWallLayoutProps> = ({
       <CarouselPrevious
         className="absolute top-1/2 left-0 transform -translate-y-1/2 w-14 h-14 text-rose-500 hover:text-white hover:bg-rose-500"
         onClick={() => setCurrentSlide((prev) => Math.max(prev - 1, 0))}
-        disabled={currentSlide === 0}
+        disabled={currentSlide === 0 || slides.length === 0}
       />
       <CarouselNext
         className="absolute top-1/2 right-0 transform -translate-y-1/2 w-14 h-14 text-rose-500 hover:text-white hover:bg-rose-500"
         onClick={() =>
           setCurrentSlide((prev) => Math.min(prev + 1, slides.length - 1))
         }
-        disabled={currentSlide === slides.length - 1}
+        disabled={currentSlide === slides.length - 1 || slides.length === 0}
       />
     </Carousel>
   );
