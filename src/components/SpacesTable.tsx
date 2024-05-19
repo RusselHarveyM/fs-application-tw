@@ -36,9 +36,10 @@ export default function SpacesTable({ data, ratings, dataByRoom }) {
   const [imagesBySpace, setImagesBySpace] = useState<SpaceImagesBySpace[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const guideModal = useRef<any>();
+  const isLoggedIn = isAdminLoggedIn();
 
   useEffect(() => {
-    guideModal.current.open();
+    if (!isLoggedIn) guideModal.current.open();
   }, []);
 
   useEffect(() => {
@@ -88,18 +89,20 @@ export default function SpacesTable({ data, ratings, dataByRoom }) {
   };
 
   const foundSpace = data.find((curr) => curr.id === selectedId);
-  const isLoggedIn = isAdminLoggedIn();
   const foundRatings = ratings?.filter((curr) => curr.spaceId === selectedId);
   const sortedRatings = sortDate(ratings);
 
   return (
     <>
-      <Modal ref={guideModal} buttonVariant="rose" buttonCaption="Confirm">
-        <div className="flex justify-center items-center gap-4 text-white text-xl mb-4 p-3 bg-rose-500">
-          <h2>How to use</h2>
-          <CircleHelp />
-        </div>
-      </Modal>
+      {!isLoggedIn && (
+        <Modal ref={guideModal} buttonVariant="rose" buttonCaption="Confirm">
+          <div className="flex justify-center items-center gap-4 text-white text-xl mb-4 p-3 bg-rose-500">
+            <h2>How to use</h2>
+            <CircleHelp />
+          </div>
+        </Modal>
+      )}
+
       <div className="md:w-[90rem] sm:w-[44rem] xs:w-[22rem] mx-auto bg-white shadow-sm rounded-lg mt-10 flex flex-col items-center justify-center p-6">
         <Table>
           <TableCaption className="xs:text-[0.75rem]">

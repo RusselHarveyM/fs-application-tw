@@ -293,7 +293,7 @@ export default function Space({
             roomNumber: foundRoom.roomNumber,
             image: foundRoom.image,
             status: status,
-            modifiedBy: [authToken.id, ...foundRoom.modifiedBy],
+            modifiedBy: [authToken.id, ...(foundRoom.modifiedBy ?? [])],
           },
         };
 
