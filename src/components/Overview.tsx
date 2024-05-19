@@ -49,13 +49,21 @@ export default function Overview({ ratings, dataByRoom }) {
   useEffect(() => {
     if (room && spaces) {
       const averageScores = calculateMonthlyAverages(data);
-
+      console.log("averageScores >> ", averageScores);
       if (averageScores.length > 1) {
         const currentMonth = averageScores[0];
         const previousMonth = averageScores[1];
 
-        const calculateDifference = (current, previous) =>
-          ((current - previous) / previous) * 100;
+        const calculateDifference = (current, previous) => {
+          if (previous == 0) {
+            if (current == 0) {
+              return 0;
+            } else {
+              return current * 10;
+            }
+          }
+          return ((current - previous) / previous) * 10;
+        };
 
         setScores({
           monthly: averageScores,
