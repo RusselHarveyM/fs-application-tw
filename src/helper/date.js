@@ -110,7 +110,9 @@ export function calculateMonthlyAverages(data) {
     };
   });
 
-  averageScores.sort((a, b) => new Date(a.date) - new Date(b.date));
+  const sortedAverageScores = averageScores.sort(
+    (a, b) => new Date(b.originalDate) - new Date(a.originalDate)
+  );
 
-  return averageScores;
+  return sortedAverageScores;
 }
