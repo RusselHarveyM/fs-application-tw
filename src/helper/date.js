@@ -1,6 +1,7 @@
 export function checkMonth(date) {
   if (date) {
     const currDate = new Date(date).getMonth();
+    console.log("currDate", currDate);
     return currDate === new Date().getMonth();
   }
   return false;
@@ -59,6 +60,7 @@ export function calculateMonthlyAverages(data) {
         })} ${date.getFullYear()}`;
         acc[month] = acc[month] || {
           date: month,
+          originalDate: date,
           Sort: 0,
           "Set In Order": 0,
           Shine: 0,
@@ -79,6 +81,7 @@ export function calculateMonthlyAverages(data) {
     let shine = (average.Shine / average.count).toFixed(1);
     return {
       date: average.date,
+      originalDate: average.originalDate,
       Sort: sort,
       "Set In Order": set,
       Shine: shine,

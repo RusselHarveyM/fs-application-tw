@@ -6,7 +6,11 @@ import { BarChartCustom } from "./BarChart";
 
 import RecentUsers from "./RecentUsers";
 
-import { calculateMonthlyAverages } from "@/helper/date.js";
+import {
+  calculateMonthlyAverages,
+  checkYear,
+  checkMonth,
+} from "@/helper/date.js";
 
 export default function Overview({ ratings, dataByRoom }) {
   const { users, rooms, spaces } = useContext(DataContext);
@@ -94,28 +98,64 @@ export default function Overview({ ratings, dataByRoom }) {
     }
   }, [room, spaces, data, ratings, id]);
 
+  const avgDate = scores?.average?.originalDate;
+
+  console.log("avgDate >> ", checkMonth(avgDate));
+
   return (
     <div className="flex flex-col mt-4 bg-neutral-50 shadow-sm rounded-xl p-6 h-full md:w-[97rem] sm:w-[45rem] xs:w-[22rem] mx-auto gap-4">
       <div className="flex  xs:flex-row sm:flex-row md:flex-row lg:flex-row xl:flex-row w-full justify-around mt-4 mx-auto xs:-mb-8 sm:mb-0">
         <Card
-          score={scores?.average?.Average ?? 0}
+          score={
+            checkMonth(avgDate) && checkYear(avgDate)
+              ? scores?.average?.Average ?? 0
+              : 0
+          }
           title={"Overall"}
-          percent={`${scores?.overallDifference ?? 0}%`}
+          percent={`${
+            checkMonth(avgDate) && checkYear(avgDate)
+              ? scores?.overallDifference ?? 0
+              : 0
+          }%`}
         />
         <Card
-          score={scores?.average?.Sort ?? 0}
+          score={
+            checkMonth(avgDate) && checkYear(avgDate)
+              ? scores?.average?.Sort ?? 0
+              : 0
+          }
           title={"Sort"}
-          percent={`${scores?.sortDifference ?? 0}%`}
+          percent={`${
+            checkMonth(avgDate) && checkYear(avgDate)
+              ? scores?.sortDifference ?? 0
+              : 0
+          }%`}
         />
         <Card
-          score={(scores?.average && scores?.average["Set In Order"]) ?? 0}
+          score={
+            checkMonth(avgDate) && checkYear(avgDate)
+              ? (scores?.average && scores?.average["Set In Order"]) ?? 0
+              : 0
+          }
           title={"Set In Order"}
-          percent={`${scores?.setDifference ?? 0}%`}
+          percent={`${
+            checkMonth(avgDate) && checkYear(avgDate)
+              ? scores?.setDifference ?? 0
+              : 0
+          }%`}
         />
         <Card
-          score={scores?.average?.Shine ?? 0}
+          score={
+            checkMonth(avgDate) && checkYear(avgDate)
+              ? scores?.average?.Shine ?? 0
+              : 0
+          }
           title={"Shine"}
-          percent={`${scores?.shineDifference ?? 0}%`}
+          percent={`${
+            checkMonth(avgDate) && checkYear(avgDate)
+              ? scores?.shineDifference ?? 0
+              : 0
+          }%`}
         />
       </div>
       <div className="flex md:flex-row sm:flex-col xs:flex-col gap-4 w-full h-[35rem] mt-4 -pt-8">
