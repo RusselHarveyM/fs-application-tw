@@ -62,7 +62,7 @@ export default function ImageDisplay({
     setSelectedModel(num);
   }
 
-  const selectItemCss = "hover:cursor-pointer xs:text-[7px]";
+  const selectItemCss = "hover:cursor-pointer xs:text-[7px] md:text-base";
 
   return (
     <div
