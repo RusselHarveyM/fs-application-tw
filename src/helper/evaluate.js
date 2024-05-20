@@ -6,7 +6,7 @@ const API_KEY = "YQqkSBcCWshZKil9jU2C";
 
 const apiEndpoints = {
   countModel: "https://detect.roboflow.com/new-count-model/18",
-  orderModel: "https://detect.roboflow.com/classroom-order-seg/23",
+  orderModel: "https://detect.roboflow.com/classroom-order-seg/20",
   pbModel: "https://detect.roboflow.com/classroom-type-identification/22",
   blueModel: "https://detect.roboflow.com/classroom-blue-det/7",
   yellowModel: "https://detect.roboflow.com/new_yellow_model/9",
